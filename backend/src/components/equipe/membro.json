@@ -1,0 +1,24 @@
+{
+  "collectionName": "components_equipe_membros",
+  "info": {
+    "displayName": "Membro",
+    "icon": "user"
+  },
+  "attributes": {
+    "nome": {
+      "type": "string",
+      "required": true
+    },
+    "cargo": {
+      "type": "string"
+    },
+    "bio": {
+      "type": "text"
+    },
+    "foto": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": ["images"]
+    }
+  }
+}

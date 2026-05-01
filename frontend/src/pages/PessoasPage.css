@@ -1,0 +1,168 @@
+/* PESSOAS PAGE - TV1 */
+
+.pessoas-page {
+  background: #fff;
+  color: #000001;
+  font-family: 'Gilroy', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── HEADER ─────────────────────────── */
+
+.pessoas-header {
+  padding: 40px 80px;
+  cursor: pointer;
+  display: inline-block;
+}
+
+.pessoas-header__logo img {
+  height: 36px;
+  width: auto;
+  object-fit: contain;
+  display: block;
+  /* inverte pra ficar preto no fundo branco */
+  filter: brightness(0);
+}
+
+.pessoas-header__logo span {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #000001;
+  opacity: 0.45;
+}
+
+/* ── MAIN ────────────────────────────── */
+
+.pessoas-main {
+  padding: 0 80px 120px;
+  display: flex;
+  flex-direction: column;
+  gap: 120px;
+}
+
+/* ── BLOCO DE PESSOA ─────────────────── */
+
+/*
+  Layout: CSS grid com 1 coluna / 1 linha
+  Foto e texto ficam na mesma célula (sobrepostos).
+  A foto tem margin-left automática para empurrar pra direita.
+  O texto fica à esquerda e tem um padding-top para alinhar.
+*/
+
+.pessoa-bloco {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto;
+  position: relative;
+}
+
+/* foto: mesma célula de grid, empurrada pra direita */
+.pessoa-foto {
+  grid-column: 1;
+  grid-row: 1;
+  margin-left: 44%;
+  align-self: start;
+  pointer-events: none;
+}
+
+/* a cada 3 blocos, foto levemente mais à esquerda */
+.pessoa-bloco:nth-child(3n) .pessoa-foto {
+  margin-left: 34%;
+}
+
+.pessoa-foto img {
+  display: block;
+  width: auto;
+  max-width: 100%;
+  height: auto;
+  max-height: 80vh;
+  object-fit: contain;
+}
+
+/* texto: mesma célula, fica por cima da foto */
+.pessoa-texto {
+  grid-column: 1;
+  grid-row: 1;
+  padding-top: 28px;
+  padding-bottom: 48px;
+  padding-right: 0;
+  z-index: 1;
+  align-self: start;
+  /* sem largura fixa — o nome invade a foto livremente */
+}
+
+/* ── TIPOGRAFIA ───────────────────────── */
+
+.pessoa-nome {
+  font-size: clamp(40px, 5.2vw, 68px);
+  font-weight: 900;
+  font-style: italic;
+  text-transform: uppercase;
+  line-height: 0.92;
+  color: #000001;
+  margin: 0;
+  white-space: nowrap; /* nome numa linha só, invade a foto */
+}
+
+.pessoa-cargo {
+  font-size: clamp(40px, 5.2vw, 68px);
+  font-weight: 900;
+  font-style: italic;
+  text-transform: uppercase;
+  line-height: 0.95;
+  color: #000001;
+  margin: 0 0 32px;
+  max-width: 55%; /* cargo quebra mas só no espaço livre */
+}
+
+.pessoa-bio {
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.65;
+  color: #000001;
+  max-width: 360px; /* bio bem estreita, lado esquerdo */
+  margin: 0;
+}
+
+/* ── LOADING ──────────────────────────── */
+
+.pessoas-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 80px;
+  font-size: 14px;
+  font-weight: 500;
+  opacity: 0.4;
+}
+
+/* ── RESPONSIVO ───────────────────────── */
+
+@media (max-width: 768px) {
+  .pessoas-header {
+    padding: 24px;
+  }
+
+  .pessoas-main {
+    padding: 0 24px 80px;
+    gap: 80px;
+  }
+
+  .pessoa-bloco {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .pessoa-foto {
+    width: 100%;
+    margin-left: 0;
+  }
+
+  .pessoa-texto {
+    width: 100%;
+  }
+}

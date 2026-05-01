@@ -1,0 +1,15 @@
+{
+  "collectionName": "components_blocks_imagem_trios",
+  "info": { "displayName": "Imagem em 3", "icon": "apps" },
+  "attributes": {
+    "imagem_1": { "type": "media", "multiple": false, "required": true, "allowedTypes": ["images"] },
+    "imagem_2": { "type": "media", "multiple": false, "required": true, "allowedTypes": ["images"] },
+    "imagem_3": { "type": "media", "multiple": false, "required": true, "allowedTypes": ["images"] },
+    "numeros": {
+      "type": "component",
+      "component": "blocks.big-number-item",
+      "repeatable": true,
+      "max": 4
+    }
+  }
+}

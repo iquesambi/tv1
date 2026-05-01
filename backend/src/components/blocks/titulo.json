@@ -1,0 +1,7 @@
+{
+  "collectionName": "components_blocks_titulos",
+  "info": { "displayName": "Título", "icon": "bold" },
+  "attributes": {
+    "texto": { "type": "string", "required": true }
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "collectionName": "components_blocks_imagens_simples",
+  "info": { "displayName": "Imagem Simples", "icon": "picture" },
+  "attributes": {
+    "imagem": { "type": "media", "multiple": false, "required": true, "allowedTypes": ["images"] },
+    "legenda": { "type": "string" }
+  }
+}

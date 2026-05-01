@@ -1,0 +1,9 @@
+{
+  "collectionName": "components_blocks_videos",
+  "info": { "displayName": "Vídeo", "icon": "play" },
+  "attributes": {
+    "url": { "type": "string", "required": true },
+    "capa": { "type": "media", "multiple": false, "required": true, "allowedTypes": ["images"] },
+    "legenda": { "type": "string" }
+  }
+}

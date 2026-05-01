@@ -1,0 +1,21 @@
+{
+  "collectionName": "components_navigation_sublinks",
+  "info": {
+    "displayName": "Sublink",
+    "icon": "arrowRight"
+  },
+  "attributes": {
+    "label": {
+      "type": "string",
+      "required": true
+    },
+    "url": {
+      "type": "string"
+    },
+    "imagem_hover": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": ["images", "videos"]
+    }
+  }
+}

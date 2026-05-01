@@ -1,0 +1,7 @@
+{
+  "collectionName": "components_blocks_galerias",
+  "info": { "displayName": "Galeria", "icon": "layout" },
+  "attributes": {
+    "imagens": { "type": "media", "multiple": true, "required": true, "allowedTypes": ["images"] }
+  }
+}

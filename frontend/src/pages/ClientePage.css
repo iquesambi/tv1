@@ -1,0 +1,172 @@
+/* CLIENTE PAGE - TV1 */
+
+.cliente-page {
+  background: #fff;
+  color: #000001;
+  font-family: 'Gilroy', sans-serif;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  user-select: none;
+}
+
+/* ── HEADER ─────────────────────────── */
+
+.cliente-header {
+  padding: 40px 80px 24px;
+  flex-shrink: 0;
+}
+
+.cliente-header__logo {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #000001;
+  opacity: 0.45;
+}
+
+/* ── VIEWPORT + TRACK ────────────────── */
+
+.cliente-viewport {
+  flex: 1;
+  overflow: hidden;
+  cursor: grab;
+}
+
+.cliente-viewport:active {
+  cursor: grabbing;
+}
+
+.cliente-track {
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+  height: 100%;
+  will-change: transform;
+  transform-origin: center center;
+}
+
+/* ── CARD ─────────────────────────────── */
+
+.cliente-card {
+  position: relative;
+  flex: 0 0 auto;
+  width: clamp(180px, 22vw, 320px);
+  overflow: hidden;
+  cursor: pointer;
+  background: #111;
+}
+
+.cliente-card__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.5s ease;
+}
+
+.cliente-card:hover .cliente-card__img {
+  transform: scale(1.04);
+}
+
+.cliente-card__overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 40%, rgba(0, 0, 0, 0.72) 100%);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 24px 20px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.cliente-card:hover .cliente-card__overlay {
+  opacity: 1;
+}
+
+.cliente-card__ano {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.65);
+  margin-bottom: 4px;
+}
+
+.cliente-card__titulo {
+  font-size: 16px;
+  font-weight: 900;
+  text-transform: uppercase;
+  line-height: 1.1;
+  color: #fff;
+  margin: 0;
+  text-wrap: balance;
+}
+
+/* ── TIMELINE ─────────────────────────── */
+
+.timeline {
+  padding: 16px 80px 32px;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.timeline__ticks {
+  display: flex;
+  align-items: center;
+  height: 20px;
+}
+
+.timeline__tick {
+  flex: 1;
+  height: 100%;
+  border-left: 1px solid #000001;
+  transform-origin: center;
+}
+
+.timeline__anos {
+  position: relative;
+  height: 28px;
+  margin-top: 6px;
+}
+
+.timeline__ano {
+  position: absolute;
+  transform: translateX(-50%);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #000001;
+}
+
+/* ── LOADING ──────────────────────────── */
+
+.cliente-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  font-family: 'Gilroy', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* ── RESPONSIVO ───────────────────────── */
+
+@media (max-width: 768px) {
+  .cliente-header {
+    padding: 24px 24px 16px;
+  }
+
+  .cliente-card {
+    width: clamp(140px, 60vw, 240px);
+  }
+
+  .timeline {
+    padding: 12px 24px 20px;
+  }
+}

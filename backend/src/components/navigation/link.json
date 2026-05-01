@@ -1,0 +1,27 @@
+{
+  "collectionName": "components_navigation_links",
+  "info": {
+    "displayName": "Link",
+    "icon": "link"
+  },
+  "attributes": {
+    "label": {
+      "type": "string",
+      "required": true
+    },
+    "url": {
+      "type": "string",
+      "required": true
+    },
+    "imagem_hover": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": ["images", "videos"]
+    },
+    "sublinks": {
+      "type": "component",
+      "component": "navigation.sublink",
+      "repeatable": true
+    }
+  }
+}

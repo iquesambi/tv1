@@ -1,0 +1,21 @@
+{
+  "kind": "singleType",
+  "collectionName": "navigations",
+  "info": {
+    "singularName": "navigation",
+    "pluralName": "navigations",
+    "displayName": "Navigation"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "links": {
+      "type": "component",
+      "component": "navigation.link",
+      "repeatable": true,
+      "required": true,
+      "max": 4
+    }
+  }
+}

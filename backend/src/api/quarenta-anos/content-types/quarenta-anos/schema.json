@@ -1,0 +1,29 @@
+{
+  "kind": "singleType",
+  "collectionName": "quarenta_anos",
+  "info": {
+    "singularName": "quarenta-anos",
+    "pluralName": "quarenta-anos-item",
+    "displayName": "40 Anos"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "ativo": {
+      "type": "boolean",
+      "default": false,
+      "required": true
+    },
+    "imagem": {
+      "type": "media",
+      "multiple": false,
+      "required": true,
+      "allowedTypes": ["images"]
+    },
+    "url": {
+      "type": "string",
+      "required": true
+    }
+  }
+}

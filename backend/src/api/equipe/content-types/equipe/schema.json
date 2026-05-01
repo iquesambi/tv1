@@ -1,0 +1,19 @@
+{
+  "kind": "singleType",
+  "collectionName": "equipe",
+  "info": {
+    "singularName": "equipe",
+    "pluralName": "equipes",
+    "displayName": "Equipe"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "membros": {
+      "type": "component",
+      "repeatable": true,
+      "component": "equipe.membro"
+    }
+  }
+}

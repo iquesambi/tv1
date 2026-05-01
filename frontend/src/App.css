@@ -1,0 +1,229 @@
+/* HOME - TV1 */
+
+.home {
+  background: #000001;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  position: relative;
+  font-family: 'Gilroy', sans-serif;
+  color: #fff;
+}
+
+/* ── BACKGROUND POR LINK ──────────────── */
+
+.home__bg {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.45s ease;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.home__bg--ativo {
+  opacity: 1;
+}
+
+.home__bg img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* overlay escuro sobre o bg para os textos lerem bem */
+.home__bg::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 1, 0.45);
+}
+
+/* ── TOPO ─────────────────────────────── */
+
+.home__top {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding: 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  z-index: 3;
+}
+
+.home__logo img {
+  height: 40px;
+  width: auto;
+  object-fit: contain;
+  display: block;
+}
+
+.home__camera img {
+  height: 100px;
+  width: auto;
+  object-fit: contain;
+  display: block;
+}
+
+/* ── NAV CENTRAL ──────────────────────── */
+
+.home__nav {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 3;
+}
+
+.home__nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+              opacity  0.4s ease;
+}
+
+/* item clicado: sobe para o topo */
+.home__nav-item--ativo {
+  transform: translateY(-24vh);
+}
+
+/* itens ACIMA do ativo: sobem junto com o ativo, mesma distância */
+.home__nav-item--acima {
+  transform: translateY(-24vh);
+}
+
+/* itens ABAIXO do ativo: descem, podem cortar na borda */
+.home__nav-item--abaixo {
+  transform: translateY(23vh);
+}
+
+.home__nav-link {
+  display: block;
+  font-size: clamp(72px, 11vw, 150px);
+  font-weight: 900;
+  font-style: italic;
+  text-transform: uppercase;
+  color: #fff;
+  text-decoration: none;
+  line-height: 0.95;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: opacity 0.3s ease;
+  text-shadow: 0px 14px 24px rgba(0, 0, 0, 0.45);
+}
+
+.home__nav-link--dimmed {
+  opacity: 0.4;
+}
+
+/* ── SUBMENU ──────────────────────────── */
+
+.home__submenu {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 32px 0 48px;
+  gap: 0;
+  opacity: 0;
+  animation: submenu-in 0.35s ease forwards;
+}
+
+@keyframes submenu-in {
+  from { opacity: 0; transform: translateY(-12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.home__submenu-link {
+  display: block;
+  font-size: clamp(40px, 5.8vw, 80px);
+  font-weight: 900;
+  font-style: italic;
+  text-transform: uppercase;
+  color: #fff;
+  text-decoration: none;
+  line-height: 1;
+  white-space: nowrap;
+  opacity: 0.5;
+  transition: opacity 0.3s ease;
+}
+
+.home__submenu-link:hover,
+.home__submenu-link--ativo {
+  opacity: 1;
+}
+
+/* ── RODAPÉ ───────────────────────────── */
+
+.home__bottom {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 60px 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  z-index: 3;
+}
+
+.home__contato {
+  font-size: 24px;
+  font-weight: 900;
+  text-transform: uppercase;
+  color: #fff;
+  text-decoration: none;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: opacity 0.2s;
+}
+
+.home__contato:hover { opacity: 0.6; }
+
+/* Marcas */
+
+.home__marcas {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  transition: opacity 0.4s ease;
+}
+
+.home__marcas--oculto {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.home__marcas img {
+  height: 16px;
+  width: auto;
+  object-fit: contain;
+  display: block;
+}
+
+/* Redes */
+
+.home__redes {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-shrink: 0;
+}
+
+.home__redes img {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  display: block;
+  filter: brightness(0) invert(1);
+  transition: opacity 0.2s;
+}
+
+.home__redes a:hover img { opacity: 0.7; }

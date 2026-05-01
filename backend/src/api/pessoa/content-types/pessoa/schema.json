@@ -1,0 +1,38 @@
+{
+  "kind": "collectionType",
+  "collectionName": "pessoas",
+  "info": {
+    "singularName": "pessoa",
+    "pluralName": "pessoas",
+    "displayName": "Pessoa"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "nome": {
+      "type": "string",
+      "required": true
+    },
+    "slug": {
+      "type": "uid",
+      "targetField": "nome",
+      "required": true
+    },
+    "cargo": {
+      "type": "string"
+    },
+    "bio": {
+      "type": "text"
+    },
+    "foto": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": ["images"]
+    },
+    "ordem": {
+      "type": "integer",
+      "default": 0
+    }
+  }
+}

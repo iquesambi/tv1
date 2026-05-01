@@ -1,0 +1,20 @@
+{
+  "kind": "singleType",
+  "collectionName": "logo_sites",
+  "info": {
+    "singularName": "logo-site",
+    "pluralName": "logo-sites",
+    "displayName": "Logo"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "logo": {
+      "type": "media",
+      "multiple": false,
+      "required": true,
+      "allowedTypes": ["images"]
+    }
+  }
+}

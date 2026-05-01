@@ -1,0 +1,19 @@
+{
+  "collectionName": "components_social_redes",
+  "info": {
+    "displayName": "Rede Social",
+    "icon": "earth"
+  },
+  "attributes": {
+    "icone": {
+      "type": "media",
+      "multiple": false,
+      "required": true,
+      "allowedTypes": ["images"]
+    },
+    "url": {
+      "type": "string",
+      "required": true
+    }
+  }
+}

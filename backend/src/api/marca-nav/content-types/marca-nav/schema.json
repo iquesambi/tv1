@@ -1,0 +1,20 @@
+{
+  "kind": "singleType",
+  "collectionName": "marca_navs",
+  "info": {
+    "singularName": "marca-nav",
+    "pluralName": "marca-navs",
+    "displayName": "Navegação Marcas"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "marcas": {
+      "type": "component",
+      "component": "marca.item",
+      "repeatable": true,
+      "required": true
+    }
+  }
+}

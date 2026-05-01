@@ -1,0 +1,29 @@
+{
+  "kind": "collectionType",
+  "collectionName": "agencias",
+  "info": {
+    "singularName": "agencia",
+    "pluralName": "agencias",
+    "displayName": "Agência"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "nome": {
+      "type": "string",
+      "required": true
+    },
+    "slug": {
+      "type": "uid",
+      "targetField": "nome",
+      "required": true
+    },
+    "cases": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::case.case",
+      "mappedBy": "agencia"
+    }
+  }
+}

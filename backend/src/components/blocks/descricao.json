@@ -1,0 +1,7 @@
+{
+  "collectionName": "components_blocks_descricoes",
+  "info": { "displayName": "Descrição", "icon": "quote" },
+  "attributes": {
+    "conteudo": { "type": "richtext", "required": true }
+  }
+}

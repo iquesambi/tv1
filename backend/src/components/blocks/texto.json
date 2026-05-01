@@ -1,0 +1,7 @@
+{
+  "collectionName": "components_blocks_textos",
+  "info": { "displayName": "Texto", "icon": "file" },
+  "attributes": {
+    "conteudo": { "type": "richtext", "required": true }
+  }
+}

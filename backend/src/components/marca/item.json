@@ -1,0 +1,19 @@
+{
+  "collectionName": "components_marca_items",
+  "info": {
+    "displayName": "Marca Item",
+    "icon": "picture"
+  },
+  "attributes": {
+    "logo": {
+      "type": "media",
+      "multiple": false,
+      "required": true,
+      "allowedTypes": ["images"]
+    },
+    "url": {
+      "type": "string",
+      "required": true
+    }
+  }
+}

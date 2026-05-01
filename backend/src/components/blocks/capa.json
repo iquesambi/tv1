@@ -1,0 +1,7 @@
+{
+  "collectionName": "components_blocks_capas",
+  "info": { "displayName": "Imagem Capa", "icon": "landscape" },
+  "attributes": {
+    "imagem": { "type": "media", "multiple": false, "required": true, "allowedTypes": ["images"] }
+  }
+}

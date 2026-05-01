@@ -1,0 +1,13 @@
+{
+  "collectionName": "components_blocks_big_numbers",
+  "info": { "displayName": "Big Numbers", "icon": "hashtag" },
+  "attributes": {
+    "itens": {
+      "type": "component",
+      "component": "blocks.big-number-item",
+      "repeatable": true,
+      "required": true,
+      "max": 5
+    }
+  }
+}

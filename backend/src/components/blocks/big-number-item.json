@@ -1,0 +1,8 @@
+{
+  "collectionName": "components_blocks_big_number_items",
+  "info": { "displayName": "Big Number Item", "icon": "hashtag" },
+  "attributes": {
+    "numero": { "type": "string", "required": true },
+    "descricao": { "type": "string", "required": true }
+  }
+}

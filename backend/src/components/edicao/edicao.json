@@ -1,0 +1,25 @@
+{
+  "collectionName": "components_edicao_edicoes",
+  "info": { "displayName": "Edição", "icon": "calendar" },
+  "attributes": {
+    "ancora": {
+      "type": "string",
+      "required": true
+    },
+    "conteudo": {
+      "type": "dynamiczone",
+      "components": [
+        "blocks.titulo",
+        "blocks.subtitulo",
+        "blocks.texto",
+        "blocks.descricao",
+        "blocks.capa",
+        "blocks.imagem-simples",
+        "blocks.galeria",
+        "blocks.imagem-trio",
+        "blocks.video",
+        "blocks.big-numbers"
+      ]
+    }
+  }
+}

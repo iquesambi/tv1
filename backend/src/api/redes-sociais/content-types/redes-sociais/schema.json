@@ -1,0 +1,20 @@
+{
+  "kind": "singleType",
+  "collectionName": "redes_sociais",
+  "info": {
+    "singularName": "redes-sociais",
+    "pluralName": "redes-sociais-list",
+    "displayName": "Redes Sociais"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "redes": {
+      "type": "component",
+      "component": "social.rede",
+      "repeatable": true,
+      "required": true
+    }
+  }
+}
