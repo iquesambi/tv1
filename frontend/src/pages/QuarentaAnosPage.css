@@ -1,0 +1,177 @@
+/* ── BASE ───────────────────────────── */
+
+.qa-page {
+  background: #000001;
+  color: #fff;
+  font-family: 'Gilroy', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── HERO ───────────────────────────── */
+
+.qa-hero {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.qa-hero__bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.qa-hero__overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 1, 0.55);
+}
+
+/* ── COMPOSIÇÃO ─────────────────────── */
+
+.qa-composicao {
+  position: relative;
+  width: 100%;
+  background: #000001;
+  overflow: hidden;
+}
+
+/* SVG ocupa 100% da largura; altura é determinada pelo viewBox 0 0 1366 1720 */
+
+.qa-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* Lorem dentro do foreignObject */
+
+.qa-lorem-fo {
+  font-family: 'Gilroy', sans-serif;
+  font-size: 13px;
+  line-height: 1.7;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0;
+}
+
+/* ── CASES ─────────────────────────── */
+
+.qa-cases {
+  padding: 80px 0 0;
+  background: #000001;
+}
+
+.qa-cases__titulo {
+  display: flex;
+  align-items: baseline;
+  gap: 20px;
+  padding: 0 48px;
+  margin: 0 0 48px;
+}
+
+.qa-titulo-case {
+  font-size: clamp(56px, 8vw, 110px);
+  font-weight: 900;
+  font-style: italic;
+  text-transform: uppercase;
+}
+
+.qa-titulo-historias {
+  font-family: 'PP Hatton', serif;
+  font-style: italic;
+  font-size: clamp(56px, 8vw, 110px);
+  text-transform: lowercase;
+}
+
+/* STRIP */
+
+.qa-strip {
+  display: flex;
+  gap: 4px;
+  overflow-x: auto;
+  padding: 0 48px;
+  scrollbar-width: none;
+}
+
+.qa-strip::-webkit-scrollbar {
+  display: none;
+}
+
+/* CARDS */
+
+.qa-card {
+  flex: 0 0 auto;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  background: #111;
+}
+
+.qa-card:nth-child(4n+1) { width: clamp(180px, 22vw, 300px); height: clamp(160px, 18vh, 240px); }
+.qa-card:nth-child(4n+2) { width: clamp(200px, 25vw, 360px); height: clamp(200px, 25vh, 320px); }
+.qa-card:nth-child(4n+3) { width: clamp(180px, 22vw, 320px); height: clamp(240px, 33vh, 460px); }
+.qa-card:nth-child(4n+4) { width: clamp(180px, 22vw, 330px); height: clamp(180px, 22vh, 280px); }
+
+.qa-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.qa-card:hover img {
+  transform: scale(1.04);
+}
+
+.qa-card__overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 50%, rgba(0, 0, 0, 0.75) 100%);
+  display: flex;
+  align-items: flex-end;
+  padding: 16px;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.qa-card:hover .qa-card__overlay {
+  opacity: 1;
+}
+
+.qa-card__titulo {
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+/* ── TIMELINE ───────────────────────── */
+
+.qa-timeline {
+  padding: 32px 90px 80px;
+}
+
+.qa-timeline__linha {
+  width: 100%;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.2);
+  margin-bottom: 12px;
+}
+
+.qa-timeline__anos {
+  position: relative;
+  height: 28px;
+}
+
+.qa-timeline__ano {
+  position: absolute;
+  transform: translateX(-50%);
+  font-family: 'PP Hatton', serif;
+  font-style: italic;
+  font-size: 18px;
+  color: rgba(255, 255, 255, 0.55);
+  white-space: nowrap;
+}
