@@ -219,7 +219,7 @@ export interface NavigationLink extends Struct.ComponentSchema {
     imagem_hover: Schema.Attribute.Media<'images' | 'videos'>;
     label: Schema.Attribute.String & Schema.Attribute.Required;
     sublinks: Schema.Attribute.Component<'navigation.sublink', true>;
-    url: Schema.Attribute.String & Schema.Attribute.Required;
+    url: Schema.Attribute.String;
   };
 }
 

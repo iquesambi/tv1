@@ -10,8 +10,7 @@
       "required": true
     },
     "url": {
-      "type": "string",
-      "required": true
+      "type": "string"
     },
     "imagem_hover": {
       "type": "media",

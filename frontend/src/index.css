@@ -122,6 +122,45 @@
 }
 
 
+/* ── PP Hatton ───────────────────────── */
+
+@font-face {
+  font-family: 'PP Hatton';
+  src: url('./assets/fonts/PPHatton-Ultralight.otf') format('opentype');
+  font-weight: 200;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'PP Hatton';
+  src: url('./assets/fonts/PPHatton-UltralightItalic.otf') format('opentype');
+  font-weight: 200;
+  font-style: italic;
+}
+@font-face {
+  font-family: 'PP Hatton';
+  src: url('./assets/fonts/PPHatton-Medium.otf') format('opentype');
+  font-weight: 500;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'PP Hatton';
+  src: url('./assets/fonts/PPHatton-MediumItalic.otf') format('opentype');
+  font-weight: 500;
+  font-style: italic;
+}
+@font-face {
+  font-family: 'PP Hatton';
+  src: url('./assets/fonts/PPHatton-Bold.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'PP Hatton';
+  src: url('./assets/fonts/PPHatton-BoldItalic.otf') format('opentype');
+  font-weight: 700;
+  font-style: italic;
+}
+
 /* ── CARTELA DE TRANSIÇÃO ────────────── */
 
 .cartela {

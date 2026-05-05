@@ -4,7 +4,7 @@
   "info": {
     "singularName": "agencia",
     "pluralName": "agencias",
-    "displayName": "Agência"
+    "displayName": "Agência / Marca"
   },
   "options": {
     "draftAndPublish": true
@@ -18,6 +18,18 @@
       "type": "uid",
       "targetField": "nome",
       "required": true
+    },
+    "logo": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": ["images"]
+    },
+    "url_externo": {
+      "type": "string"
+    },
+    "ordem": {
+      "type": "integer",
+      "default": 0
     },
     "cases": {
       "type": "relation",

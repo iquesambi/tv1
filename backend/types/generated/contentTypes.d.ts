@@ -433,7 +433,7 @@ export interface AdminUser extends Struct.CollectionTypeSchema {
 export interface ApiAgenciaAgencia extends Struct.CollectionTypeSchema {
   collectionName: 'agencias';
   info: {
-    displayName: 'Ag\u00EAncia';
+    displayName: 'Ag\u00EAncia / Marca';
     pluralName: 'agencias';
     singularName: 'agencia';
   };
@@ -451,12 +451,15 @@ export interface ApiAgenciaAgencia extends Struct.CollectionTypeSchema {
       'api::agencia.agencia'
     > &
       Schema.Attribute.Private;
+    logo: Schema.Attribute.Media<'images'>;
     nome: Schema.Attribute.String & Schema.Attribute.Required;
+    ordem: Schema.Attribute.Integer & Schema.Attribute.DefaultTo<0>;
     publishedAt: Schema.Attribute.DateTime;
     slug: Schema.Attribute.UID<'nome'> & Schema.Attribute.Required;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    url_externo: Schema.Attribute.String;
   };
 }
 
@@ -699,9 +702,12 @@ export interface ApiQuarentaAnosQuarentaAnos extends Struct.SingleTypeSchema {
     ativo: Schema.Attribute.Boolean &
       Schema.Attribute.Required &
       Schema.Attribute.DefaultTo<false>;
+    cases_destaque: Schema.Attribute.Relation<'manyToMany', 'api::case.case'>;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    descricao: Schema.Attribute.Text;
+    fotos: Schema.Attribute.Media<'images', true>;
     imagem: Schema.Attribute.Media<'images'> & Schema.Attribute.Required;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
@@ -714,6 +720,8 @@ export interface ApiQuarentaAnosQuarentaAnos extends Struct.SingleTypeSchema {
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
     url: Schema.Attribute.String & Schema.Attribute.Required;
+    video_capa: Schema.Attribute.Media<'images' | 'videos'>;
+    video_url: Schema.Attribute.String;
   };
 }
 

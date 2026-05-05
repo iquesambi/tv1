@@ -24,6 +24,27 @@
     "url": {
       "type": "string",
       "required": true
+    },
+    "descricao": {
+      "type": "text"
+    },
+    "video_url": {
+      "type": "string"
+    },
+    "video_capa": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": ["images", "videos"]
+    },
+    "fotos": {
+      "type": "media",
+      "multiple": true,
+      "allowedTypes": ["images"]
+    },
+    "cases_destaque": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::case.case"
     }
   }
 }
