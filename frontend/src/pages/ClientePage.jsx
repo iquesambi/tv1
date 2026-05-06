@@ -46,26 +46,28 @@ function montarEntradas(cases) {
       }
     }
   }
-  entradas.sort((a, b) => a.data - b.data)
+  // Anos mais recentes à esquerda; dentro do mesmo ano, jan antes de dez
+  entradas.sort((a, b) => {
+    if (a.ano !== b.ano) return b.ano - a.ano   // ano descending
+    return a.data - b.data                        // dentro do ano: ascending
+  })
   return entradas
 }
 
-/* ── labels da timeline: anos de 2 em 2, distribuídos igualmente ── */
-function labelsDaTimeline(entradas) {
+/* ── grupos de anos (cards consecutivos do mesmo ano agrupados) ── */
+function gruposDeAnos(entradas) {
   if (!entradas.length) return []
-  // Pega todos os anos únicos do range
-  const anos = [...new Set(entradas.map(e => e.ano))].sort((a, b) => a - b)
-  if (!anos.length) return []
-  const min = anos[0]
-  const max = anos[anos.length - 1]
-  // Gera anos de 2 em 2 dentro do range
-  const labels = []
-  for (let ano = min; ano <= max; ano += 2) {
-    labels.push(String(ano))
+  const grupos = []
+  for (let i = 0; i < entradas.length; i++) {
+    const ano = entradas[i].ano
+    const ult = grupos[grupos.length - 1]
+    if (ult && ult.ano === ano) {
+      ult.indices.push(i)
+    } else {
+      grupos.push({ ano, indices: [i] })
+    }
   }
-  // garante que o último ano apareça
-  if (labels[labels.length - 1] !== String(max)) labels.push(String(max))
-  return labels
+  return grupos
 }
 
 /* ── índice do card "ativo" para layouts estáticos ── */
@@ -76,7 +78,7 @@ function ativoIdxParaN(n) {
 }
 
 /* ── alturas alternadas para o carrossel ── */
-const ALTURAS = [387, 287, 340, 260, 320]
+const ALTURAS = [460, 340, 400, 310, 380]
 function alturaParaIdx(idx) { return ALTURAS[idx % ALTURAS.length] }
 
 /* ── Card ── */
@@ -112,7 +114,7 @@ function CaseCard({ entrada, idx, ativo = false, carousel = false }) {
 }
 
 /* ── Timeline ── */
-function Timeline({ labels, xRef, timelineTrackRef, usaCarrossel }) {
+function Timeline({ labels, xRef, tiltDeltaRef, timelineTrackRef, usaCarrossel }) {
   const isDragging = useRef(false)
   const dragStart  = useRef(0)
 
@@ -130,6 +132,10 @@ function Timeline({ labels, xRef, timelineTrackRef, usaCarrossel }) {
       const delta = e.clientX - dragStart.current
       dragStart.current = e.clientX
       if (xRef?.current) xRef.current.x += delta
+      // alimenta o tilt: drag pra direita → cards giram no sentido oposto ao wheel positivo
+      if (tiltDeltaRef?.current != null) {
+        tiltDeltaRef.current = -delta * 4
+      }
     }
     const onUp = () => { isDragging.current = false }
     window.addEventListener('mousemove', onMove)
@@ -138,9 +144,9 @@ function Timeline({ labels, xRef, timelineTrackRef, usaCarrossel }) {
       window.removeEventListener('mousemove', onMove)
       window.removeEventListener('mouseup', onUp)
     }
-  }, [usaCarrossel, xRef])
+  }, [usaCarrossel, xRef, tiltDeltaRef])
 
-  // Carrossel: ticks fixos, mas labels (anos) deslizam dentro do viewport 1366px
+  // Carrossel: ticks fixos, labels deslizam dentro do viewport, posicionados em %
   if (usaCarrossel) {
     return (
       <div
@@ -159,9 +165,13 @@ function Timeline({ labels, xRef, timelineTrackRef, usaCarrossel }) {
             <div className="timeline__labels-track" ref={timelineTrackRef}>
               {[0, 1, 2].map(setIdx => (
                 <div className="timeline__labels-set" key={setIdx}>
-                  {labels.map((label, i) => (
-                    <div key={i} className="timeline__label">
-                      {label}
+                  {labels.map((l, i) => (
+                    <div
+                      key={i}
+                      className="timeline__label"
+                      style={{ left: `${l.pos}%` }}
+                    >
+                      {l.label}
                     </div>
                   ))}
                 </div>
@@ -182,10 +192,14 @@ function Timeline({ labels, xRef, timelineTrackRef, usaCarrossel }) {
             <div key={i} className="timeline__tick" />
           ))}
         </div>
-        <div className="timeline__labels timeline__labels--static">
-          {labels.map((label, i) => (
-            <div key={i} className="timeline__label">
-              {label}
+        <div className="timeline__labels-static">
+          {labels.map((l, i) => (
+            <div
+              key={i}
+              className="timeline__label"
+              style={{ left: `${l.pos}%` }}
+            >
+              {l.label}
             </div>
           ))}
         </div>
@@ -204,6 +218,9 @@ export default function ClientePage() {
   const timelineTrackRef = useRef(null)
   // ref compartilhado entre o tick e o drag da timeline
   const xRef = useRef({ x: 0 })
+  // delta usado para calcular o tilt 3D dos cards (alimentado por wheel ou drag)
+  const tiltDeltaRef = useRef(0)
+  const goTo = useGoTo()
 
   /* fetch logo do site */
   useEffect(() => {
@@ -231,7 +248,9 @@ export default function ClientePage() {
   const n           = entradas.length
   const usaCarrossel = n >= 4
   const ativoIdx    = usaCarrossel ? -1 : ativoIdxParaN(n)
-  const labels      = labelsDaTimeline(entradas)
+
+  // labels com posição em % calculada a partir dos cards reais (medidos)
+  const [labels, setLabels] = useState([])
 
   /* ── Scroll: tilt sempre; movimento X só no carrossel ── */
   useEffect(() => {
@@ -244,37 +263,58 @@ export default function ClientePage() {
 
     const oneSet = usaCarrossel ? track.scrollWidth / 3 : 0
     xRef.current.x = usaCarrossel ? -oneSet : 0
-    let delta = 0
+    tiltDeltaRef.current = 0
     let tilt  = 0
     let raf
 
     let cards = Array.from(track.querySelectorAll('.cliente-card'))
 
-    // Sincroniza largura dos sets de labels com oneSet do carrossel (para loop infinito)
+    // Sincroniza largura dos sets de labels com o oneSet do carrossel + calcula posições reais
     if (usaCarrossel && timelineTrackRef.current) {
       const sets = timelineTrackRef.current.querySelectorAll('.timeline__labels-set')
-      sets.forEach(s => { s.style.flex = `0 0 ${oneSet}px` })
+      sets.forEach(s => { s.style.width = `${oneSet}px` })
+
+      // Label alinhado com o PRIMEIRO card de cada grupo (consecutivo do mesmo ano)
+      const firstSetCards = cards.slice(0, n)
+      const grupos = gruposDeAnos(entradas)
+      const novosLabels = grupos.map(g => {
+        const firstIdx = g.indices[0]
+        const card = firstSetCards[firstIdx]
+        const center = card ? card.offsetLeft + card.offsetWidth / 2 : 0
+        const pos = (center / oneSet) * 100
+        return { label: String(g.ano), pos }
+      })
+      setLabels(novosLabels)
+    } else if (!usaCarrossel) {
+      // Estático: alinha ao primeiro card de cada grupo
+      const grupos = gruposDeAnos(entradas)
+      const novosLabels = grupos.map(g => {
+        const firstIdx = g.indices[0]
+        const pos = ((firstIdx + 0.5) / n) * 100
+        return { label: String(g.ano), pos }
+      })
+      setLabels(novosLabels)
     }
 
     const onWheel = (e) => {
       e.preventDefault()
-      delta = e.deltaY
+      tiltDeltaRef.current = e.deltaY
       if (usaCarrossel) {
         xRef.current.x -= e.deltaY * 0.5
       }
     }
 
     const tick = () => {
-      const targetTilt = Math.max(-60, Math.min(60, delta * 0.55))
+      const targetTilt = Math.max(-60, Math.min(60, tiltDeltaRef.current * 0.55))
       tilt  += (targetTilt - tilt) * 0.08
-      delta *= 0.91
+      tiltDeltaRef.current *= 0.91
 
       if (usaCarrossel) {
         // mantém o loop infinito clamping o x
         if (xRef.current.x < -2 * oneSet) xRef.current.x += oneSet
         if (xRef.current.x > 0)           xRef.current.x -= oneSet
         track.style.transform = `translateX(${xRef.current.x}px)`
-        // sincroniza os labels da timeline com a mesma velocidade
+        // labels da timeline: mesmo translate (sets têm mesma largura que oneSet)
         if (timelineTrackRef.current) {
           timelineTrackRef.current.style.transform = `translateX(${xRef.current.x}px)`
         }
@@ -315,9 +355,13 @@ export default function ClientePage() {
     <div className="cliente-page">
 
       <header className="cliente-header">
-        <div className="cliente-header__logo">
+        <button
+          className="cliente-header__logo"
+          onClick={() => goTo('/')}
+          aria-label="Ir para a home"
+        >
           {logo && <img src={mediaUrl(logo)} alt="TV1" />}
-        </div>
+        </button>
       </header>
 
       {/* Layout estático (1–3 itens) */}
@@ -358,6 +402,7 @@ export default function ClientePage() {
       <Timeline
         labels={labels}
         xRef={xRef}
+        tiltDeltaRef={tiltDeltaRef}
         timelineTrackRef={timelineTrackRef}
         usaCarrossel={usaCarrossel}
       />

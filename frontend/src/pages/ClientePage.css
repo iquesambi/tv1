@@ -18,6 +18,19 @@
   flex-shrink: 0;
 }
 
+.cliente-header__logo {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: inline-block;
+  transition: opacity 0.2s ease;
+}
+
+.cliente-header__logo:hover {
+  opacity: 0.7;
+}
+
 .cliente-header__logo img {
   height: 36px;
   width: auto;
@@ -164,13 +177,13 @@
 .cliente-track {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 16px;
   height: 100%;
   will-change: transform;
 }
 
 .cliente-card--carousel {
-  width: clamp(180px, 22vw, 320px);
+  width: clamp(220px, 26vw, 380px);
 }
 
 /* ── TIMELINE ─────────────────────────── */
@@ -192,10 +205,9 @@
   cursor: grabbing;
 }
 
-/* Container interno com largura limitada (Figma: 1366px) */
+/* Container interno com 98% da página (margens 1% de cada lado) */
 .timeline__inner {
-  width: 100%;
-  max-width: 1366px;
+  width: 98%;
   padding: 0 12px;
   box-sizing: border-box;
   position: relative;
@@ -214,21 +226,18 @@
   border-left: 1px solid #000001;
 }
 
-/* Estático: anos distribuídos com justify-between (sem deslizar) */
-.timeline__labels--static {
-  display: flex;
-  justify-content: space-between;
+/* Estático: labels posicionados em % do inner */
+.timeline__labels-static {
+  position: relative;
   height: 28px;
-  margin-top: 6px;
-  padding: 0 28px;
-  box-sizing: border-box;
+  margin-top: 18px;
 }
 
 /* Carrossel: viewport interno onde os labels deslizam */
 .timeline__labels-viewport {
   position: relative;
   height: 28px;
-  margin-top: 6px;
+  margin-top: 18px;
   overflow: hidden;
 }
 
@@ -239,16 +248,17 @@
   will-change: transform;
 }
 
-/* Cada set ocupa 100% da largura do viewport (1366px) */
+/* Cada set tem largura = oneSet do carrossel (aplicada via JS) */
 .timeline__labels-set {
-  flex: 0 0 100%;
-  display: flex;
-  justify-content: space-between;
-  padding: 0 28px;
-  box-sizing: border-box;
+  flex: 0 0 auto;
+  position: relative;
+  height: 100%;
 }
 
 .timeline__label {
+  position: absolute;
+  transform: translateX(-50%);
+  top: 0;
   font-family: 'Gilroy', sans-serif;
   font-size: 16px;
   font-weight: 500;
