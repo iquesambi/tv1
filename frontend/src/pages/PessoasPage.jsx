@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import axios from 'axios'
 import { useGoTo } from '../transition.jsx'
+import FooterBranco from '../components/FooterBranco.jsx'
 import './PessoasPage.css'
 
 const STRAPI = 'http://localhost:1337'
@@ -73,6 +74,8 @@ export default function PessoasPage() {
           </section>
         ))}
       </main>
+
+      <FooterBranco />
 
     </div>
   )

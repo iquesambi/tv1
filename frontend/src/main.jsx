@@ -15,6 +15,7 @@ createRoot(document.getElementById('root')).render(
       <TransitionProvider>
         <Routes>
           <Route path="/" element={<App />} />
+          <Route path="/contato" element={<App />} />
           <Route path="/pessoas" element={<PessoasPage />} />
           <Route path="/quarenta-anos" element={<QuarentaAnosPage />} />
           <Route path="/:cliente" element={<ClientePage />} />

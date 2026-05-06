@@ -18,42 +18,19 @@
   flex-shrink: 0;
 }
 
-.cliente-header__logo {
-  font-size: 14px;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: #000001;
-  opacity: 0.45;
+.cliente-header__logo img {
+  height: 36px;
+  width: auto;
+  object-fit: contain;
+  display: block;
+  filter: brightness(0);
 }
 
-/* ── VIEWPORT + TRACK ────────────────── */
-
-.cliente-viewport {
-  flex: 1;
-  overflow: hidden;
-  cursor: grab;
-}
-
-.cliente-viewport:active {
-  cursor: grabbing;
-}
-
-.cliente-track {
-  display: flex;
-  align-items: flex-end;
-  gap: 4px;
-  height: 100%;
-  will-change: transform;
-  transform-origin: center center;
-}
-
-/* ── CARD ─────────────────────────────── */
+/* ── CARD BASE ───────────────────────── */
 
 .cliente-card {
   position: relative;
   flex: 0 0 auto;
-  width: clamp(180px, 22vw, 320px);
   overflow: hidden;
   cursor: pointer;
   background: #111;
@@ -71,10 +48,36 @@
   transform: scale(1.04);
 }
 
+/* ── LOGO DA AGÊNCIA ─────────────────── */
+
+.cliente-card__agencia {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 2;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.cliente-card:hover .cliente-card__agencia {
+  opacity: 1;
+}
+
+.cliente-card__agencia img {
+  height: 24px;
+  width: auto;
+  max-width: 80px;
+  object-fit: contain;
+  display: block;
+  filter: brightness(0) invert(1);
+}
+
+/* ── OVERLAY ─────────────────────────── */
+
 .cliente-card__overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, transparent 40%, rgba(0, 0, 0, 0.72) 100%);
+  background: linear-gradient(180deg, transparent 45%, rgba(0, 0, 0, 0.78) 100%);
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
@@ -83,27 +86,94 @@
   transition: opacity 0.3s ease;
 }
 
+/* Overlay só no hover — todos os cards */
 .cliente-card:hover .cliente-card__overlay {
   opacity: 1;
-}
-
-.cliente-card__ano {
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.65);
-  margin-bottom: 4px;
 }
 
 .cliente-card__titulo {
   font-size: 16px;
   font-weight: 900;
+  font-style: italic;
   text-transform: uppercase;
-  line-height: 1.1;
+  line-height: 1.05;
   color: #fff;
   margin: 0;
   text-wrap: balance;
+}
+
+/* Título maior no card ativo */
+.cliente-card--ativo .cliente-card__titulo {
+  font-size: clamp(22px, 2.6vw, 44px);
+}
+
+/* ── LAYOUT ESTÁTICO — 1 ITEM ────────── */
+
+.cliente-static {
+  flex: 1;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 80px 0;
+  overflow: hidden;
+}
+
+.cliente-static--1 {
+  align-items: center;  /* centraliza também na vertical */
+}
+
+.cliente-static--1 .cliente-card--ativo {
+  width: clamp(160px, 17vw, 260px);
+  height: 62vh;
+}
+
+/* ── LAYOUT ESTÁTICO — 2 ITENS ──────── */
+
+.cliente-static--2 .cliente-card--inativo {
+  width: clamp(200px, 24vw, 380px);
+  height: 44vh;
+}
+
+.cliente-static--2 .cliente-card--ativo {
+  width: clamp(200px, 22vw, 360px);
+  height: 64vh;
+}
+
+/* ── LAYOUT ESTÁTICO — 3 ITENS ──────── */
+
+.cliente-static--3 .cliente-card--inativo {
+  width: clamp(180px, 21vw, 340px);
+  height: 40vh;
+}
+
+.cliente-static--3 .cliente-card--ativo {
+  width: clamp(200px, 24vw, 380px);
+  height: 64vh;
+}
+
+/* ── CARROSSEL (4+ ITENS) ────────────── */
+
+.cliente-viewport {
+  flex: 1;
+  overflow: hidden;
+  cursor: grab;
+}
+
+.cliente-viewport:active {
+  cursor: grabbing;
+}
+
+.cliente-track {
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+  height: 100%;
+  will-change: transform;
+}
+
+.cliente-card--carousel {
+  width: clamp(180px, 22vw, 320px);
 }
 
 /* ── TIMELINE ─────────────────────────── */
@@ -124,16 +194,15 @@
   flex: 1;
   height: 100%;
   border-left: 1px solid #000001;
-  transform-origin: center;
 }
 
-.timeline__anos {
+.timeline__labels {
   position: relative;
   height: 28px;
   margin-top: 6px;
 }
 
-.timeline__ano {
+.timeline__label {
   position: absolute;
   transform: translateX(-50%);
   font-size: 13px;
@@ -162,7 +231,29 @@
     padding: 24px 24px 16px;
   }
 
-  .cliente-card {
+  .cliente-static {
+    padding: 0 24px;
+    gap: 6px;
+  }
+
+  .cliente-static--1 .cliente-card--ativo {
+    width: clamp(140px, 55vw, 220px);
+    height: 55vh;
+  }
+
+  .cliente-static--2 .cliente-card--inativo,
+  .cliente-static--2 .cliente-card--ativo,
+  .cliente-static--3 .cliente-card--inativo,
+  .cliente-static--3 .cliente-card--ativo {
+    width: clamp(100px, 40vw, 200px);
+  }
+
+  .cliente-static--2 .cliente-card--inativo { height: 36vh; }
+  .cliente-static--2 .cliente-card--ativo   { height: 52vh; }
+  .cliente-static--3 .cliente-card--inativo { height: 32vh; }
+  .cliente-static--3 .cliente-card--ativo   { height: 50vh; }
+
+  .cliente-card--carousel {
     width: clamp(140px, 60vw, 240px);
   }
 

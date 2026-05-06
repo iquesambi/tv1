@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { useLocation } from 'react-router-dom'
 import axios from 'axios'
 import { useGoTo } from './transition.jsx'
 import './App.css'
@@ -26,6 +27,9 @@ function App() {
   const [equipe, setEquipe]     = useState(null)
   const [aberto, setAberto]     = useState(null)
   const [hoveredSub, setHoveredSub] = useState(null)
+  const [menuMobile, setMenuMobile] = useState(false)
+  const location = useLocation()
+  const contatoAberto = location.pathname === '/contato'
   const goTo = useGoTo()
 
   useEffect(() => {
@@ -78,8 +82,14 @@ function App() {
     return () => window.removeEventListener('wheel', onWheel)
   }, [aberto, links.length])
 
+  const isMobile = () => window.innerWidth <= 768
+
   const handleLink = (e, i, link) => {
     e.preventDefault()
+    if (isMobile()) {
+      if (link.url) goTo(link.url)
+      return
+    }
     if (aberto === i) {
       // só navega se o link tiver URL definida
       if (link.url) goTo(link.url)
@@ -118,21 +128,52 @@ function App() {
         ]
       })}
 
+      {/* Menu mobile overlay */}
+      <div className={`home__menu-mobile ${menuMobile ? 'home__menu-mobile--aberto' : ''}`} onClick={() => setMenuMobile(false)}>
+        <div className="home__menu-mobile__inner" onClick={e => e.stopPropagation()}>
+          {/* conteúdo: redes sociais + links — em breve */}
+          <button className="home__menu-mobile__fechar" onClick={() => setMenuMobile(false)}>✕</button>
+        </div>
+      </div>
+
       {/* Topo */}
-      <header className="home__top" onClick={e => e.stopPropagation()}>
-        <div className="home__logo">
+      <header className="home__top">
+        <div className="home__logo" onClick={e => e.stopPropagation()}>
           {logo?.logo && <img src={mediaUrl(logo.logo)} alt="TV1" />}
         </div>
-        <div className="home__camera">
+        {/* câmera — visível no desktop dentro do header */}
+        <button className="home__camera home__camera--desktop" onClick={(e) => { e.stopPropagation(); quarentaAnos?.ativo && goTo('/quarenta-anos') }} aria-label="40 Anos TV1">
           {quarentaAnos?.ativo && quarentaAnos?.imagem && (
             <img src={mediaUrl(quarentaAnos.imagem)} alt="" />
           )}
-        </div>
+        </button>
+        {/* hamburguer — visível só no mobile */}
+        <button className="home__hamburger" onClick={(e) => { e.stopPropagation(); setMenuMobile(true) }} aria-label="Menu">
+          <span /><span /><span />
+        </button>
       </header>
 
+      {/* câmera mobile — centralizada abaixo do header */}
+      <button className="home__camera home__camera--mobile" onClick={(e) => { e.stopPropagation(); quarentaAnos?.ativo && goTo('/quarenta-anos') }} aria-label="40 Anos TV1">
+        {quarentaAnos?.ativo && quarentaAnos?.imagem && (
+          <img src={mediaUrl(quarentaAnos.imagem)} alt="" />
+        )}
+      </button>
+
       {/* Nav central */}
-      <nav className={`home__nav ${aberto !== null ? 'home__nav--aberto' : ''}`} onClick={e => e.stopPropagation()}>
-        {links.map((link, i) => {
+      <nav className={`home__nav ${aberto !== null ? 'home__nav--aberto' : ''} ${contatoAberto ? 'home__nav--contato' : ''}`}>
+
+        {/* Seção de Contato */}
+        {contatoAberto && (
+          <div className="home__nav-contato">
+            <a href="#" className="home__nav-link home__nav-link--contato" onClick={(e) => { e.preventDefault(); e.stopPropagation() }}>SEJA CLIENTE</a>
+            <a href="#" className="home__nav-link home__nav-link--contato" onClick={(e) => { e.preventDefault(); e.stopPropagation() }}>TRABALHE CONOSCO</a>
+            <a href="#" className="home__nav-link home__nav-link--contato" onClick={(e) => { e.preventDefault(); e.stopPropagation() }}>OUTROS ASSUNTOS</a>
+          </div>
+        )}
+
+        {/* Links normais da nav */}
+        {!contatoAberto && links.map((link, i) => {
           const esteAberto = aberto === i
           const acima   = aberto !== null && !esteAberto && i < aberto
           const abaixo  = aberto !== null && !esteAberto && i > aberto
@@ -147,6 +188,7 @@ function App() {
                 acima      ? 'home__nav-item--acima'  : '',
                 abaixo     ? 'home__nav-item--abaixo' : '',
               ].join(' ')}
+              onClick={e => e.stopPropagation()}
             >
               <a
                 href={link.url || '#'}
@@ -179,7 +221,7 @@ function App() {
 
       {/* Rodapé — marcas agora vêm de agencias */}
       <footer className="home__bottom" onClick={e => e.stopPropagation()}>
-        <a href="mailto:contato@tv1.com.br" className="home__contato">Contato</a>
+        <button className="home__contato" onClick={(e) => { e.stopPropagation(); goTo('/contato') }}>Contato</button>
 
         <div className={`home__marcas ${aberto !== null ? 'home__marcas--oculto' : ''}`}>
           {agencias?.filter(a => a.logo).map((a, i) => (

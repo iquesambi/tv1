@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback, useRef } from 'react'
 import { useParams } from 'react-router-dom'
 import axios from 'axios'
+import FooterBranco from '../components/FooterBranco.jsx'
 import './CasePage.css'
 
 const STRAPI = 'http://localhost:1337'
@@ -300,6 +301,8 @@ export default function CasePage() {
       {data.blocos?.map((block, i) => (
         <Block key={i} block={block} />
       ))}
+
+      <FooterBranco />
 
     </div>
   )

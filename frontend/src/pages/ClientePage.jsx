@@ -16,12 +16,14 @@ function montarEntradas(cases) {
 
     if (c.Data) {
       entradas.push({
-        id:   `${c.id}-main`,
-        ano:  new Date(c.Data).getFullYear(),
-        data: new Date(c.Data),
-        nome: c.titulo,
-        capa: c.imagem_capa,
-        href: `/${clienteSlug}/${caseSlug}`,
+        id:          `${c.id}-main`,
+        ano:         new Date(c.Data).getFullYear(),
+        data:        new Date(c.Data),
+        nome:        c.titulo,
+        capa:        c.imagem_capa,
+        href:        `/${clienteSlug}/${caseSlug}`,
+        agenciaLogo: c.agencia?.logo ?? null,
+        agenciaNome: c.agencia?.nome ?? null,
       })
     }
 
@@ -32,12 +34,14 @@ function montarEntradas(cases) {
         bloco.timeline_data
       ) {
         entradas.push({
-          id:   `${c.id}-sub-${bloco.id}`,
-          ano:  new Date(bloco.timeline_data).getFullYear(),
-          data: new Date(bloco.timeline_data),
-          nome: bloco.timeline_nome || bloco.texto,
-          capa: bloco.timeline_capa || c.imagem_capa,
-          href: `/${clienteSlug}/${caseSlug}#${bloco.ancora_id ?? ''}`,
+          id:          `${c.id}-sub-${bloco.id}`,
+          ano:         new Date(bloco.timeline_data).getFullYear(),
+          data:        new Date(bloco.timeline_data),
+          nome:        bloco.timeline_nome || bloco.texto,
+          capa:        bloco.timeline_capa || c.imagem_capa,
+          href:        `/${clienteSlug}/${caseSlug}#${bloco.ancora_id ?? ''}`,
+          agenciaLogo: c.agencia?.logo ?? null,
+          agenciaNome: c.agencia?.nome ?? null,
         })
       }
     }
@@ -46,33 +50,66 @@ function montarEntradas(cases) {
   return entradas
 }
 
-/* ── posição do ano na timeline (%) ── */
-function posicaoAno(ano, todos) {
-  if (todos.length === 1) return 50
-  const min = Math.min(...todos)
-  const max = Math.max(...todos)
-  if (min === max) return 50
-  return ((ano - min) / (max - min)) * 85 + 7.5
+/* ── labels da timeline com posição proporcional ── */
+function labelsDaTimeline(entradas) {
+  if (!entradas.length) return []
+  const timestamps = entradas.map(e => e.data.getTime())
+  const min = Math.min(...timestamps)
+  const max = Math.max(...timestamps)
+
+  const byAgencia = {}
+  entradas.forEach(e => {
+    const nome = e.agenciaNome ?? 'TV1'
+    if (!byAgencia[nome]) byAgencia[nome] = []
+    byAgencia[nome].push(e.data.getTime())
+  })
+
+  return Object.entries(byAgencia).map(([nome, ts]) => {
+    const medio = ts.reduce((a, b) => a + b, 0) / ts.length
+    const pos   = max === min ? 50 : ((medio - min) / (max - min)) * 85 + 7.5
+    // remove o prefixo "tv1 " para exibir só a especialidade
+    const label = nome.replace(/^tv1\s*/i, '').toUpperCase() || nome.toUpperCase()
+    return { label, pos }
+  })
 }
 
-/* ── alturas alternadas estáveis por entrada ── */
+/* ── índice do card "ativo" para layouts estáticos ── */
+function ativoIdxParaN(n) {
+  if (n <= 1) return 0
+  if (n === 2) return 1   // rightmost
+  return 1                // center (para n=3, idx 1 = centro)
+}
+
+/* ── alturas alternadas para o carrossel ── */
 const ALTURAS = [387, 287, 340, 260, 320]
 function alturaParaIdx(idx) { return ALTURAS[idx % ALTURAS.length] }
 
 /* ── Card ── */
-function CaseCard({ entrada, idx }) {
+function CaseCard({ entrada, idx, ativo = false, carousel = false }) {
   const goTo = useGoTo()
   return (
     <div
-      className="cliente-card"
-      style={{ height: alturaParaIdx(idx) }}
+      className={[
+        'cliente-card',
+        ativo     ? 'cliente-card--ativo'    : 'cliente-card--inativo',
+        carousel  ? 'cliente-card--carousel' : '',
+      ].join(' ')}
+      style={carousel ? { height: alturaParaIdx(idx) } : undefined}
       onClick={() => goTo(entrada.href)}
     >
       {entrada.capa && (
         <img src={mediaUrl(entrada.capa)} alt={entrada.nome} className="cliente-card__img" />
       )}
+
+      {/* Logo da agência — canto superior direito */}
+      {entrada.agenciaLogo && (
+        <div className="cliente-card__agencia">
+          <img src={mediaUrl(entrada.agenciaLogo)} alt={entrada.agenciaNome ?? ''} />
+        </div>
+      )}
+
+      {/* Overlay com título: sempre visível no ativo, só no hover para inativos */}
       <div className="cliente-card__overlay">
-        <span className="cliente-card__ano">{entrada.ano}</span>
         <h3 className="cliente-card__titulo">{entrada.nome}</h3>
       </div>
     </div>
@@ -80,7 +117,7 @@ function CaseCard({ entrada, idx }) {
 }
 
 /* ── Timeline ── */
-function Timeline({ anosUnicos }) {
+function Timeline({ labels }) {
   return (
     <div className="timeline">
       <div className="timeline__ticks">
@@ -88,14 +125,10 @@ function Timeline({ anosUnicos }) {
           <div key={i} className="timeline__tick" />
         ))}
       </div>
-      <div className="timeline__anos">
-        {anosUnicos.map(ano => (
-          <div
-            key={ano}
-            className="timeline__ano"
-            style={{ left: `${posicaoAno(ano, anosUnicos)}%` }}
-          >
-            {ano}
+      <div className="timeline__labels">
+        {labels.map((l, i) => (
+          <div key={i} className="timeline__label" style={{ left: `${l.pos}%` }}>
+            {l.label}
           </div>
         ))}
       </div>
@@ -106,18 +139,26 @@ function Timeline({ anosUnicos }) {
 /* ── Página ── */
 export default function ClientePage() {
   const { cliente: clienteSlug } = useParams()
-  const [entradas, setEntradas] = useState([])
+  const [entradas, setEntradas]  = useState([])
+  const [logo, setLogo]          = useState(null)
   const viewportRef = useRef(null)
   const trackRef    = useRef(null)
 
-  /* fetch */
+  /* fetch logo do site */
+  useEffect(() => {
+    axios.get(`${STRAPI}/api/logo-site?populate=logo`)
+      .then(r => setLogo(r.data.data?.logo ?? null))
+      .catch(() => {})
+  }, [])
+
+  /* fetch — inclui logo da agência */
   useEffect(() => {
     axios
       .get(
         `${STRAPI}/api/cases` +
         `?filters[cliente][slug][$eq]=${clienteSlug}` +
         `&populate[cliente]=true` +
-        `&populate[agencia]=true` +
+        `&populate[agencia][populate]=logo` +
         `&populate[imagem_capa]=true` +
         `&populate[blocos][populate]=*` +
         `&sort=Data:asc`
@@ -126,41 +167,47 @@ export default function ClientePage() {
       .catch(() => {})
   }, [clienteSlug])
 
-  /* scroll horizontal infinito + tilt individual por card */
+  const n           = entradas.length
+  const usaCarrossel = n >= 4
+  const ativoIdx    = usaCarrossel ? -1 : ativoIdxParaN(n)
+  const labels      = labelsDaTimeline(entradas)
+
+  /* ── Scroll: tilt sempre; movimento X só no carrossel ── */
   useEffect(() => {
-    if (!entradas.length) return
-    const viewport = viewportRef.current
-    const track    = trackRef.current
-    if (!viewport || !track) return
+    if (!n) return
+    const container = viewportRef.current
+    // para static: querySelectorAll no próprio container
+    // para carousel: no trackRef (filho translateX)
+    const track = usaCarrossel ? trackRef.current : viewportRef.current
+    if (!container || !track) return
 
-    const oneSet = track.scrollWidth / 3
-
-    let x     = -oneSet
+    const oneSet = usaCarrossel ? track.scrollWidth / 3 : 0
+    let x     = usaCarrossel ? -oneSet : 0
     let delta = 0
     let tilt  = 0
     let raf
 
-    // coleta os cards uma vez (evita query por frame)
     let cards = Array.from(track.querySelectorAll('.cliente-card'))
 
     const onWheel = (e) => {
       e.preventDefault()
       delta = e.deltaY
-      x -= e.deltaY * 0.5
-      if (x < -2 * oneSet) x += oneSet
-      if (x > 0)           x -= oneSet
+      if (usaCarrossel) {
+        x -= e.deltaY * 0.5
+        if (x < -2 * oneSet) x += oneSet
+        if (x > 0)           x -= oneSet
+      }
     }
 
     const tick = () => {
-      // tilt suave com inércia
       const targetTilt = Math.max(-60, Math.min(60, delta * 0.55))
       tilt  += (targetTilt - tilt) * 0.08
       delta *= 0.91
 
-      // track só translada horizontalmente
-      track.style.transform = `translateX(${x}px)`
+      if (usaCarrossel) {
+        track.style.transform = `translateX(${x}px)`
+      }
 
-      // cada card gira no próprio eixo Y, com perspectiva própria
       cards.forEach(card => {
         card.style.transform = `perspective(700px) rotateY(${tilt}deg)`
       })
@@ -168,43 +215,75 @@ export default function ClientePage() {
       raf = requestAnimationFrame(tick)
     }
 
-    viewport.addEventListener('wheel', onWheel, { passive: false })
+    container.addEventListener('wheel', onWheel, { passive: false })
     raf = requestAnimationFrame(tick)
 
     return () => {
-      viewport.removeEventListener('wheel', onWheel)
+      container.removeEventListener('wheel', onWheel)
       cancelAnimationFrame(raf)
     }
-  }, [entradas])
+  }, [n, usaCarrossel])
 
-  if (!entradas.length) return <div className="cliente-page"><div className="cliente-loading">Carregando...</div></div>
+  if (!n) return (
+    <div className="cliente-page">
+      <div className="cliente-loading">Carregando...</div>
+    </div>
+  )
 
-  /* triplica as entradas para o loop infinito */
-  const triplicadas = [
-    ...entradas.map((e, i) => ({ ...e, _key: `a-${e.id}`, _idx: i })),
-    ...entradas.map((e, i) => ({ ...e, _key: `b-${e.id}`, _idx: i })),
-    ...entradas.map((e, i) => ({ ...e, _key: `c-${e.id}`, _idx: i })),
-  ]
-
-  const anosUnicos = [...new Set(entradas.map(e => e.ano))].sort((a, b) => a - b)
+  /* triplica só no carrossel */
+  const triplicadas = usaCarrossel
+    ? [
+        ...entradas.map((e, i) => ({ ...e, _key: `a-${e.id}`, _idx: i })),
+        ...entradas.map((e, i) => ({ ...e, _key: `b-${e.id}`, _idx: i })),
+        ...entradas.map((e, i) => ({ ...e, _key: `c-${e.id}`, _idx: i })),
+      ]
+    : entradas.map((e, i) => ({ ...e, _key: e.id, _idx: i }))
 
   return (
     <div className="cliente-page">
 
       <header className="cliente-header">
-        <span className="cliente-header__logo">TV1</span>
+        <div className="cliente-header__logo">
+          {logo && <img src={mediaUrl(logo)} alt="TV1" />}
+        </div>
       </header>
 
-      {/* viewport com perspectiva — intercepta o wheel */}
-      <div className="cliente-viewport" ref={viewportRef}>
-        <div className="cliente-track" ref={trackRef}>
+      {/* Layout estático (1–3 itens) */}
+      {!usaCarrossel && (
+        <div
+          className={`cliente-static cliente-static--${n}`}
+          ref={viewportRef}
+        >
           {triplicadas.map(e => (
-            <CaseCard key={e._key} entrada={e} idx={e._idx} />
+            <CaseCard
+              key={e._key}
+              entrada={e}
+              idx={e._idx}
+              ativo={e._idx === ativoIdx}
+              carousel={false}
+            />
           ))}
         </div>
-      </div>
+      )}
 
-      <Timeline anosUnicos={anosUnicos} />
+      {/* Carrossel (4+ itens) */}
+      {usaCarrossel && (
+        <div className="cliente-viewport" ref={viewportRef}>
+          <div className="cliente-track" ref={trackRef}>
+            {triplicadas.map(e => (
+              <CaseCard
+                key={e._key}
+                entrada={e}
+                idx={e._idx}
+                ativo={false}
+                carousel={true}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
+      <Timeline labels={labels} />
 
     </div>
   )
