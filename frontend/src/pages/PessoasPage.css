@@ -8,32 +8,6 @@
   overflow-x: hidden;
 }
 
-/* ── HEADER ─────────────────────────── */
-
-.pessoas-header {
-  padding: 40px 80px;
-  cursor: pointer;
-  display: inline-block;
-}
-
-.pessoas-header__logo img {
-  height: 36px;
-  width: auto;
-  object-fit: contain;
-  display: block;
-  /* inverte pra ficar preto no fundo branco */
-  filter: brightness(0);
-}
-
-.pessoas-header__logo span {
-  font-size: 14px;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: #000001;
-  opacity: 0.45;
-}
-
 /* ── MAIN ────────────────────────────── */
 
 .pessoas-main {
@@ -46,30 +20,30 @@
 /* ── BLOCO DE PESSOA ─────────────────── */
 
 /*
-  Layout: flexbox para sobreposição
-  - Foto é absolutamente posicionada e centralizada
-  - Texto fica relativo, por cima da foto
+  Grid de 12 colunas:
+  - Foto começa na coluna 6 (margin-left: 50% do container de conteúdo).
+  - O container da foto ocupa as colunas 6–12 (50% do width restante).
+  - A imagem dentro do container se adapta naturalmente ao formato:
+      → Landscape (horizontal): preenche os 6 colunas (max-width: 100%)
+      → Portrait (vertical): é mais estreita (~4 colunas), centrada no container
+  - O texto fica na mesma célula de grid, por cima da foto (z-index maior).
 */
 
 .pessoa-bloco {
-  position: relative;
-  display: flex;
-  align-items: flex-start;
-  justify-content: flex-start;
-  min-height: 70vh;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto;
 }
 
-/* foto: centralizada absolutamente no meio */
+/* foto: alinhada pelo centro do grid (coluna 6 de 12) */
 .pessoa-foto {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  grid-column: 1;
+  grid-row: 1;
+  margin-left: 50%;            /* começa na coluna central */
   display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 100%;
+  justify-content: center;     /* centra a imagem dentro do container de 6 colunas */
+  align-items: flex-start;
+  align-self: start;
   pointer-events: none;
   z-index: 0;
 }
@@ -78,21 +52,19 @@
   display: block;
   width: auto;
   height: auto;
-  max-width: 85%;
-  max-height: 85%;
-  object-fit: contain;
+  max-width: 100%;             /* landscape: preenche o container (6 col) */
+  max-height: 75vh;            /* portrait: limitado em altura, fica ~4 col */
 }
 
-/* texto: relativo, fica por cima da foto com z-index maior */
+/* texto: mesma célula, sobreposto por cima da foto */
 .pessoa-texto {
-  position: relative;
-  z-index: 1;
-  padding-top: 28px;
+  grid-column: 1;
+  grid-row: 1;
+  max-width: 33%;              /* ocupa 4 colunas de 12 */
   padding-bottom: 48px;
-  padding-right: 0;
-  max-width: 50%;
-  align-self: flex-start;
-  /* permite que o nome invada a foto */
+  margin-top: clamp(-80px, -8%, 0);  /* invade a imagem pra cima */
+  z-index: 1;
+  align-self: start;
 }
 
 /* ── TIPOGRAFIA ───────────────────────── */
@@ -143,49 +115,36 @@
 /* ── RESPONSIVO ───────────────────────── */
 
 @media (max-width: 768px) {
-  .pessoas-header {
-    padding: 24px;
-  }
-
   .pessoas-main {
     padding: 0 24px 80px;
     gap: 80px;
   }
 
   .pessoa-bloco {
-    position: relative;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-    min-height: auto;
     gap: 24px;
   }
 
   .pessoa-foto {
-    position: relative;
-    top: auto;
-    left: auto;
-    transform: none;
     width: 100%;
-    height: auto;
-    min-height: 300px;
-    display: flex;
-    align-items: center;
+    margin-left: 0;
+    align-self: auto;
     justify-content: center;
-    z-index: 0;
   }
 
   .pessoa-foto img {
     max-width: 100%;
-    max-height: 400px;
+    max-height: none;
   }
 
   .pessoa-texto {
-    position: relative;
     width: 100%;
     max-width: 100%;
-    padding-top: 0;
-    z-index: 1;
+    margin-top: 0;
+  }
+
+  .pessoa-cargo {
+    max-width: 100%;
   }
 }
