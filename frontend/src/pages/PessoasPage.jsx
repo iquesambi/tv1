@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import axios from 'axios'
+import { useGoTo } from '../transition.jsx'
 import FooterBranco from '../components/FooterBranco.jsx'
 import './PessoasPage.css'
 
@@ -14,9 +15,12 @@ export const slugify = (str) => str.toLowerCase()
 
 export default function PessoasPage() {
   const [equipe, setEquipe] = useState(null)
+  const [logo, setLogo]     = useState(null)
+  const goTo = useGoTo()
 
   useEffect(() => {
     api('equipe?populate[membros][populate]=foto').then(setEquipe)
+    api('logo-site?populate=logo').then(setLogo)
   }, [])
 
   const membros = equipe?.membros ?? []
@@ -36,6 +40,14 @@ export default function PessoasPage() {
 
   return (
     <div className="pessoas-page">
+
+      <header className="pessoas-header" onClick={() => goTo('/')}>
+        <div className="pessoas-header__logo">
+          {logo?.logo
+            ? <img src={mediaUrl(logo.logo)} alt="TV1" />
+            : <span>TV1</span>}
+        </div>
+      </header>
 
       <main className="pessoas-main">
         {equipe === null && (
