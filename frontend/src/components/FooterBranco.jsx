@@ -26,6 +26,7 @@ export default function FooterBranco() {
   const [aberto, setAberto]         = useState(null)
   const [hoveredSub, setHoveredSub] = useState(null)
   const goTo = useGoTo()
+  const lastScrollY = useRef(0)
 
   useEffect(() => {
     api('navigation?populate[links][populate][0]=imagem_hover&populate[links][populate][sublinks][populate]=imagem_hover').then(setNav)
@@ -35,6 +36,22 @@ export default function FooterBranco() {
     api('quarenta-anos?populate=imagem').then(setQa)
     api('equipe?populate[membros][populate]=foto').then(setEquipe)
   }, [])
+
+  // Fechar menu ao scrollar pra cima
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY
+      // Se está scrollando pra cima (scrollY diminui) e menu está aberto, fecha
+      if (currentScrollY < lastScrollY.current && aberto !== null) {
+        setAberto(null)
+        setHoveredSub(null)
+      }
+      lastScrollY.current = currentScrollY
+    }
+
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [aberto])
 
   const links = nav?.links ?? []
 

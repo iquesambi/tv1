@@ -200,7 +200,19 @@
   display: flex;
   align-items: center;
   gap: 32px;
+  padding: 16px 32px;
+  position: relative;
   transition: opacity 0.4s ease;
+}
+
+/* resguardo branco — paralelogramo com laterais inclinadas */
+.home__marcas::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: #fff;
+  transform: skewX(-10deg);
+  z-index: -1;
 }
 
 .home__marcas--oculto {
@@ -213,6 +225,7 @@
   width: auto;
   object-fit: contain;
   display: block;
+  /* logos com cores originais */
 }
 
 /* Redes */

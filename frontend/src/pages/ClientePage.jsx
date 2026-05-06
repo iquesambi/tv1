@@ -50,27 +50,22 @@ function montarEntradas(cases) {
   return entradas
 }
 
-/* ── labels da timeline com posição proporcional ── */
+/* ── labels da timeline: anos de 2 em 2, distribuídos igualmente ── */
 function labelsDaTimeline(entradas) {
   if (!entradas.length) return []
-  const timestamps = entradas.map(e => e.data.getTime())
-  const min = Math.min(...timestamps)
-  const max = Math.max(...timestamps)
-
-  const byAgencia = {}
-  entradas.forEach(e => {
-    const nome = e.agenciaNome ?? 'TV1'
-    if (!byAgencia[nome]) byAgencia[nome] = []
-    byAgencia[nome].push(e.data.getTime())
-  })
-
-  return Object.entries(byAgencia).map(([nome, ts]) => {
-    const medio = ts.reduce((a, b) => a + b, 0) / ts.length
-    const pos   = max === min ? 50 : ((medio - min) / (max - min)) * 85 + 7.5
-    // remove o prefixo "tv1 " para exibir só a especialidade
-    const label = nome.replace(/^tv1\s*/i, '').toUpperCase() || nome.toUpperCase()
-    return { label, pos }
-  })
+  // Pega todos os anos únicos do range
+  const anos = [...new Set(entradas.map(e => e.ano))].sort((a, b) => a - b)
+  if (!anos.length) return []
+  const min = anos[0]
+  const max = anos[anos.length - 1]
+  // Gera anos de 2 em 2 dentro do range
+  const labels = []
+  for (let ano = min; ano <= max; ano += 2) {
+    labels.push(String(ano))
+  }
+  // garante que o último ano apareça
+  if (labels[labels.length - 1] !== String(max)) labels.push(String(max))
+  return labels
 }
 
 /* ── índice do card "ativo" para layouts estáticos ── */
@@ -117,20 +112,83 @@ function CaseCard({ entrada, idx, ativo = false, carousel = false }) {
 }
 
 /* ── Timeline ── */
-function Timeline({ labels }) {
+function Timeline({ labels, xRef, timelineTrackRef, usaCarrossel }) {
+  const isDragging = useRef(false)
+  const dragStart  = useRef(0)
+
+  const handleMouseDown = (e) => {
+    if (!usaCarrossel || !xRef?.current) return
+    isDragging.current = true
+    dragStart.current = e.clientX
+    e.preventDefault()
+  }
+
+  useEffect(() => {
+    if (!usaCarrossel) return
+    const onMove = (e) => {
+      if (!isDragging.current) return
+      const delta = e.clientX - dragStart.current
+      dragStart.current = e.clientX
+      if (xRef?.current) xRef.current.x += delta
+    }
+    const onUp = () => { isDragging.current = false }
+    window.addEventListener('mousemove', onMove)
+    window.addEventListener('mouseup', onUp)
+    return () => {
+      window.removeEventListener('mousemove', onMove)
+      window.removeEventListener('mouseup', onUp)
+    }
+  }, [usaCarrossel, xRef])
+
+  // Carrossel: ticks fixos, mas labels (anos) deslizam dentro do viewport 1366px
+  if (usaCarrossel) {
+    return (
+      <div
+        className="timeline timeline--carousel"
+        onMouseDown={handleMouseDown}
+      >
+        <div className="timeline__inner">
+          {/* Ticks fixos */}
+          <div className="timeline__ticks">
+            {Array.from({ length: 120 }).map((_, i) => (
+              <div key={i} className="timeline__tick" />
+            ))}
+          </div>
+          {/* Labels triplicados deslizando */}
+          <div className="timeline__labels-viewport">
+            <div className="timeline__labels-track" ref={timelineTrackRef}>
+              {[0, 1, 2].map(setIdx => (
+                <div className="timeline__labels-set" key={setIdx}>
+                  {labels.map((label, i) => (
+                    <div key={i} className="timeline__label">
+                      {label}
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Estático: timeline simples, sem drag
   return (
     <div className="timeline">
-      <div className="timeline__ticks">
-        {Array.from({ length: 120 }).map((_, i) => (
-          <div key={i} className="timeline__tick" />
-        ))}
-      </div>
-      <div className="timeline__labels">
-        {labels.map((l, i) => (
-          <div key={i} className="timeline__label" style={{ left: `${l.pos}%` }}>
-            {l.label}
-          </div>
-        ))}
+      <div className="timeline__inner">
+        <div className="timeline__ticks">
+          {Array.from({ length: 120 }).map((_, i) => (
+            <div key={i} className="timeline__tick" />
+          ))}
+        </div>
+        <div className="timeline__labels timeline__labels--static">
+          {labels.map((label, i) => (
+            <div key={i} className="timeline__label">
+              {label}
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   )
@@ -143,6 +201,9 @@ export default function ClientePage() {
   const [logo, setLogo]          = useState(null)
   const viewportRef = useRef(null)
   const trackRef    = useRef(null)
+  const timelineTrackRef = useRef(null)
+  // ref compartilhado entre o tick e o drag da timeline
+  const xRef = useRef({ x: 0 })
 
   /* fetch logo do site */
   useEffect(() => {
@@ -182,20 +243,24 @@ export default function ClientePage() {
     if (!container || !track) return
 
     const oneSet = usaCarrossel ? track.scrollWidth / 3 : 0
-    let x     = usaCarrossel ? -oneSet : 0
+    xRef.current.x = usaCarrossel ? -oneSet : 0
     let delta = 0
     let tilt  = 0
     let raf
 
     let cards = Array.from(track.querySelectorAll('.cliente-card'))
 
+    // Sincroniza largura dos sets de labels com oneSet do carrossel (para loop infinito)
+    if (usaCarrossel && timelineTrackRef.current) {
+      const sets = timelineTrackRef.current.querySelectorAll('.timeline__labels-set')
+      sets.forEach(s => { s.style.flex = `0 0 ${oneSet}px` })
+    }
+
     const onWheel = (e) => {
       e.preventDefault()
       delta = e.deltaY
       if (usaCarrossel) {
-        x -= e.deltaY * 0.5
-        if (x < -2 * oneSet) x += oneSet
-        if (x > 0)           x -= oneSet
+        xRef.current.x -= e.deltaY * 0.5
       }
     }
 
@@ -205,7 +270,14 @@ export default function ClientePage() {
       delta *= 0.91
 
       if (usaCarrossel) {
-        track.style.transform = `translateX(${x}px)`
+        // mantém o loop infinito clamping o x
+        if (xRef.current.x < -2 * oneSet) xRef.current.x += oneSet
+        if (xRef.current.x > 0)           xRef.current.x -= oneSet
+        track.style.transform = `translateX(${xRef.current.x}px)`
+        // sincroniza os labels da timeline com a mesma velocidade
+        if (timelineTrackRef.current) {
+          timelineTrackRef.current.style.transform = `translateX(${xRef.current.x}px)`
+        }
       }
 
       cards.forEach(card => {
@@ -283,7 +355,12 @@ export default function ClientePage() {
         </div>
       )}
 
-      <Timeline labels={labels} />
+      <Timeline
+        labels={labels}
+        xRef={xRef}
+        timelineTrackRef={timelineTrackRef}
+        usaCarrossel={usaCarrossel}
+      />
 
     </div>
   )
