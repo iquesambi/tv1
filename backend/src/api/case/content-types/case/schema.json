@@ -45,6 +45,15 @@
       "target": "api::agencia.agencia",
       "inversedBy": "cases"
     },
+    "especialidade": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::especialidade.especialidade",
+      "inversedBy": "cases"
+    },
+    "sub_especialidade": {
+      "type": "string"
+    },
     "blocos": {
       "type": "dynamiczone",
       "components": [

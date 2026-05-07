@@ -492,12 +492,17 @@ export interface ApiCaseCase extends Struct.CollectionTypeSchema {
       Schema.Attribute.Private;
     Data: Schema.Attribute.Date;
     descricao: Schema.Attribute.Text;
+    especialidade: Schema.Attribute.Relation<
+      'manyToOne',
+      'api::especialidade.especialidade'
+    >;
     imagem_capa: Schema.Attribute.Media<'images'>;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<'oneToMany', 'api::case.case'> &
       Schema.Attribute.Private;
     publishedAt: Schema.Attribute.DateTime;
     slug: Schema.Attribute.UID<'titulo'> & Schema.Attribute.Required;
+    sub_especialidade: Schema.Attribute.String;
     titulo: Schema.Attribute.String & Schema.Attribute.Required;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
@@ -557,6 +562,37 @@ export interface ApiEquipeEquipe extends Struct.SingleTypeSchema {
       Schema.Attribute.Private;
     membros: Schema.Attribute.Component<'equipe.membro', true>;
     publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiEspecialidadeEspecialidade
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'especialidades';
+  info: {
+    displayName: 'Especialidade';
+    pluralName: 'especialidades';
+    singularName: 'especialidade';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    cases: Schema.Attribute.Relation<'oneToMany', 'api::case.case'>;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::especialidade.especialidade'
+    > &
+      Schema.Attribute.Private;
+    nome: Schema.Attribute.String & Schema.Attribute.Required;
+    publishedAt: Schema.Attribute.DateTime;
+    slug: Schema.Attribute.UID<'nome'> & Schema.Attribute.Required;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -1269,6 +1305,7 @@ declare module '@strapi/strapi' {
       'api::case.case': ApiCaseCase;
       'api::cliente.cliente': ApiClienteCliente;
       'api::equipe.equipe': ApiEquipeEquipe;
+      'api::especialidade.especialidade': ApiEspecialidadeEspecialidade;
       'api::logo-site.logo-site': ApiLogoSiteLogoSite;
       'api::marca-nav.marca-nav': ApiMarcaNavMarcaNav;
       'api::navigation.navigation': ApiNavigationNavigation;
