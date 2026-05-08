@@ -25,7 +25,7 @@ function montarEntradas(cases) {
       data: c.Data ? new Date(c.Data) : new Date(0),
       nome: c.titulo || '',
       capa: c.imagem_capa,
-      href: c.slug ? `/cases/${c.slug}` : '#',
+      href: (c.cliente?.slug && c.slug) ? `/${c.cliente.slug}/${c.slug}` : '#',
     }))
     .sort((a, b) => {
       if (a.ano !== b.ano) return (b.ano || 0) - (a.ano || 0)
@@ -178,7 +178,7 @@ export default function QuarentaAnosPage() {
   const tiltDeltaRef      = useRef(0)
 
   useEffect(() => {
-    api('quarenta-anos?populate[0]=imagem&populate[1]=video_capa&populate[2]=fotos&populate[3]=cases_destaque.imagem_capa').then(setData)
+    api('quarenta-anos?populate[0]=imagem&populate[1]=video_capa&populate[2]=fotos&populate[3]=cases_destaque.imagem_capa&populate[4]=cases_destaque.cliente').then(setData)
   }, [])
 
   const fotos = data?.fotos?.length
