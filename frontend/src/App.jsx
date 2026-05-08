@@ -25,6 +25,7 @@ function App() {
   const [quarentaAnos, setQA]   = useState(null)
   const [redes, setRedes]       = useState(null)
   const [equipe, setEquipe]     = useState(null)
+  const [clientes, setClientes] = useState(null)
   const [aberto, setAberto]     = useState(null)
   const [hoveredSub, setHoveredSub] = useState(null)
   const [activeSubIdx, setActiveSubIdx] = useState(0)
@@ -41,6 +42,7 @@ function App() {
     api('quarenta-anos?populate=imagem').then(setQA)
     api('redes-sociais?populate[redes][populate]=icone').then(setRedes)
     api('pessoas?filters[ativo][$eq]=true&populate=foto&sort=ordem').then(setEquipe)
+    api('clientes?sort=nome:asc').then(setClientes)
   }, [])
 
   // Fechar menu ao scrollar pra cima
@@ -61,13 +63,20 @@ function App() {
 
   const links = nav?.links ?? []
 
-  // Sublinks dinâmicos: /pessoas → membros da equipe
+  // Sublinks dinâmicos: /pessoas → membros da equipe; /clientes → clientes
   const getSublinks = (link) => {
     if (link.url === '/pessoas') {
       return (equipe ?? []).map(m => ({
         label: m.nome,
         url: `/pessoas#${slugify(m.nome)}`,
         imagem_hover: m.foto ?? null,
+      }))
+    }
+    if (link.url === '/clientes') {
+      return (clientes ?? []).map(c => ({
+        label: c.nome,
+        url: `/${c.slug}`,
+        imagem_hover: link.imagem_hover ?? null,
       }))
     }
     return link.sublinks ?? []
@@ -156,7 +165,7 @@ function App() {
 
     window.addEventListener('wheel', onWheel, { passive: false })
     return () => window.removeEventListener('wheel', onWheel)
-  }, [aberto, links, equipe])
+  }, [aberto, links, equipe, clientes])
 
   // Reset acumulador quando muda o menu
   useEffect(() => { accDelta.current = 0 }, [aberto])

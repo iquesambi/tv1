@@ -23,6 +23,7 @@ export default function FooterBranco() {
   const [redes, setRedes]           = useState(null)
   const [qa, setQa]                 = useState(null)
   const [equipe, setEquipe]         = useState(null)
+  const [clientes, setClientes]     = useState(null)
   const [aberto, setAberto]         = useState(null)
   const [hoveredSub, setHoveredSub] = useState(null)
   const [activeSubIdx, setActiveSubIdx] = useState(0)
@@ -42,6 +43,13 @@ export default function FooterBranco() {
         imagem_hover: m.foto ?? null,
       }))
     }
+    if (link.url === '/clientes') {
+      return (clientes ?? []).map(c => ({
+        label: c.nome,
+        url: `/${c.slug}`,
+        imagem_hover: link.imagem_hover ?? null,
+      }))
+    }
     return link.sublinks ?? []
   }
 
@@ -52,6 +60,7 @@ export default function FooterBranco() {
     api('redes-sociais?populate[redes][populate]=icone').then(setRedes)
     api('quarenta-anos?populate=imagem').then(setQa)
     api('pessoas?filters[ativo][$eq]=true&populate=foto&sort=ordem').then(setEquipe)
+    api('clientes?sort=nome:asc').then(setClientes)
   }, [])
 
   // Fechar menu ao scrollar pra cima
@@ -139,7 +148,7 @@ export default function FooterBranco() {
     }
     window.addEventListener('wheel', onWheel, { passive: false })
     return () => window.removeEventListener('wheel', onWheel)
-  }, [aberto, links, equipe])
+  }, [aberto, links, equipe, clientes])
 
   const handleLink = (e, i, link) => {
     e.preventDefault()
