@@ -1,0 +1,26 @@
+{
+  "kind": "singleType",
+  "collectionName": "trabalhe_conoscos",
+  "info": {
+    "singularName": "trabalhe-conosco",
+    "pluralName": "trabalhe-conoscos",
+    "displayName": "Trabalhe Conosco"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "titulo": {
+      "type": "string",
+      "default": "Porquê trabalhar aqui?"
+    },
+    "descricao": {
+      "type": "richtext"
+    },
+    "vagas": {
+      "type": "component",
+      "repeatable": true,
+      "component": "trabalhe-conosco.vaga"
+    }
+  }
+}

@@ -4,7 +4,7 @@ import axios from 'axios'
 import FooterBranco from '../components/FooterBranco.jsx'
 import './CasePage.css'
 
-const STRAPI = 'http://localhost:1337'
+const STRAPI = 'https://tv1-53ev.onrender.com'
 
 const PALAVRAS_CURTAS = [
   'o','a','os','as','um','uma','uns','umas',
@@ -165,7 +165,7 @@ function Block({ block }) {
       return (
         <h2
           className="block-subtitulo"
-          id={block.ancora && block.ancora_id ? block.ancora_id : undefined}
+          id={block.ancora_id || undefined}
         >
           {block.texto}
         </h2>

@@ -4,7 +4,7 @@
   "info": {
     "singularName": "case",
     "pluralName": "cases",
-    "displayName": "Case"
+    "displayName": "Cases"
   },
   "options": {
     "draftAndPublish": true

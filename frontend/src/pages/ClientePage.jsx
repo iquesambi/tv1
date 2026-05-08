@@ -4,7 +4,7 @@ import axios from 'axios'
 import { useGoTo } from '../transition.jsx'
 import './ClientePage.css'
 
-const STRAPI = 'http://localhost:1337'
+const STRAPI = 'https://tv1-53ev.onrender.com'
 const mediaUrl = (obj) => obj?.url ? `${STRAPI}${obj.url}` : null
 
 /* ── monta entradas (principal + âncoras de subtítulo) ── */

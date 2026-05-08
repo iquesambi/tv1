@@ -3,7 +3,7 @@ import axios from 'axios'
 import FooterBranco from '../components/FooterBranco.jsx'
 import './PessoasPage.css'
 
-const STRAPI = 'http://localhost:1337'
+const STRAPI = 'https://tv1-53ev.onrender.com'
 const api = (path) => axios.get(`${STRAPI}/api/${path}`).then(r => r.data.data).catch(() => null)
 const mediaUrl = (obj) => obj?.url ? `${STRAPI}${obj.url}` : null
 
@@ -16,10 +16,10 @@ export default function PessoasPage() {
   const [equipe, setEquipe] = useState(null)
 
   useEffect(() => {
-    api('equipe?populate[membros][populate]=foto').then(setEquipe)
+    api('pessoas?filters[ativo][$eq]=true&populate=foto&sort=ordem').then(setEquipe)
   }, [])
 
-  const membros = equipe?.membros ?? []
+  const membros = equipe ?? []
 
   // âncora via hash após carregar
   useEffect(() => {
@@ -28,7 +28,7 @@ export default function PessoasPage() {
     if (!hash) return
     const tentar = (n = 0) => {
       const el = document.getElementById(hash)
-      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' })
       else if (n < 10) setTimeout(() => tentar(n + 1), 150)
     }
     tentar()

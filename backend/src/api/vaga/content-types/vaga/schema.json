@@ -1,0 +1,30 @@
+{
+  "kind": "collectionType",
+  "collectionName": "vagas",
+  "info": {
+    "singularName": "vaga",
+    "pluralName": "vagas",
+    "displayName": "Vaga"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "titulo": {
+      "type": "string",
+      "required": true
+    },
+    "descricao": {
+      "type": "text",
+      "required": true
+    },
+    "link_aplicacao": {
+      "type": "string"
+    },
+    "trabalhe_conosco": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::trabalhe-conosco.trabalhe-conosco"
+    }
+  }
+}

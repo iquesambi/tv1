@@ -466,7 +466,7 @@ export interface ApiAgenciaAgencia extends Struct.CollectionTypeSchema {
 export interface ApiCaseCase extends Struct.CollectionTypeSchema {
   collectionName: 'cases';
   info: {
-    displayName: 'Case';
+    displayName: 'Cases';
     pluralName: 'cases';
     singularName: 'case';
   };
@@ -540,34 +540,6 @@ export interface ApiClienteCliente extends Struct.CollectionTypeSchema {
   };
 }
 
-export interface ApiEquipeEquipe extends Struct.SingleTypeSchema {
-  collectionName: 'equipe';
-  info: {
-    displayName: 'Equipe';
-    pluralName: 'equipes';
-    singularName: 'equipe';
-  };
-  options: {
-    draftAndPublish: true;
-  };
-  attributes: {
-    createdAt: Schema.Attribute.DateTime;
-    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
-      Schema.Attribute.Private;
-    locale: Schema.Attribute.String & Schema.Attribute.Private;
-    localizations: Schema.Attribute.Relation<
-      'oneToMany',
-      'api::equipe.equipe'
-    > &
-      Schema.Attribute.Private;
-    membros: Schema.Attribute.Component<'equipe.membro', true>;
-    publishedAt: Schema.Attribute.DateTime;
-    updatedAt: Schema.Attribute.DateTime;
-    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
-      Schema.Attribute.Private;
-  };
-}
-
 export interface ApiEspecialidadeEspecialidade
   extends Struct.CollectionTypeSchema {
   collectionName: 'especialidades';
@@ -602,7 +574,7 @@ export interface ApiEspecialidadeEspecialidade
 export interface ApiLogoSiteLogoSite extends Struct.SingleTypeSchema {
   collectionName: 'logo_sites';
   info: {
-    displayName: 'Logo';
+    displayName: 'Logo do Site';
     pluralName: 'logo-sites';
     singularName: 'logo-site';
   };
@@ -627,39 +599,10 @@ export interface ApiLogoSiteLogoSite extends Struct.SingleTypeSchema {
   };
 }
 
-export interface ApiMarcaNavMarcaNav extends Struct.SingleTypeSchema {
-  collectionName: 'marca_navs';
-  info: {
-    displayName: 'Navega\u00E7\u00E3o Marcas';
-    pluralName: 'marca-navs';
-    singularName: 'marca-nav';
-  };
-  options: {
-    draftAndPublish: true;
-  };
-  attributes: {
-    createdAt: Schema.Attribute.DateTime;
-    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
-      Schema.Attribute.Private;
-    locale: Schema.Attribute.String & Schema.Attribute.Private;
-    localizations: Schema.Attribute.Relation<
-      'oneToMany',
-      'api::marca-nav.marca-nav'
-    > &
-      Schema.Attribute.Private;
-    marcas: Schema.Attribute.Component<'marca.item', true> &
-      Schema.Attribute.Required;
-    publishedAt: Schema.Attribute.DateTime;
-    updatedAt: Schema.Attribute.DateTime;
-    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
-      Schema.Attribute.Private;
-  };
-}
-
 export interface ApiNavigationNavigation extends Struct.SingleTypeSchema {
   collectionName: 'navigations';
   info: {
-    displayName: 'Navigation';
+    displayName: 'Navega\u00E7\u00E3o';
     pluralName: 'navigations';
     singularName: 'navigation';
   };
@@ -694,7 +637,7 @@ export interface ApiNavigationNavigation extends Struct.SingleTypeSchema {
 export interface ApiPessoaPessoa extends Struct.CollectionTypeSchema {
   collectionName: 'pessoas';
   info: {
-    displayName: 'Pessoa';
+    displayName: 'Pessoas';
     pluralName: 'pessoas';
     singularName: 'pessoa';
   };
@@ -702,6 +645,7 @@ export interface ApiPessoaPessoa extends Struct.CollectionTypeSchema {
     draftAndPublish: true;
   };
   attributes: {
+    ativo: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
     bio: Schema.Attribute.Text;
     cargo: Schema.Attribute.String;
     createdAt: Schema.Attribute.DateTime;
@@ -728,7 +672,7 @@ export interface ApiQuarentaAnosQuarentaAnos extends Struct.SingleTypeSchema {
   collectionName: 'quarenta_anos';
   info: {
     displayName: '40 Anos';
-    pluralName: 'quarenta-anos-item';
+    pluralName: 'quarenta-anos-pagina';
     singularName: 'quarenta-anos';
   };
   options: {
@@ -765,7 +709,7 @@ export interface ApiRedesSociaisRedesSociais extends Struct.SingleTypeSchema {
   collectionName: 'redes_sociais';
   info: {
     displayName: 'Redes Sociais';
-    pluralName: 'redes-sociais-list';
+    pluralName: 'redes-sociais-pagina';
     singularName: 'redes-sociais';
   };
   options: {
@@ -784,6 +728,69 @@ export interface ApiRedesSociaisRedesSociais extends Struct.SingleTypeSchema {
     publishedAt: Schema.Attribute.DateTime;
     redes: Schema.Attribute.Component<'social.rede', true> &
       Schema.Attribute.Required;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiTrabalheConoscoTrabalheConosco
+  extends Struct.SingleTypeSchema {
+  collectionName: 'trabalhe_conoscos';
+  info: {
+    displayName: 'Trabalhe Conosco';
+    pluralName: 'trabalhe-conoscos';
+    singularName: 'trabalhe-conosco';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    descricao: Schema.Attribute.RichText;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::trabalhe-conosco.trabalhe-conosco'
+    > &
+      Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
+    titulo: Schema.Attribute.String &
+      Schema.Attribute.DefaultTo<'Porqu\u00EA trabalhar aqui?'>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    vagas: Schema.Attribute.Component<'trabalhe-conosco.vaga', true>;
+  };
+}
+
+export interface ApiVagaVaga extends Struct.CollectionTypeSchema {
+  collectionName: 'vagas';
+  info: {
+    displayName: 'Vaga';
+    pluralName: 'vagas';
+    singularName: 'vaga';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    descricao: Schema.Attribute.Text & Schema.Attribute.Required;
+    link_aplicacao: Schema.Attribute.String;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<'oneToMany', 'api::vaga.vaga'> &
+      Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
+    titulo: Schema.Attribute.String & Schema.Attribute.Required;
+    trabalhe_conosco: Schema.Attribute.Relation<
+      'manyToOne',
+      'api::trabalhe-conosco.trabalhe-conosco'
+    >;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -1304,14 +1311,14 @@ declare module '@strapi/strapi' {
       'api::agencia.agencia': ApiAgenciaAgencia;
       'api::case.case': ApiCaseCase;
       'api::cliente.cliente': ApiClienteCliente;
-      'api::equipe.equipe': ApiEquipeEquipe;
       'api::especialidade.especialidade': ApiEspecialidadeEspecialidade;
       'api::logo-site.logo-site': ApiLogoSiteLogoSite;
-      'api::marca-nav.marca-nav': ApiMarcaNavMarcaNav;
       'api::navigation.navigation': ApiNavigationNavigation;
       'api::pessoa.pessoa': ApiPessoaPessoa;
       'api::quarenta-anos.quarenta-anos': ApiQuarentaAnosQuarentaAnos;
       'api::redes-sociais.redes-sociais': ApiRedesSociaisRedesSociais;
+      'api::trabalhe-conosco.trabalhe-conosco': ApiTrabalheConoscoTrabalheConosco;
+      'api::vaga.vaga': ApiVagaVaga;
       'plugin::content-releases.release': PluginContentReleasesRelease;
       'plugin::content-releases.release-action': PluginContentReleasesReleaseAction;
       'plugin::i18n.locale': PluginI18NLocale;

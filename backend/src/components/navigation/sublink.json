@@ -16,6 +16,11 @@
       "type": "media",
       "multiple": false,
       "allowedTypes": ["images", "videos"]
+    },
+    "especialidade": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::especialidade.especialidade"
     }
   }
 }

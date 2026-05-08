@@ -1,7 +1,0 @@
-{
-  "collectionName": "components_blocks_secoes",
-  "info": { "displayName": "Seção / Âncora", "icon": "layer" },
-  "attributes": {
-    "ancora": { "type": "string", "required": true }
-  }
-}

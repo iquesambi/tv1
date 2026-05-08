@@ -3,7 +3,7 @@
   "collectionName": "redes_sociais",
   "info": {
     "singularName": "redes-sociais",
-    "pluralName": "redes-sociais-list",
+    "pluralName": "redes-sociais-pagina",
     "displayName": "Redes Sociais"
   },
   "options": {

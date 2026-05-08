@@ -1,0 +1,174 @@
+/* TRABALHE CONOSCO PAGE - TV1 */
+
+.trabalhe-page {
+  background: #fff;
+  color: #000001;
+  font-family: 'Gilroy', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── HEADER ─────────────────────────── */
+
+.trabalhe-header {
+  padding: 40px 40px 0;
+}
+
+.trabalhe-logo {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  height: 40px;
+}
+
+.trabalhe-logo img {
+  height: 100%;
+  width: auto;
+}
+
+/* ── MAIN ────────────────────────────── */
+
+.trabalhe-main {
+  padding: 120px 80px 160px;
+  display: flex;
+  flex-direction: column;
+  gap: 114px;
+}
+
+/* ── INTRO ───────────────────────────── */
+
+.trabalhe-intro {
+  display: flex;
+  flex-direction: column;
+  gap: 60px;
+}
+
+.trabalhe-intro__title {
+  font-size: 130px;
+  font-weight: 900;
+  text-transform: uppercase;
+  line-height: 0.9;
+  margin: 0;
+  letter-spacing: -0.02em;
+  max-width: 50%;
+}
+
+.trabalhe-intro__text {
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* ── OPORTUNIDADES ───────────────────── */
+
+.trabalhe-oportunidades {
+  display: flex;
+  flex-direction: column;
+  gap: 72px;
+}
+
+.trabalhe-oportunidades__title {
+  font-size: 40px;
+  font-weight: 900;
+  text-transform: uppercase;
+  line-height: 1;
+  margin: 0;
+}
+
+.trabalhe-sem-vagas {
+  font-size: 16px;
+  font-weight: 500;
+  opacity: 0.4;
+  margin: 0;
+  padding: 40px 0;
+  border-top: 1px solid #000001;
+}
+
+.trabalhe-vagas {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── VAGA ───────────────────────────── */
+
+.trabalhe-vaga {
+  display: grid;
+  grid-template-columns: 200px 1fr auto;
+  gap: 86px;
+  align-items: center;
+  padding: 40px 0;
+  border-bottom: 1px solid #000001;
+}
+
+.trabalhe-vaga:first-child {
+  border-top: 1px solid #000001;
+}
+
+.trabalhe-vaga__titulo {
+  font-size: 24px;
+  font-weight: 900;
+  text-transform: uppercase;
+  line-height: 1.1;
+}
+
+.trabalhe-vaga__descricao {
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.5;
+  min-width: 0;
+}
+
+.trabalhe-vaga__btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 20px;
+  border: 1px solid #000001;
+  border-radius: 0 20px 0 20px;
+  font-size: 16px;
+  font-weight: 500;
+  text-transform: uppercase;
+  color: #000001;
+  background: #fff;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background 0.2s, color 0.2s;
+}
+
+.trabalhe-vaga__btn:hover {
+  background: #000001;
+  color: #fff;
+}
+
+/* ── RESPONSIVO ─────────────────────── */
+
+@media (max-width: 768px) {
+  .trabalhe-header {
+    padding: 24px 24px 0;
+  }
+
+  .trabalhe-main {
+    padding: 60px 24px 80px;
+    gap: 60px;
+  }
+
+  .trabalhe-intro__title {
+    font-size: 48px;
+  }
+
+  .trabalhe-intro__text {
+    font-size: 16px;
+  }
+
+  .trabalhe-oportunidades__title {
+    font-size: 24px;
+  }
+
+  .trabalhe-vaga {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    padding: 24px 0;
+  }
+}

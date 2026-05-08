@@ -1,0 +1,201 @@
+/* OUTROS ASSUNTOS PAGE - TV1 */
+
+.outros-page {
+  background: #fff;
+  color: #000001;
+  font-family: 'Gilroy', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── HEADER ─────────────────────────── */
+
+.outros-header {
+  padding: 40px 40px 0;
+}
+
+.outros-logo {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  height: 40px;
+}
+
+.outros-logo img {
+  height: 100%;
+  width: auto;
+}
+
+/* ── MAIN ────────────────────────────── */
+
+.outros-main {
+  padding: 120px 16.67% 160px; /* 2 colunas de 12 de cada lado */
+  display: flex;
+  flex-direction: column;
+  gap: 64px;
+}
+
+/* ── TÍTULO ─────────────────────────── */
+
+.outros-title {
+  font-size: 130px;
+  font-weight: 900;
+  text-transform: uppercase;
+  line-height: 0.9;
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+/* ── CONTENT ────────────────────────── */
+
+.outros-content {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.outros-desc {
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* ── FORM ───────────────────────────── */
+
+.outros-form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* ── FIELD ──────────────────────────── */
+
+.outros-field {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #000001;
+  border-left: 4px solid #000001;
+  padding: 16px 24px;
+  gap: 4px;
+}
+
+.outros-field__label {
+  font-size: 16px;
+  font-weight: 900;
+  text-transform: uppercase;
+  line-height: 1.4;
+  color: #000001;
+}
+
+.outros-field__input {
+  font-family: 'Gilroy', sans-serif;
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 1.4;
+  color: #000001;
+  background: transparent;
+  border: none;
+  outline: none;
+  padding: 0;
+  width: 100%;
+}
+
+.outros-field__textarea {
+  font-family: 'Gilroy', sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.4;
+  color: #000001;
+  background: transparent;
+  border: none;
+  outline: none;
+  padding: 0;
+  width: 100%;
+  height: 131px;
+  resize: none;
+}
+
+.outros-field__input::placeholder,
+.outros-field__textarea::placeholder {
+  color: #000001;
+  opacity: 0.3;
+}
+
+/* ── BOTÃO ──────────────────────────── */
+
+.outros-form__footer {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.outros-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 20px;
+  border: 1px solid #000001;
+  border-radius: 0 20px 0 20px;
+  font-family: 'Gilroy', sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  text-transform: uppercase;
+  color: #000001;
+  background: #fff;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.2s, color 0.2s;
+}
+
+.outros-btn:hover:not(:disabled) {
+  background: #000001;
+  color: #fff;
+}
+
+.outros-btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* ── SUCESSO ────────────────────────── */
+
+.outros-sucesso {
+  padding: 40px 0;
+  font-size: 24px;
+  font-weight: 500;
+  border-top: 1px solid #000001;
+}
+
+.outros-sucesso p {
+  margin: 0;
+}
+
+/* ── RESPONSIVO ─────────────────────── */
+
+@media (max-width: 768px) {
+  .outros-header {
+    padding: 24px 24px 0;
+  }
+
+  .outros-main {
+    padding: 60px 24px 80px;
+    gap: 40px;
+  }
+
+  .outros-title {
+    font-size: 48px;
+  }
+
+  .outros-main {
+    padding: 60px 24px 80px;
+  }
+
+  .outros-desc {
+    font-size: 16px;
+  }
+
+  .outros-field__input {
+    font-size: 18px;
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "collectionName": "components_trabalhe_conosco_vagas",
+  "info": {
+    "displayName": "Vaga",
+    "icon": "briefcase"
+  },
+  "attributes": {
+    "titulo": {
+      "type": "string",
+      "required": true
+    },
+    "descricao": {
+      "type": "text",
+      "required": true
+    },
+    "link_aplicacao": {
+      "type": "string"
+    },
+    "data_expiracao": {
+      "type": "date"
+    }
+  }
+}

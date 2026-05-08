@@ -3,7 +3,6 @@
   "info": { "displayName": "Subtítulo", "icon": "italic" },
   "attributes": {
     "texto": { "type": "string", "required": true },
-    "ancora": { "type": "boolean", "default": false },
     "ancora_id": { "type": "string" },
     "timeline": { "type": "boolean", "default": false },
     "timeline_nome": { "type": "string" },

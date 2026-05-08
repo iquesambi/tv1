@@ -30,28 +30,6 @@ export interface BlocksBigNumbers extends Struct.ComponentSchema {
   };
 }
 
-export interface BlocksCapa extends Struct.ComponentSchema {
-  collectionName: 'components_blocks_capas';
-  info: {
-    displayName: 'Imagem Capa';
-    icon: 'landscape';
-  };
-  attributes: {
-    imagem: Schema.Attribute.Media<'images'> & Schema.Attribute.Required;
-  };
-}
-
-export interface BlocksDescricao extends Struct.ComponentSchema {
-  collectionName: 'components_blocks_descricoes';
-  info: {
-    displayName: 'Descri\u00E7\u00E3o';
-    icon: 'quote';
-  };
-  attributes: {
-    conteudo: Schema.Attribute.RichText & Schema.Attribute.Required;
-  };
-}
-
 export interface BlocksGaleria extends Struct.ComponentSchema {
   collectionName: 'components_blocks_galerias';
   info: {
@@ -95,17 +73,6 @@ export interface BlocksImagemTrio extends Struct.ComponentSchema {
   };
 }
 
-export interface BlocksSecao extends Struct.ComponentSchema {
-  collectionName: 'components_blocks_secoes';
-  info: {
-    displayName: 'Se\u00E7\u00E3o / \u00C2ncora';
-    icon: 'layer';
-  };
-  attributes: {
-    ancora: Schema.Attribute.String & Schema.Attribute.Required;
-  };
-}
-
 export interface BlocksSubtitulo extends Struct.ComponentSchema {
   collectionName: 'components_blocks_subtitulos';
   info: {
@@ -113,7 +80,6 @@ export interface BlocksSubtitulo extends Struct.ComponentSchema {
     icon: 'italic';
   };
   attributes: {
-    ancora: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
     ancora_id: Schema.Attribute.String;
     texto: Schema.Attribute.String & Schema.Attribute.Required;
     timeline: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
@@ -134,17 +100,6 @@ export interface BlocksTexto extends Struct.ComponentSchema {
   };
 }
 
-export interface BlocksTitulo extends Struct.ComponentSchema {
-  collectionName: 'components_blocks_titulos';
-  info: {
-    displayName: 'T\u00EDtulo';
-    icon: 'bold';
-  };
-  attributes: {
-    texto: Schema.Attribute.String & Schema.Attribute.Required;
-  };
-}
-
 export interface BlocksVideo extends Struct.ComponentSchema {
   collectionName: 'components_blocks_videos';
   info: {
@@ -153,58 +108,6 @@ export interface BlocksVideo extends Struct.ComponentSchema {
   };
   attributes: {
     capa: Schema.Attribute.Media<'images'> & Schema.Attribute.Required;
-    legenda: Schema.Attribute.String;
-    url: Schema.Attribute.String & Schema.Attribute.Required;
-  };
-}
-
-export interface EdicaoEdicao extends Struct.ComponentSchema {
-  collectionName: 'components_edicao_edicoes';
-  info: {
-    displayName: 'Edi\u00E7\u00E3o';
-    icon: 'calendar';
-  };
-  attributes: {
-    ancora: Schema.Attribute.String & Schema.Attribute.Required;
-    conteudo: Schema.Attribute.DynamicZone<
-      [
-        'blocks.titulo',
-        'blocks.subtitulo',
-        'blocks.texto',
-        'blocks.descricao',
-        'blocks.capa',
-        'blocks.imagem-simples',
-        'blocks.galeria',
-        'blocks.imagem-trio',
-        'blocks.video',
-        'blocks.big-numbers',
-      ]
-    >;
-  };
-}
-
-export interface EquipeMembro extends Struct.ComponentSchema {
-  collectionName: 'components_equipe_membros';
-  info: {
-    displayName: 'Membro';
-    icon: 'user';
-  };
-  attributes: {
-    bio: Schema.Attribute.Text;
-    cargo: Schema.Attribute.String;
-    foto: Schema.Attribute.Media<'images'>;
-    nome: Schema.Attribute.String & Schema.Attribute.Required;
-  };
-}
-
-export interface MarcaItem extends Struct.ComponentSchema {
-  collectionName: 'components_marca_items';
-  info: {
-    displayName: 'Marca Item';
-    icon: 'picture';
-  };
-  attributes: {
-    logo: Schema.Attribute.Media<'images'> & Schema.Attribute.Required;
     url: Schema.Attribute.String & Schema.Attribute.Required;
   };
 }
@@ -230,6 +133,10 @@ export interface NavigationSublink extends Struct.ComponentSchema {
     icon: 'arrowRight';
   };
   attributes: {
+    especialidade: Schema.Attribute.Relation<
+      'oneToOne',
+      'api::especialidade.especialidade'
+    >;
     imagem_hover: Schema.Attribute.Media<'images' | 'videos'>;
     label: Schema.Attribute.String & Schema.Attribute.Required;
     url: Schema.Attribute.String;
@@ -248,27 +155,35 @@ export interface SocialRede extends Struct.ComponentSchema {
   };
 }
 
+export interface TrabalheConoscoVaga extends Struct.ComponentSchema {
+  collectionName: 'components_trabalhe_conosco_vagas';
+  info: {
+    displayName: 'Vaga';
+    icon: 'briefcase';
+  };
+  attributes: {
+    data_expiracao: Schema.Attribute.Date;
+    descricao: Schema.Attribute.Text & Schema.Attribute.Required;
+    link_aplicacao: Schema.Attribute.String;
+    titulo: Schema.Attribute.String & Schema.Attribute.Required;
+  };
+}
+
 declare module '@strapi/strapi' {
   export module Public {
     export interface ComponentSchemas {
       'blocks.big-number-item': BlocksBigNumberItem;
       'blocks.big-numbers': BlocksBigNumbers;
-      'blocks.capa': BlocksCapa;
-      'blocks.descricao': BlocksDescricao;
       'blocks.galeria': BlocksGaleria;
       'blocks.imagem-simples': BlocksImagemSimples;
       'blocks.imagem-trio': BlocksImagemTrio;
-      'blocks.secao': BlocksSecao;
       'blocks.subtitulo': BlocksSubtitulo;
       'blocks.texto': BlocksTexto;
-      'blocks.titulo': BlocksTitulo;
       'blocks.video': BlocksVideo;
-      'edicao.edicao': EdicaoEdicao;
-      'equipe.membro': EquipeMembro;
-      'marca.item': MarcaItem;
       'navigation.link': NavigationLink;
       'navigation.sublink': NavigationSublink;
       'social.rede': SocialRede;
+      'trabalhe-conosco.vaga': TrabalheConoscoVaga;
     }
   }
 }

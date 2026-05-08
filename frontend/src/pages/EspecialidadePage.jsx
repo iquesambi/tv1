@@ -4,36 +4,42 @@ import axios from 'axios'
 import { useGoTo } from '../transition.jsx'
 import './ClientePage.css' // reusa estilos da ClientePage
 
-const STRAPI = 'http://localhost:1337'
+const STRAPI = 'https://tv1-53ev.onrender.com'
 const mediaUrl = (obj) => obj?.url ? `${STRAPI}${obj.url}` : null
 
 /* ── monta entradas (principal + âncoras de subtítulo) ── */
 function montarEntradas(cases) {
-  const entradas = []
+  // Primeiro monta grupos por case (principal + subtítulos juntos)
+  const grupos = []
+
   for (const c of cases) {
     const clienteSlug = c.cliente?.slug
     const caseSlug    = c.slug
+    const dataCase    = c.Data ? new Date(c.Data) : null
+    if (!dataCase) continue
 
-    if (c.Data) {
-      entradas.push({
-        id:               `${c.id}-main`,
-        data:             new Date(c.Data),
-        subEspecialidade: c.sub_especialidade || c.subEspecialidade || '',
-        nome:             c.titulo,
-        capa:             c.imagem_capa,
-        href:             `/${clienteSlug}/${caseSlug}`,
-        agenciaLogo:      c.agencia?.logo ?? null,
-        agenciaNome:      c.agencia?.nome ?? null,
-      })
-    }
+    const itens = []
 
+    // Card principal do case
+    itens.push({
+      id:               `${c.id}-main`,
+      data:             dataCase,
+      subEspecialidade: c.sub_especialidade || c.subEspecialidade || '',
+      nome:             c.titulo,
+      capa:             c.imagem_capa,
+      href:             `/${clienteSlug}/${caseSlug}`,
+      agenciaLogo:      c.agencia?.logo ?? null,
+      agenciaNome:      c.agencia?.nome ?? null,
+    })
+
+    // Subtítulos do case
     for (const bloco of c.blocos ?? []) {
       if (
         bloco.__component === 'blocks.subtitulo' &&
         bloco.timeline &&
         bloco.timeline_data
       ) {
-        entradas.push({
+        itens.push({
           id:               `${c.id}-sub-${bloco.id}`,
           data:             new Date(bloco.timeline_data),
           subEspecialidade: c.sub_especialidade || c.subEspecialidade || '',
@@ -45,26 +51,32 @@ function montarEntradas(cases) {
         })
       }
     }
+
+    // Dentro do grupo, ordena por data dos itens (mais novo primeiro)
+    itens.sort((a, b) => b.data - a.data)
+
+    grupos.push({ dataCase, itens })
   }
-  // Mais novo ao mais velho (descending por data)
-  entradas.sort((a, b) => b.data - a.data)
-  return entradas
+
+  // Ordena os grupos pela data principal do case (mais novo primeiro)
+  grupos.sort((a, b) => b.dataCase - a.dataCase)
+
+  // Achata os grupos em uma lista plana
+  return grupos.flatMap(g => g.itens)
 }
 
-/* ── grupos de sub-especialidades (cards consecutivos com mesma sub) ── */
+/* ── grupos de sub-especialidades (todas com mesma sub, independente posição) ── */
 function gruposDeSubEspecialidades(entradas) {
   if (!entradas.length) return []
-  const grupos = []
-  for (let i = 0; i < entradas.length; i++) {
-    const sub = entradas[i].subEspecialidade
-    const ult = grupos[grupos.length - 1]
-    if (ult && ult.sub === sub) {
-      ult.indices.push(i)
-    } else {
-      grupos.push({ sub, indices: [i] })
+  const mapa = new Map()
+  entradas.forEach((entrada, idx) => {
+    const sub = entrada.subEspecialidade
+    if (!mapa.has(sub)) {
+      mapa.set(sub, { sub, indices: [] })
     }
-  }
-  return grupos
+    mapa.get(sub).indices.push(idx)
+  })
+  return Array.from(mapa.values())
 }
 
 /* ── índice do card "ativo" para layouts estáticos ── */

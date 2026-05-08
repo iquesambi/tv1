@@ -61,16 +61,19 @@
 /* ── CASES ─────────────────────────── */
 
 .qa-cases {
-  padding: 80px 0 0;
+  padding: 48px 0 48px;
   background: #000001;
+  position: relative;
+  z-index: 1;
+  user-select: none;
 }
 
 .qa-cases__titulo {
   display: flex;
   align-items: baseline;
   gap: 20px;
-  padding: 0 48px;
-  margin: 0 0 48px;
+  padding: 0 80px;
+  margin: 0 0 32px;
 }
 
 .qa-titulo-case {
@@ -87,91 +90,200 @@
   text-transform: lowercase;
 }
 
-/* STRIP */
+/* ── CARD BASE ───────────────────────── */
 
-.qa-strip {
-  display: flex;
-  gap: 4px;
-  overflow-x: auto;
-  padding: 0 48px;
-  scrollbar-width: none;
-}
-
-.qa-strip::-webkit-scrollbar {
-  display: none;
-}
-
-/* CARDS */
-
-.qa-card {
-  flex: 0 0 auto;
+.qa-case-card {
   position: relative;
+  flex: 0 0 auto;
   overflow: hidden;
   cursor: pointer;
   background: #111;
 }
 
-.qa-card:nth-child(4n+1) { width: clamp(180px, 22vw, 300px); height: clamp(160px, 18vh, 240px); }
-.qa-card:nth-child(4n+2) { width: clamp(200px, 25vw, 360px); height: clamp(200px, 25vh, 320px); }
-.qa-card:nth-child(4n+3) { width: clamp(180px, 22vw, 320px); height: clamp(240px, 33vh, 460px); }
-.qa-card:nth-child(4n+4) { width: clamp(180px, 22vw, 330px); height: clamp(180px, 22vh, 280px); }
-
-.qa-card img {
+.qa-case-card__img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  display: block;
   transition: transform 0.5s ease;
 }
 
-.qa-card:hover img {
+.qa-case-card:hover .qa-case-card__img {
   transform: scale(1.04);
 }
 
-.qa-card__overlay {
+/* OVERLAY */
+
+.qa-case-card__overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, transparent 50%, rgba(0, 0, 0, 0.75) 100%);
+  background: linear-gradient(180deg, transparent 45%, rgba(0, 0, 0, 0.78) 100%);
   display: flex;
-  align-items: flex-end;
-  padding: 16px;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 24px 20px;
   opacity: 0;
-  transition: opacity 0.3s;
+  transition: opacity 0.3s ease;
 }
 
-.qa-card:hover .qa-card__overlay {
+.qa-case-card:hover .qa-case-card__overlay {
   opacity: 1;
 }
 
-.qa-card__titulo {
-  font-size: 13px;
-  font-weight: 700;
+.qa-case-card__titulo {
+  font-size: 16px;
+  font-weight: 900;
+  font-style: italic;
   text-transform: uppercase;
+  line-height: 1.05;
+  color: #fff;
+  margin: 0;
+  text-wrap: balance;
+}
+
+.qa-case-card--ativo .qa-case-card__titulo,
+.qa-case-card:hover .qa-case-card__titulo {
+  font-size: clamp(22px, 2.6vw, 44px);
+}
+
+/* ── LAYOUT ESTÁTICO 1 ITEM ────────── */
+
+.qa-static {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 80px;
+  height: 70vh;
+  overflow: hidden;
+}
+
+.qa-static--1 .qa-case-card--ativo {
+  width: clamp(160px, 17vw, 260px);
+  height: 62vh;
+}
+
+/* ── LAYOUT ESTÁTICO 2 ITENS ──────── */
+
+.qa-static--2 .qa-case-card--inativo {
+  width: clamp(200px, 24vw, 380px);
+  height: 44vh;
+}
+
+.qa-static--2 .qa-case-card--ativo {
+  width: clamp(200px, 22vw, 360px);
+  height: 64vh;
+}
+
+/* ── LAYOUT ESTÁTICO 3 ITENS ──────── */
+
+.qa-static--3 .qa-case-card--inativo {
+  width: clamp(180px, 21vw, 340px);
+  height: 40vh;
+}
+
+.qa-static--3 .qa-case-card--ativo {
+  width: clamp(200px, 24vw, 380px);
+  height: 64vh;
+}
+
+/* ── CARROSSEL (4+ ITENS) ────────────── */
+
+.qa-viewport {
+  height: 70vh;
+  overflow: hidden;
+  cursor: grab;
+}
+
+.qa-viewport:active {
+  cursor: grabbing;
+}
+
+.qa-track {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  height: 100%;
+  will-change: transform;
+}
+
+.qa-case-card--carousel {
+  width: clamp(220px, 26vw, 380px);
 }
 
 /* ── TIMELINE ───────────────────────── */
 
 .qa-timeline {
-  padding: 32px 90px 80px;
+  background: #000001;
+  padding: 16px 0 48px;
+  position: relative;
+  user-select: none;
+  display: flex;
+  justify-content: center;
 }
 
-.qa-timeline__linha {
-  width: 100%;
-  height: 1px;
-  background: rgba(255, 255, 255, 0.2);
-  margin-bottom: 12px;
+.qa-timeline--carousel {
+  cursor: grab;
 }
 
-.qa-timeline__anos {
+.qa-timeline--carousel:active {
+  cursor: grabbing;
+}
+
+.qa-timeline__inner {
+  width: 98%;
+  padding: 0 12px;
+  box-sizing: border-box;
+  position: relative;
+  overflow: hidden;
+}
+
+.qa-timeline__ticks {
+  display: flex;
+  align-items: center;
+  height: 20px;
+}
+
+.qa-timeline__tick {
+  flex: 1;
+  height: 100%;
+  border-left: 1px solid #fff;
+}
+
+/* Estático: labels posicionados em % do inner */
+.qa-timeline__labels-static {
   position: relative;
   height: 28px;
+  margin-top: 18px;
 }
 
-.qa-timeline__ano {
+/* Carrossel: viewport interno onde os labels deslizam */
+.qa-timeline__labels-viewport {
+  position: relative;
+  height: 28px;
+  margin-top: 18px;
+  overflow: hidden;
+}
+
+.qa-timeline__labels-track {
+  display: flex;
+  height: 100%;
+  will-change: transform;
+}
+
+.qa-timeline__labels-set {
+  flex: 0 0 auto;
+  position: relative;
+  height: 100%;
+}
+
+.qa-timeline__label {
   position: absolute;
   transform: translateX(-50%);
+  top: 0;
   font-family: 'PP Hatton', serif;
   font-style: italic;
-  font-size: 18px;
-  color: rgba(255, 255, 255, 0.55);
+  font-size: 24px;
+  color: #fff;
   white-space: nowrap;
 }

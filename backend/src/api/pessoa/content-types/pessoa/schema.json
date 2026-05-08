@@ -4,7 +4,7 @@
   "info": {
     "singularName": "pessoa",
     "pluralName": "pessoas",
-    "displayName": "Pessoa"
+    "displayName": "Pessoas"
   },
   "options": {
     "draftAndPublish": true
@@ -33,6 +33,10 @@
     "ordem": {
       "type": "integer",
       "default": 0
+    },
+    "ativo": {
+      "type": "boolean",
+      "default": true
     }
   }
 }

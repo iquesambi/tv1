@@ -8,6 +8,8 @@ import ClientePage from './pages/ClientePage.jsx'
 import EspecialidadePage from './pages/EspecialidadePage.jsx'
 import PessoasPage from './pages/PessoasPage.jsx'
 import QuarentaAnosPage from './pages/QuarentaAnosPage.jsx'
+import TrabalheComenoscoPage from './pages/TrabalheComenoscoPage.jsx'
+import OutrosAssuntosPage from './pages/OutrosAssuntosPage.jsx'
 import { TransitionProvider } from './transition.jsx'
 
 createRoot(document.getElementById('root')).render(
@@ -17,6 +19,8 @@ createRoot(document.getElementById('root')).render(
         <Routes>
           <Route path="/" element={<App />} />
           <Route path="/contato" element={<App />} />
+          <Route path="/contato/trabalhe-conosco" element={<TrabalheComenoscoPage />} />
+          <Route path="/contato/outros-assuntos" element={<OutrosAssuntosPage />} />
           <Route path="/pessoas" element={<PessoasPage />} />
           <Route path="/quarenta-anos" element={<QuarentaAnosPage />} />
           <Route path="/cases/:especialidade" element={<EspecialidadePage />} />

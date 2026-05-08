@@ -4,7 +4,7 @@ import axios from 'axios'
 import { useGoTo } from './transition.jsx'
 import './App.css'
 
-const STRAPI = 'http://localhost:1337'
+const STRAPI = 'https://tv1-53ev.onrender.com'
 const api = (path) => axios.get(`${STRAPI}/api/${path}`).then(r => r.data.data).catch(() => null)
 const mediaUrl = (obj) => obj?.url ? `${STRAPI}${obj.url}` : null
 
@@ -27,6 +27,7 @@ function App() {
   const [equipe, setEquipe]     = useState(null)
   const [aberto, setAberto]     = useState(null)
   const [hoveredSub, setHoveredSub] = useState(null)
+  const [activeSubIdx, setActiveSubIdx] = useState(0)
   const [menuMobile, setMenuMobile] = useState(false)
   const location = useLocation()
   const contatoAberto = location.pathname === '/contato'
@@ -39,7 +40,7 @@ function App() {
     api('agencias?populate=logo&sort=ordem:asc').then(setAgencias)
     api('quarenta-anos?populate=imagem').then(setQA)
     api('redes-sociais?populate[redes][populate]=icone').then(setRedes)
-    api('equipe?populate[membros][populate]=foto').then(setEquipe)
+    api('pessoas?filters[ativo][$eq]=true&populate=foto&sort=ordem').then(setEquipe)
   }, [])
 
   // Fechar menu ao scrollar pra cima
@@ -63,7 +64,7 @@ function App() {
   // Sublinks dinâmicos: /pessoas → membros da equipe
   const getSublinks = (link) => {
     if (link.url === '/pessoas') {
-      return (equipe?.membros ?? []).map(m => ({
+      return (equipe ?? []).map(m => ({
         label: m.nome,
         url: `/pessoas#${slugify(m.nome)}`,
         imagem_hover: m.foto ?? null,
@@ -72,47 +73,110 @@ function App() {
     return link.sublinks ?? []
   }
 
-  // Scroll forte: navega entre itens
-  const scrollLocked = useRef(false)
+  // Reset roleta sempre que troca de menu
+  useEffect(() => { setActiveSubIdx(0) }, [aberto])
+
+  // Scroll: roleta dentro do submenu (ou navega entre menus se sem sublinks)
+  const accDelta = useRef(0)
+  const navLock = useRef(false)
+  const activeSubIdxRef = useRef(0)
+
+  useEffect(() => { activeSubIdxRef.current = activeSubIdx }, [activeSubIdx])
+
   useEffect(() => {
-    const THRESHOLD = 80
-    const LOCK_MS   = 700
+    const STEP_PX = 80          // pixels por troca de item dentro da categoria
+    const NAV_THRESHOLD = 180   // threshold forte pra pular entre categorias
+    const NAV_LOCK_MS   = 600
 
     const onWheel = (e) => {
       if (aberto === null) return
-      if (scrollLocked.current) return
-      if (Math.abs(e.deltaY) < THRESHOLD) return
+
+      const link = links[aberto]
+      const sublinks = link ? getSublinks(link) : []
 
       e.preventDefault()
-      scrollLocked.current = true
-      setTimeout(() => { scrollLocked.current = false }, LOCK_MS)
 
-      if (e.deltaY < 0) {
-        setAberto(aberto > 0 ? aberto - 1 : null)
+      if (sublinks.length > 0) {
+        // Roleta — acumula delta e move por passos
+        accDelta.current += e.deltaY
+        while (Math.abs(accDelta.current) >= STEP_PX) {
+          if (accDelta.current > 0) {
+            // Scroll down
+            if (activeSubIdxRef.current < sublinks.length - 1) {
+              setActiveSubIdx(prev => prev + 1)
+              activeSubIdxRef.current += 1
+              accDelta.current -= STEP_PX
+            } else {
+              // Último item — acumula até NAV_THRESHOLD pra pular
+              if (Math.abs(accDelta.current) >= NAV_THRESHOLD) {
+                navLock.current = true
+                setTimeout(() => { navLock.current = false }, NAV_LOCK_MS)
+                setAberto(aberto < links.length - 1 ? aberto + 1 : null)
+                setActiveSubIdx(0)
+                activeSubIdxRef.current = 0
+                accDelta.current = 0
+              }
+              break
+            }
+          } else {
+            // Scroll up
+            if (activeSubIdxRef.current > 0) {
+              setActiveSubIdx(prev => prev - 1)
+              activeSubIdxRef.current -= 1
+              accDelta.current += STEP_PX
+            } else {
+              // Primeiro item — acumula até NAV_THRESHOLD pra pular
+              if (Math.abs(accDelta.current) >= NAV_THRESHOLD) {
+                navLock.current = true
+                setTimeout(() => { navLock.current = false }, NAV_LOCK_MS)
+                setAberto(aberto > 0 ? aberto - 1 : null)
+                setActiveSubIdx(0)
+                activeSubIdxRef.current = 0
+                accDelta.current = 0
+              }
+              break
+            }
+          }
+        }
+        setHoveredSub(null)
       } else {
-        setAberto(aberto < links.length - 1 ? aberto + 1 : null)
+        // Sem sublinks: navega entre menus (com lock)
+        if (navLock.current) return
+        if (Math.abs(e.deltaY) < NAV_THRESHOLD) return
+        navLock.current = true
+        setTimeout(() => { navLock.current = false }, NAV_LOCK_MS)
+        if (e.deltaY < 0) {
+          setAberto(aberto > 0 ? aberto - 1 : null)
+        } else {
+          setAberto(aberto < links.length - 1 ? aberto + 1 : null)
+        }
+        setHoveredSub(null)
       }
-      setHoveredSub(null)
     }
 
     window.addEventListener('wheel', onWheel, { passive: false })
     return () => window.removeEventListener('wheel', onWheel)
-  }, [aberto, links.length])
+  }, [aberto, links, equipe])
+
+  // Reset acumulador quando muda o menu
+  useEffect(() => { accDelta.current = 0 }, [aberto])
 
   const isMobile = () => window.innerWidth <= 768
 
   const handleLink = (e, i, link) => {
     e.preventDefault()
+    e.stopPropagation()
+    const sublinks = getSublinks(link)
     if (isMobile()) {
-      if (link.url) goTo(link.url)
+      if (sublinks.length > 0) { setAberto(aberto === i ? null : i); setHoveredSub(null) }
+      else if (link.url) goTo(link.url)
       return
     }
+    // Desktop: toggle submenu — nunca navega direto pelo clique no menu principal
     if (aberto === i) {
-      // só navega se o link tiver URL definida
-      if (link.url) goTo(link.url)
-      else { setAberto(null); setHoveredSub(null) }
+      setAberto(null); setHoveredSub(null)
     } else {
-      setAberto(i)
+      setAberto(i); setHoveredSub(null)
     }
   }
 
@@ -214,27 +278,66 @@ function App() {
               >
                 {link.label}
               </a>
-
-              {esteAberto && sublinks.length > 0 && (
-                <div className="home__submenu">
-                  {sublinks.map((sub, j) => (
-                    <a
-                      key={j}
-                      href={sub.url || '#'}
-                      className={`home__submenu-link ${hoveredSub === sub ? 'home__submenu-link--ativo' : ''}`}
-                      onMouseEnter={() => setHoveredSub(sub)}
-                      onMouseLeave={() => setHoveredSub(null)}
-                      onClick={e => { e.preventDefault(); sub.url && goTo(sub.url) }}
-                    >
-                      {sub.label}
-                    </a>
-                  ))}
-                </div>
-              )}
             </div>
           )
         })}
       </nav>
+
+      {/* Submenu Roleta - fora do nav (porque nav tem transform que quebraria position: fixed) */}
+      {aberto !== null && !contatoAberto && (() => {
+        const link = links[aberto]
+        const sublinks = link ? getSublinks(link) : []
+        if (sublinks.length === 0) return null
+
+        const isRoleta = sublinks.length >= 5
+
+        const sizes = sublinks.map((_, j) => {
+          if (!isRoleta) return 70
+          const d = Math.abs(j - activeSubIdx)
+          return d === 0 ? 90 : Math.max(16, 56 - (d - 1) * 12)
+        })
+        const centers = []
+        let acc = 0
+        sizes.forEach(h => { centers.push(acc + h / 2); acc += h })
+        const totalHeight = acc
+
+        // Para não-roleta: targetY varia por posição do item ativo
+        // Primeiro item → 35%, último item → 62%, intermediários → interpolado
+        const ratio = links.length > 1 ? aberto / (links.length - 1) : 0.5
+        const normalTargetY = window.innerHeight * (0.35 + ratio * 0.27)
+
+        const listShift = isRoleta
+          ? window.innerHeight * 0.58 - centers[activeSubIdx]
+          : normalTargetY - totalHeight / 2
+
+        return (
+          <div className="home__submenu" onClick={e => e.stopPropagation()}>
+            <div
+              className="home__submenu-list"
+              style={{ transform: `translate(-50%, ${listShift}px)` }}
+            >
+              {sublinks.map((sub, j) => {
+                const d = Math.abs(j - activeSubIdx)
+                const opacity = isRoleta ? Math.max(0.06, 1 - d * 0.18) : 1
+                const isActive = j === activeSubIdx
+                return (
+                  <a
+                    key={j}
+                    href={sub.url || '#'}
+                    className={`home__submenu-link ${isActive ? 'home__submenu-link--ativo' : ''}`}
+                    style={{ fontSize: `${sizes[j]}px`, opacity }}
+                    onMouseEnter={() => { setActiveSubIdx(j); setHoveredSub(sub) }}
+                    onMouseLeave={() => setHoveredSub(null)}
+                    onClick={e => { e.preventDefault(); sub.url && goTo(sub.url) }}
+                  >
+                    {sub.label}
+                  </a>
+                )
+              })}
+            </div>
+          </div>
+        )
+      })()}
 
       {/* Rodapé — marcas agora vêm de agencias */}
       <footer className="home__bottom" onClick={e => e.stopPropagation()}>
