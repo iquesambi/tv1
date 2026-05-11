@@ -221,8 +221,63 @@ function App() {
       {/* Menu mobile overlay */}
       <div className={`home__menu-mobile ${menuMobile ? 'home__menu-mobile--aberto' : ''}`} onClick={() => setMenuMobile(false)}>
         <div className="home__menu-mobile__inner" onClick={e => e.stopPropagation()}>
-          {/* conteúdo: redes sociais + links — em breve */}
-          <button className="home__menu-mobile__fechar" onClick={() => setMenuMobile(false)}>✕</button>
+          {/* Header do menu mobile */}
+          <div className="home__menu-mobile__header">
+            <div className="home__menu-mobile__logo">
+              {logo?.logo && <img src={mediaUrl(logo.logo)} alt="TV1" />}
+            </div>
+            <button className="home__menu-mobile__fechar" onClick={() => setMenuMobile(false)}>✕</button>
+          </div>
+
+          {/* Nav mobile */}
+          <nav className="home__menu-mobile__nav">
+            {links.map((link, i) => {
+              const sublinks = getSublinks(link)
+              return (
+                <button
+                  key={i}
+                  className="home__menu-mobile__nav-link"
+                  onClick={(e) => {
+                    e.preventDefault()
+                    if (sublinks.length === 0 && link.url) {
+                      goTo(link.url)
+                      setMenuMobile(false)
+                    }
+                  }}
+                >
+                  {link.label}
+                </button>
+              )
+            })}
+            <button
+              className="home__menu-mobile__nav-link"
+              onClick={(e) => {
+                e.preventDefault()
+                goTo('/contato')
+                setMenuMobile(false)
+              }}
+            >
+              Contato
+            </button>
+          </nav>
+
+          {/* Marcas — flutua entre menu e linha */}
+          <div className="home__menu-mobile__marcas">
+            {agencias?.filter(a => a.logo).map((a, i) => (
+              <a key={i} href={externalUrl(a.url_externo)} target="_blank" rel="noreferrer">
+                <img src={mediaUrl(a.logo)} alt={a.nome} />
+              </a>
+            ))}
+          </div>
+
+          {/* Redes — fixas no final com linha acima */}
+          <div className="home__menu-mobile__redes">
+            {redes?.redes?.map((rede, i) => (
+              <a key={i} href={externalUrl(rede.url)} target="_blank" rel="noreferrer">
+                <img src={mediaUrl(rede.icone)} alt="" />
+              </a>
+            ))}
+          </div>
         </div>
       </div>
 

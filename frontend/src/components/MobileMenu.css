@@ -1,0 +1,168 @@
+/* ── HAMBURGUER BOTÃO ─────────────────── */
+
+.mobile-menu__btn {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .mobile-menu__btn {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    background: transparent;
+    border: none;
+    padding: 4px;
+    cursor: pointer;
+    -webkit-appearance: none;
+    appearance: none;
+    outline: none;
+    box-shadow: none;
+  }
+
+  .mobile-menu__btn span {
+    display: block;
+    width: 28px;
+    height: 2px;
+    background: currentColor;
+    border-radius: 0;
+  }
+
+  .mobile-menu__btn span:nth-child(2) {
+    width: 16px;
+    align-self: center;
+  }
+}
+
+/* ── OVERLAY ──────────────────────────── */
+
+.mobile-menu__overlay {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .mobile-menu__overlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .mobile-menu__overlay--aberto {
+    pointer-events: all;
+    opacity: 1;
+  }
+
+  .mobile-menu__inner {
+    position: absolute;
+    inset: 0;
+    background: #ffffff;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .mobile-menu__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    flex-shrink: 0;
+  }
+
+  .mobile-menu__logo img {
+    height: 32px;
+    width: auto;
+    object-fit: contain;
+    display: block;
+  }
+
+  .mobile-menu__fechar {
+    background: none;
+    border: none;
+    color: #000001;
+    font-size: 32px;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0;
+  }
+
+  .mobile-menu__nav {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+    padding: 40px 20px;
+    flex: 1;
+    overflow-y: auto;
+  }
+
+  .mobile-menu__nav-link {
+    background: none;
+    border: none;
+    padding: 0;
+    font-family: 'Gilroy', sans-serif;
+    font-size: 64px;
+    font-weight: 900;
+    font-style: italic;
+    text-transform: uppercase;
+    color: #000001;
+    text-align: left;
+    cursor: pointer;
+    line-height: 0.85;
+    transition: opacity 0.2s ease;
+  }
+
+  .mobile-menu__nav-link:active {
+    opacity: 0.7;
+  }
+
+  .mobile-menu__marcas {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px 40px;
+    align-items: center;
+    padding: 0 20px 52px;
+    margin-top: auto;
+    flex-shrink: 0;
+  }
+
+  .mobile-menu__marcas a {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    width: 100%;
+  }
+
+  .mobile-menu__marcas img {
+    height: 24px;
+    width: auto;
+    max-width: 90%;
+    object-fit: contain;
+    display: block;
+  }
+
+  .mobile-menu__redes {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-top: 0.75px solid rgba(0, 0, 1, 0.2);
+    padding: 40px 20px;
+    flex-shrink: 0;
+  }
+
+  .mobile-menu__redes a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+  }
+
+  .mobile-menu__redes img {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+    display: block;
+    filter: brightness(0);
+  }
+}

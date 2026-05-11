@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import axios from 'axios'
 import { useGoTo } from '../transition.jsx'
+import MobileMenu from '../components/MobileMenu.jsx'
 import './ClientePage.css'
 
 const STRAPI = 'https://tv1-53ev.onrender.com'
@@ -82,10 +83,11 @@ const ALTURAS = [460, 340, 400, 310, 380]
 function alturaParaIdx(idx) { return ALTURAS[idx % ALTURAS.length] }
 
 /* ── Card ── */
-function CaseCard({ entrada, idx, ativo = false, carousel = false }) {
+function CaseCard({ entrada, idx, ativo = false, carousel = false, cardRef }) {
   const goTo = useGoTo()
   return (
     <div
+      ref={cardRef}
       className={[
         'cliente-card',
         ativo     ? 'cliente-card--ativo'    : 'cliente-card--inativo',
@@ -98,14 +100,14 @@ function CaseCard({ entrada, idx, ativo = false, carousel = false }) {
         <img src={mediaUrl(entrada.capa)} alt={entrada.nome} className="cliente-card__img" />
       )}
 
-      {/* Logo da agência — canto superior direito */}
+      {/* Logo da agência — canto superior esquerdo no mobile */}
       {entrada.agenciaLogo && (
         <div className="cliente-card__agencia">
           <img src={mediaUrl(entrada.agenciaLogo)} alt={entrada.agenciaNome ?? ''} />
         </div>
       )}
 
-      {/* Overlay com título: sempre visível no ativo, só no hover para inativos */}
+      {/* Overlay com título */}
       <div className="cliente-card__overlay">
         <h3 className="cliente-card__titulo">{entrada.nome}</h3>
       </div>
@@ -132,7 +134,6 @@ function Timeline({ labels, xRef, tiltDeltaRef, timelineTrackRef, usaCarrossel }
       const delta = e.clientX - dragStart.current
       dragStart.current = e.clientX
       if (xRef?.current) xRef.current.x += delta
-      // alimenta o tilt: drag pra direita → cards giram no sentido oposto ao wheel positivo
       if (tiltDeltaRef?.current != null) {
         tiltDeltaRef.current = -delta * 4
       }
@@ -146,12 +147,30 @@ function Timeline({ labels, xRef, tiltDeltaRef, timelineTrackRef, usaCarrossel }
     }
   }, [usaCarrossel, xRef, tiltDeltaRef])
 
+  const handleTouchStart = (e) => {
+    if (!usaCarrossel || !xRef?.current) return
+    isDragging.current = true
+    dragStart.current = e.touches[0].clientX
+  }
+  const handleTouchMove = (e) => {
+    if (!isDragging.current || !usaCarrossel) return
+    const delta = e.touches[0].clientX - dragStart.current
+    dragStart.current = e.touches[0].clientX
+    if (xRef?.current) xRef.current.x += delta
+    if (tiltDeltaRef?.current != null) tiltDeltaRef.current = -delta * 4
+    e.preventDefault()
+  }
+  const handleTouchEnd = () => { isDragging.current = false }
+
   // Carrossel: ticks fixos, labels deslizam dentro do viewport, posicionados em %
   if (usaCarrossel) {
     return (
       <div
         className="timeline timeline--carousel"
         onMouseDown={handleMouseDown}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
       >
         <div className="timeline__inner">
           {/* Ticks fixos */}
@@ -269,24 +288,37 @@ export default function ClientePage() {
 
     let cards = Array.from(track.querySelectorAll('.cliente-card'))
 
+    const mobile = window.innerWidth <= 768
+
     // Sincroniza largura dos sets de labels com o oneSet do carrossel + calcula posições reais
     if (usaCarrossel && timelineTrackRef.current) {
       const sets = timelineTrackRef.current.querySelectorAll('.timeline__labels-set')
       sets.forEach(s => { s.style.width = `${oneSet}px` })
 
-      // Label alinhado com o PRIMEIRO card de cada grupo (consecutivo do mesmo ano)
       const firstSetCards = cards.slice(0, n)
-      const grupos = gruposDeAnos(entradas)
-      const novosLabels = grupos.map(g => {
-        const firstIdx = g.indices[0]
-        const card = firstSetCards[firstIdx]
-        const center = card ? card.offsetLeft + card.offsetWidth / 2 : 0
-        const pos = (center / oneSet) * 100
-        return { label: String(g.ano), pos }
-      })
+
+      let novosLabels
+      if (mobile) {
+        // Mobile: label em cada card individualmente
+        novosLabels = entradas.map((entrada, i) => {
+          const card = firstSetCards[i]
+          const center = card ? card.offsetLeft + card.offsetWidth / 2 : 0
+          const pos = (center / oneSet) * 100
+          return { label: String(entrada.ano), pos }
+        })
+      } else {
+        // Desktop: label no primeiro card de cada grupo de ano
+        const grupos = gruposDeAnos(entradas)
+        novosLabels = grupos.map(g => {
+          const firstIdx = g.indices[0]
+          const card = firstSetCards[firstIdx]
+          const center = card ? card.offsetLeft + card.offsetWidth / 2 : 0
+          const pos = (center / oneSet) * 100
+          return { label: String(g.ano), pos }
+        })
+      }
       setLabels(novosLabels)
     } else if (!usaCarrossel) {
-      // Estático: alinha ao primeiro card de cada grupo
       const grupos = gruposDeAnos(entradas)
       const novosLabels = grupos.map(g => {
         const firstIdx = g.indices[0]
@@ -304,19 +336,53 @@ export default function ClientePage() {
       }
     }
 
+    // Touch: drag horizontal move o carrossel
+    let touchStartX = 0
+    let touchStartY = 0
+    let touchMoving = false
+    const onTouchStart = (e) => {
+      touchStartX = e.touches[0].clientX
+      touchStartY = e.touches[0].clientY
+      touchMoving = true
+    }
+    const onTouchMove = (e) => {
+      if (!touchMoving || !usaCarrossel) return
+      const dx = e.touches[0].clientX - touchStartX
+      const dy = e.touches[0].clientY - touchStartY
+      // só intercepta se movimento predominantemente horizontal
+      if (Math.abs(dx) > Math.abs(dy)) {
+        e.preventDefault()
+        xRef.current.x += dx * 1.2
+        tiltDeltaRef.current = -dx * 4
+        touchStartX = e.touches[0].clientX
+        touchStartY = e.touches[0].clientY
+      }
+    }
+    const onTouchEnd = () => { touchMoving = false }
+
+    const isMobile = () => window.innerWidth <= 768
+
     const tick = () => {
       const targetTilt = Math.max(-60, Math.min(60, tiltDeltaRef.current * 0.55))
       tilt  += (targetTilt - tilt) * 0.08
       tiltDeltaRef.current *= 0.91
 
       if (usaCarrossel) {
-        // mantém o loop infinito clamping o x
         if (xRef.current.x < -2 * oneSet) xRef.current.x += oneSet
         if (xRef.current.x > 0)           xRef.current.x -= oneSet
         track.style.transform = `translateX(${xRef.current.x}px)`
-        // labels da timeline: mesmo translate (sets têm mesma largura que oneSet)
         if (timelineTrackRef.current) {
           timelineTrackRef.current.style.transform = `translateX(${xRef.current.x}px)`
+        }
+
+        // No mobile: marca cards 100% visíveis
+        if (isMobile()) {
+          const vw = container.clientWidth
+          cards.forEach(card => {
+            const rect = card.getBoundingClientRect()
+            const visivel = rect.left >= 0 && rect.right <= vw
+            card.classList.toggle('cliente-card--visivel', visivel)
+          })
         }
       }
 
@@ -328,10 +394,16 @@ export default function ClientePage() {
     }
 
     container.addEventListener('wheel', onWheel, { passive: false })
+    container.addEventListener('touchstart', onTouchStart, { passive: true })
+    container.addEventListener('touchmove', onTouchMove, { passive: false })
+    container.addEventListener('touchend', onTouchEnd, { passive: true })
     raf = requestAnimationFrame(tick)
 
     return () => {
       container.removeEventListener('wheel', onWheel)
+      container.removeEventListener('touchstart', onTouchStart)
+      container.removeEventListener('touchmove', onTouchMove)
+      container.removeEventListener('touchend', onTouchEnd)
       cancelAnimationFrame(raf)
     }
   }, [n, usaCarrossel])
@@ -362,6 +434,7 @@ export default function ClientePage() {
         >
           {logo && <img src={mediaUrl(logo)} alt="TV1" />}
         </button>
+        <MobileMenu logo={logo} logoFiltro="brightness(0)" />
       </header>
 
       {/* Layout estático (1–3 itens) */}

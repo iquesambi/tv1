@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback, useRef } from 'react'
 import { useParams } from 'react-router-dom'
 import axios from 'axios'
 import FooterBranco from '../components/FooterBranco.jsx'
+import MobileMenu from '../components/MobileMenu.jsx'
 import './CasePage.css'
 
 const STRAPI = 'https://tv1-53ev.onrender.com'
@@ -240,6 +241,13 @@ function Block({ block }) {
 export default function CasePage() {
   const { cliente: clienteSlug, case: caseSlug } = useParams()
   const [data, setData] = useState(null)
+  const [logo, setLogo] = useState(null)
+  const [quarentaAnos, setQA] = useState(null)
+
+  useEffect(() => {
+    axios.get(`${STRAPI}/api/logo-site?populate=logo`).then(r => setLogo(r.data.data)).catch(() => {})
+    axios.get(`${STRAPI}/api/quarenta-anos?populate=imagem`).then(r => setQA(r.data.data)).catch(() => {})
+  }, [])
 
   useEffect(() => {
     axios
@@ -306,6 +314,26 @@ export default function CasePage() {
       ))}
 
       <FooterBranco />
+
+      {/* Última dobra mobile: versão branca da home */}
+      <section className="case-home-fold">
+        <div className="case-home-fold__header">
+          <div className="case-home-fold__logo">
+            {logo?.logo && <img src={mediaUrl(logo.logo)} alt="TV1" />}
+          </div>
+          <MobileMenu logoFiltro="brightness(0)" />
+        </div>
+        <div className="case-home-fold__center">
+          {quarentaAnos?.imagem && (
+            <img className="case-home-fold__camera" src={mediaUrl(quarentaAnos.imagem)} alt="" />
+          )}
+          <nav className="case-home-fold__nav">
+            <a className="case-home-fold__nav-link" href="/clientes">Cases</a>
+            <a className="case-home-fold__nav-link" href="/clientes">Clientes</a>
+            <a className="case-home-fold__nav-link" href="/pessoas">Pessoas</a>
+          </nav>
+        </div>
+      </section>
 
     </div>
   )

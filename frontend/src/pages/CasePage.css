@@ -376,9 +376,24 @@
   background: #fff;
 }
 
+/* DOBRA FINAL MOBILE (versão branca da home) */
+
+.case-home-fold {
+  display: none;
+}
+
 /* RESPONSIVO */
 
 @media (max-width: 768px) {
+
+  /* Esconde o FooterBranco no mobile — substituído pela dobra final */
+  .case-page .footer-branco {
+    display: none;
+  }
+
+  /* ── Hero ── */
+
+  /* Conteúdo: primeira dobra, full screen, centralizado */
   .case-hero {
     grid-template-columns: 1fr;
     height: auto;
@@ -386,54 +401,217 @@
 
   .case-hero__content {
     width: 100%;
-    height: auto;
-    padding: 40px;
+    height: 100vh;
+    padding: 40px 20px;
     gap: 24px;
+    order: 1;
+    justify-content: center;
+    overflow: visible;
   }
 
+  /* Imagem: segunda dobra, full width, proporção natural */
   .case-hero__image {
     width: 100%;
-    height: 60vw;
-  }
-
-  .case-hero__title {
-    font-size: 40px;
+    height: auto;
+    aspect-ratio: 2/3;
+    order: 2;
   }
 
   .case-hero__breadcrumb {
-    font-size: 18px;
+    font-size: 24px;
+    font-weight: 500;
   }
 
+  .case-hero__agency {
+    height: auto !important;
+    min-height: 0;
+    overflow: visible;
+    margin: 4px 0;
+  }
+
+  .case-hero__agency img {
+    height: 35px !important;
+    max-height: none !important;
+    width: auto;
+  }
+
+  .case-hero__title {
+    font-size: 64px;
+    font-style: normal;
+    line-height: 1;
+  }
+
+  .case-hero__description {
+    font-size: 14px;
+    line-height: 1.4;
+  }
+
+  /* ── Video ── */
   .block-video {
     height: 56vw;
   }
 
+  /* ── Trio de imagens ── */
   .block-trio {
     grid-template-columns: 1fr;
     height: auto;
+    position: relative;
   }
 
-  .block-trio__left,
+  .block-trio__left {
+    height: 100vh;
+  }
+
   .block-trio__right {
-    height: 60vw;
+    height: 100vh;
+    position: relative;
   }
 
+  /* Restaura o gradiente */
+  .block-trio__right::after {
+    display: block;
+  }
+
+  /* Imagem central flutuando na junção */
   .block-trio__center {
-    display: none;
+    display: block;
+    position: absolute;
+    width: 60vw;
+    height: 75vw;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2;
+    pointer-events: none;
   }
 
+  /* Números como overlay no canto inferior direito */
+  .block-trio__numbers {
+    position: absolute;
+    top: unset;
+    bottom: 48px;
+    right: 16px;
+    transform: none;
+    background: transparent;
+    padding: 0;
+    text-align: right;
+  }
+
+  .block-trio__numero {
+    font-size: 56px;
+    line-height: 1;
+  }
+
+  .block-trio__descricao {
+    font-size: 16px;
+    line-height: 1.4;
+  }
+
+  /* ── Big Numbers ── */
   .block-big-numbers {
-    padding: 40px;
-    gap: 32px;
+    padding: 40px 20px;
+    gap: 32px 16px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
   }
 
   .block-big-numbers__numero {
-    font-size: 56px;
+    font-size: 48px;
+    line-height: 1.1;
   }
 
-  .block-subtitulo,
+  .block-big-numbers__descricao {
+    font-size: 14px;
+    line-height: 1.3;
+  }
+
+  /* ── Subtítulo e texto ── */
+  .block-subtitulo {
+    padding: 32px 20px 8px;
+    font-size: 24px;
+    text-align: left;
+  }
+
   .block-texto {
-    padding-left: 40px;
-    padding-right: 40px;
+    padding: 8px 20px 32px;
+    font-size: 13px;
+    text-align: left;
+  }
+
+  /* ── Imagem simples ── */
+  .block-imagem-simples {
+    height: auto;
+    aspect-ratio: 4/3;
+  }
+
+  .block-imagem-simples figcaption {
+    padding: 8px 20px;
+  }
+
+  /* ── Galeria ── */
+  .block-galeria__slide {
+    height: 70vw;
+  }
+
+  /* ── Dobra final: versão branca da home ── */
+  .case-home-fold {
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    height: 100vh;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .case-home-fold__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px;
+    flex-shrink: 0;
+  }
+
+  .case-home-fold__logo img {
+    height: 32px;
+    width: auto;
+    object-fit: contain;
+    display: block;
+    filter: brightness(0);
+  }
+
+  /* Wrapper centralizado verticalmente no espaço abaixo do header */
+  .case-home-fold__center {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 34px;
+    padding-bottom: 40px;
+  }
+
+  .case-home-fold__camera {
+    height: 90px;
+    width: auto;
+    object-fit: contain;
+    display: block;
+  }
+
+  .case-home-fold__nav {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .case-home-fold__nav-link {
+    font-family: 'Gilroy', sans-serif;
+    font-size: 70px;
+    font-weight: 900;
+    font-style: italic;
+    text-transform: uppercase;
+    color: #000001;
+    text-decoration: none;
+    line-height: 1;
   }
 }

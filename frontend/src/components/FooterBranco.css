@@ -215,3 +215,48 @@
 }
 
 .footer-branco__redes a:hover img { opacity: 0.45; }
+
+/* ── MOBILE ───────────────────────────── */
+
+@media (max-width: 768px) {
+  .footer-branco {
+    height: 100dvh;
+  }
+
+  .footer-branco__top {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    padding: 16px 20px;
+    z-index: 10;
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(4px);
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .footer-branco__logo img {
+    height: 28px;
+  }
+
+  .footer-branco__camera {
+    display: none;
+  }
+
+  .footer-branco__nav {
+    padding-top: 80px;
+  }
+
+  .footer-branco__nav-link {
+    font-size: clamp(48px, 14vw, 68px);
+  }
+
+  .footer-branco__submenu {
+    display: none;
+  }
+
+  .footer-branco__bottom {
+    display: none;
+  }
+}

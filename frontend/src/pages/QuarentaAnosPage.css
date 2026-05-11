@@ -287,3 +287,62 @@
   color: #fff;
   white-space: nowrap;
 }
+
+/* ── MOBILE ───────────────────────────── */
+
+@media (max-width: 768px) {
+  .qa-hero {
+    height: 100dvh;
+  }
+
+  .qa-cases__titulo {
+    padding: 0 24px;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .qa-titulo-case,
+  .qa-titulo-historias {
+    font-size: clamp(40px, 12vw, 70px);
+  }
+
+  .qa-static {
+    padding: 0 24px;
+    gap: 6px;
+    height: auto;
+    min-height: 50vh;
+  }
+
+  .qa-static--1 .qa-case-card--ativo {
+    width: clamp(140px, 55vw, 220px);
+    height: 50vh;
+  }
+
+  .qa-static--2 .qa-case-card--inativo,
+  .qa-static--2 .qa-case-card--ativo,
+  .qa-static--3 .qa-case-card--inativo,
+  .qa-static--3 .qa-case-card--ativo {
+    width: clamp(100px, 40vw, 200px);
+  }
+
+  .qa-static--2 .qa-case-card--inativo { height: 36vh; }
+  .qa-static--2 .qa-case-card--ativo   { height: 50vh; }
+  .qa-static--3 .qa-case-card--inativo { height: 32vh; }
+  .qa-static--3 .qa-case-card--ativo   { height: 48vh; }
+
+  .qa-viewport {
+    height: 50vh;
+  }
+
+  .qa-case-card--carousel {
+    width: clamp(140px, 60vw, 240px);
+  }
+
+  .qa-timeline {
+    padding: 12px 24px 32px;
+  }
+
+  .qa-timeline__label {
+    font-size: 16px;
+  }
+}

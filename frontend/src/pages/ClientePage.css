@@ -279,40 +279,95 @@
   font-weight: 500;
 }
 
+
 /* ── RESPONSIVO ───────────────────────── */
 
 @media (max-width: 768px) {
+
+  .cliente-page {
+    height: 100dvh;
+  }
+
   .cliente-header {
-    padding: 24px 24px 16px;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
   }
 
-  .cliente-static {
-    padding: 0 24px;
-    gap: 6px;
+  .cliente-header__logo img {
+    height: 28px;
   }
 
-  .cliente-static--1 .cliente-card--ativo {
-    width: clamp(140px, 55vw, 220px);
-    height: 55vh;
-  }
-
-  .cliente-static--2 .cliente-card--inativo,
-  .cliente-static--2 .cliente-card--ativo,
-  .cliente-static--3 .cliente-card--inativo,
-  .cliente-static--3 .cliente-card--ativo {
-    width: clamp(100px, 40vw, 200px);
-  }
-
-  .cliente-static--2 .cliente-card--inativo { height: 36vh; }
-  .cliente-static--2 .cliente-card--ativo   { height: 52vh; }
-  .cliente-static--3 .cliente-card--inativo { height: 32vh; }
-  .cliente-static--3 .cliente-card--ativo   { height: 50vh; }
-
+  /* Carrossel mobile: cards ~80% da largura */
   .cliente-card--carousel {
-    width: clamp(140px, 60vw, 240px);
+    width: 78vw;
+    flex-shrink: 0;
   }
 
+  .cliente-track {
+    align-items: center;
+    padding-left: 20px;
+    gap: 12px;
+  }
+
+  /* Layout estático mobile */
+  .cliente-static {
+    padding: 0 20px;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .cliente-static--1 .cliente-card--ativo { width: 78vw; height: 58dvh; }
+
+  .cliente-static--2 .cliente-card--inativo { width: 42vw; height: 42dvh; }
+  .cliente-static--2 .cliente-card--ativo   { width: 42vw; height: 56dvh; }
+  .cliente-static--3 .cliente-card--inativo { width: 28vw; height: 38dvh; }
+  .cliente-static--3 .cliente-card--ativo   { width: 28vw; height: 52dvh; }
+
+  /* Marca visível sempre no mobile */
+  .cliente-card__agencia {
+    opacity: 1;
+  }
+
+  /* Overlay + título visível apenas quando card 100% visível */
+  /* Por padrão, esconde nos cards parciais (JS adiciona .cliente-card--visivel) */
+  .cliente-card--carousel .cliente-card__overlay {
+    opacity: 0;
+  }
+  .cliente-card--carousel.cliente-card--visivel .cliente-card__overlay {
+    opacity: 1;
+  }
+  .cliente-card--carousel .cliente-card__agencia {
+    opacity: 0;
+  }
+  .cliente-card--carousel.cliente-card--visivel .cliente-card__agencia {
+    opacity: 1;
+  }
+
+  .cliente-card__titulo {
+    font-size: clamp(16px, 4vw, 22px);
+    font-weight: 900;
+  }
+
+  /* Ticks mais espaçados — menos ticks no mobile */
+  .timeline__tick:nth-child(odd) {
+    display: none;
+  }
+
+  /* Timeline mobile */
   .timeline {
-    padding: 12px 24px 20px;
+    padding: 12px 0 24px;
+  }
+
+  .timeline__inner {
+    width: 100%;
+    padding: 0 20px;
+    box-sizing: border-box;
+  }
+
+  .timeline__label {
+    font-size: 13px;
   }
 }
