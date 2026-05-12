@@ -31,6 +31,7 @@ export default function FooterBranco() {
   const lastScrollY = useRef(0)
   const scrollLocked = useRef(false)
   const activeSubIdxRef = useRef(0)
+  const boundaryAcc = useRef(0)
 
   // Declarado antes dos useEffects que dependem de links
   const links = nav?.links ?? []
@@ -83,8 +84,8 @@ export default function FooterBranco() {
   useEffect(() => { activeSubIdxRef.current = activeSubIdx }, [activeSubIdx])
 
   // Roleta: wheel scroll dentro do submenu
-  const footerAccDelta = useRef(0)
-  const footerNavLock = useRef(false)
+  const footerLastRoletaTime = useRef(0)
+  const footerLastNavTime = useRef(0)
 
   useEffect(() => {
     if (aberto === null) return
@@ -92,57 +93,45 @@ export default function FooterBranco() {
     const sublinks = link ? getSublinks(link) : []
     if (sublinks.length === 0) return
 
-    const STEP_PX = 50
-    const NAV_THRESHOLD = 180
-    const LOCK_MS = 250
+    const ROLETA_MS  = 700
+    const NAV_THRESH = 400
 
     const onWheel = (e) => {
       e.preventDefault()
 
-      footerAccDelta.current += e.deltaY
-      while (Math.abs(footerAccDelta.current) >= STEP_PX) {
-        if (footerAccDelta.current > 0) {
-          // Scroll down
-          if (activeSubIdxRef.current < sublinks.length - 1) {
-            setActiveSubIdx(prev => prev + 1)
-            activeSubIdxRef.current += 1
-            footerAccDelta.current -= STEP_PX
-          } else {
-            // Último item — requer scroll forte
-            if (Math.abs(footerAccDelta.current) >= NAV_THRESHOLD) {
-              footerNavLock.current = true
-              setTimeout(() => { footerNavLock.current = false }, LOCK_MS)
-              setAberto(aberto < links.length - 1 ? aberto + 1 : null)
-              setActiveSubIdx(0)
-              activeSubIdxRef.current = 0
-              footerAccDelta.current = 0
-              break
-            } else {
-              footerAccDelta.current = 0
-              break
-            }
-          }
+      const direcao = Math.sign(e.deltaY)
+      if (direcao === 0) return
+      const now = Date.now()
+
+      if (direcao > 0) {
+        if (activeSubIdxRef.current < sublinks.length - 1) {
+          boundaryAcc.current = 0
+          if (now - footerLastRoletaTime.current < ROLETA_MS) return
+          footerLastRoletaTime.current = now
+          setActiveSubIdx(prev => prev + 1)
+          activeSubIdxRef.current += 1
         } else {
-          // Scroll up
-          if (activeSubIdxRef.current > 0) {
-            setActiveSubIdx(prev => prev - 1)
-            activeSubIdxRef.current -= 1
-            footerAccDelta.current += STEP_PX
-          } else {
-            // Primeiro item — requer scroll forte
-            if (Math.abs(footerAccDelta.current) >= NAV_THRESHOLD) {
-              footerNavLock.current = true
-              setTimeout(() => { footerNavLock.current = false }, LOCK_MS)
-              setAberto(aberto > 0 ? aberto - 1 : null)
-              setActiveSubIdx(0)
-              activeSubIdxRef.current = 0
-              footerAccDelta.current = 0
-              break
-            } else {
-              footerAccDelta.current = 0
-              break
-            }
-          }
+          boundaryAcc.current += Math.abs(e.deltaY)
+          if (boundaryAcc.current < NAV_THRESH) return
+          boundaryAcc.current = 0
+          setAberto(aberto < links.length - 1 ? aberto + 1 : null)
+          setActiveSubIdx(0)
+          activeSubIdxRef.current = 0
+        }
+      } else {
+        if (activeSubIdxRef.current > 0) {
+          boundaryAcc.current = 0
+          if (now - footerLastRoletaTime.current < ROLETA_MS) return
+          footerLastRoletaTime.current = now
+          setActiveSubIdx(prev => prev - 1)
+          activeSubIdxRef.current -= 1
+        } else {
+          boundaryAcc.current += Math.abs(e.deltaY)
+          if (boundaryAcc.current < NAV_THRESH) return
+          boundaryAcc.current = 0
+          setAberto(aberto > 0 ? aberto - 1 : null)
+          setActiveSubIdx(0)
+          activeSubIdxRef.current = 0
         }
       }
     }
@@ -278,7 +267,7 @@ export default function FooterBranco() {
                     href={sub.url || '#'}
                     className={`footer-branco__submenu-link ${isActive ? 'footer-branco__submenu-link--ativo' : ''}`}
                     style={{ fontSize: `${sizes[j]}px`, opacity }}
-                    onMouseEnter={() => { setActiveSubIdx(j); setHoveredSub(sub) }}
+                    onMouseEnter={() => setHoveredSub(sub)}
                     onMouseLeave={() => setHoveredSub(null)}
                     onClick={e => { e.preventDefault(); sub.url && goTo(sub.url) }}
                   >

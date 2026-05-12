@@ -34,8 +34,9 @@ function App() {
   const [hoveredSub, setHoveredSub] = useState(null)
   const [activeSubIdx, setActiveSubIdx] = useState(0)
   const [menuMobile, setMenuMobile] = useState(false)
+  const [pronto, setPronto]         = useState(false)
   const location = useLocation()
-  const contatoAberto = location.pathname === '/contato'
+  const contatoAberto = location.pathname.startsWith('/contato')
   const goTo = useGoTo()
   const lastScrollY = useRef(0)
   const touchStartY = useRef(null)
@@ -49,7 +50,39 @@ function App() {
     api('redes-sociais?populate[redes][populate]=icone').then(setRedes)
     api('pessoas?filters[ativo][$eq]=true&populate=foto&sort=ordem').then(setEquipe)
     api('clientes?sort=nome:asc').then(setClientes)
+
+    // Pré-carrega imagens salvas da visita anterior (já estarão no cache HTTP)
+    try {
+      const saved = JSON.parse(localStorage.getItem('tv1-home-imgs') ?? '[]')
+      saved.forEach(url => { const i = new Image(); i.src = url })
+    } catch {}
   }, [])
+
+  // Preloader: aguarda logo + câmera + agências + redes antes de exibir
+  useEffect(() => {
+    if (!logo || !agencias || !redes) return
+
+    const urls = [
+      mediaUrl(logo?.logo),
+      mediaUrl(quarentaAnos?.imagem),
+      ...(agencias ?? []).filter(a => a.logo).map(a => mediaUrl(a.logo)),
+      ...(redes?.redes ?? []).filter(r => r.icone).map(r => mediaUrl(r.icone)),
+    ].filter(Boolean)
+
+    // Salva URLs no localStorage para pré-carregar na próxima visita
+    try { localStorage.setItem('tv1-home-imgs', JSON.stringify(urls)) } catch {}
+
+    if (urls.length === 0) { setPronto(true); return }
+
+    // Timeout de segurança: mostra mesmo se algum asset demorar demais
+    const timeout = setTimeout(() => setPronto(true), 5000)
+
+    let count = 0
+    const done = () => { if (++count >= urls.length) { clearTimeout(timeout); setPronto(true) } }
+    urls.forEach(url => { const img = new Image(); img.onload = img.onerror = done; img.src = url })
+
+    return () => clearTimeout(timeout)
+  }, [logo, agencias, redes, quarentaAnos])
 
   // Bloqueia scroll do body na home (impede barra do Chrome de se mover)
   useEffect(() => {
@@ -98,16 +131,16 @@ function App() {
   useEffect(() => { setActiveSubIdx(0) }, [aberto])
 
   // Scroll: roleta dentro do submenu (ou navega entre menus se sem sublinks)
-  const accDelta = useRef(0)
-  const navLock = useRef(false)
+  const lastRoletaTime = useRef(0)
+  const lastNavTime = useRef(0)
   const activeSubIdxRef = useRef(0)
+  const boundaryAcc = useRef(0)
 
   useEffect(() => { activeSubIdxRef.current = activeSubIdx }, [activeSubIdx])
 
   useEffect(() => {
-    const STEP_PX = 80          // pixels por troca de item dentro da categoria
-    const NAV_THRESHOLD = 180   // threshold forte pra pular entre categorias
-    const NAV_LOCK_MS   = 600
+    const ROLETA_MS  = 700   // tempo mínimo entre trocas de item
+    const NAV_THRESH = 400   // deltaY acumulado necessário para sair da borda
 
     const onWheel = (e) => {
       if (aberto === null) return
@@ -117,56 +150,53 @@ function App() {
 
       e.preventDefault()
 
+      const direcao = Math.sign(e.deltaY)
+      if (direcao === 0) return
+      const now = Date.now()
+
       if (sublinks.length > 0) {
-        // Roleta — acumula delta e move por passos
-        accDelta.current += e.deltaY
-        while (Math.abs(accDelta.current) >= STEP_PX) {
-          if (accDelta.current > 0) {
-            // Scroll down
-            if (activeSubIdxRef.current < sublinks.length - 1) {
-              setActiveSubIdx(prev => prev + 1)
-              activeSubIdxRef.current += 1
-              accDelta.current -= STEP_PX
-            } else {
-              // Último item — acumula até NAV_THRESHOLD pra pular
-              if (Math.abs(accDelta.current) >= NAV_THRESHOLD) {
-                navLock.current = true
-                setTimeout(() => { navLock.current = false }, NAV_LOCK_MS)
-                setAberto(aberto < links.length - 1 ? aberto + 1 : null)
-                setActiveSubIdx(0)
-                activeSubIdxRef.current = 0
-                accDelta.current = 0
-              }
-              break
-            }
+        if (direcao > 0) {
+          if (activeSubIdxRef.current < sublinks.length - 1) {
+            // no meio da lista: throttle normal
+            boundaryAcc.current = 0
+            if (now - lastRoletaTime.current < ROLETA_MS) return
+            lastRoletaTime.current = now
+            setActiveSubIdx(prev => prev + 1)
+            activeSubIdxRef.current += 1
           } else {
-            // Scroll up
-            if (activeSubIdxRef.current > 0) {
-              setActiveSubIdx(prev => prev - 1)
-              activeSubIdxRef.current -= 1
-              accDelta.current += STEP_PX
-            } else {
-              // Primeiro item — acumula até NAV_THRESHOLD pra pular
-              if (Math.abs(accDelta.current) >= NAV_THRESHOLD) {
-                navLock.current = true
-                setTimeout(() => { navLock.current = false }, NAV_LOCK_MS)
-                setAberto(aberto > 0 ? aberto - 1 : null)
-                setActiveSubIdx(0)
-                activeSubIdxRef.current = 0
-                accDelta.current = 0
-              }
-              break
-            }
+            // no último item: precisa acumular scroll forte pra sair
+            boundaryAcc.current += Math.abs(e.deltaY)
+            if (boundaryAcc.current < NAV_THRESH) return
+            boundaryAcc.current = 0
+            lastNavTime.current = now
+            setAberto(aberto < links.length - 1 ? aberto + 1 : null)
+            setActiveSubIdx(0)
+            activeSubIdxRef.current = 0
+          }
+        } else {
+          if (activeSubIdxRef.current > 0) {
+            // no meio da lista: throttle normal
+            boundaryAcc.current = 0
+            if (now - lastRoletaTime.current < ROLETA_MS) return
+            lastRoletaTime.current = now
+            setActiveSubIdx(prev => prev - 1)
+            activeSubIdxRef.current -= 1
+          } else {
+            // no primeiro item: precisa acumular scroll forte pra sair
+            boundaryAcc.current += Math.abs(e.deltaY)
+            if (boundaryAcc.current < NAV_THRESH) return
+            boundaryAcc.current = 0
+            setAberto(aberto > 0 ? aberto - 1 : null)
+            setActiveSubIdx(0)
+            activeSubIdxRef.current = 0
           }
         }
         setHoveredSub(null)
       } else {
-        // Sem sublinks: navega entre menus (com lock)
-        if (navLock.current) return
-        if (Math.abs(e.deltaY) < NAV_THRESHOLD) return
-        navLock.current = true
-        setTimeout(() => { navLock.current = false }, NAV_LOCK_MS)
-        if (e.deltaY < 0) {
+        boundaryAcc.current += Math.abs(e.deltaY)
+        if (boundaryAcc.current < NAV_THRESH) return
+        boundaryAcc.current = 0
+        if (direcao < 0) {
           setAberto(aberto > 0 ? aberto - 1 : null)
         } else {
           setAberto(aberto < links.length - 1 ? aberto + 1 : null)
@@ -179,8 +209,8 @@ function App() {
     return () => window.removeEventListener('wheel', onWheel)
   }, [aberto, links, equipe, clientes])
 
-  // Reset acumulador quando muda o menu
-  useEffect(() => { accDelta.current = 0 }, [aberto])
+  // Reset acumuladores quando muda o menu
+  useEffect(() => { lastRoletaTime.current = 0; lastNavTime.current = 0; boundaryAcc.current = 0 }, [aberto])
 
   // Touch scroll para roleta no mobile
   const touchTotalMoved = useRef(0)
@@ -188,7 +218,7 @@ function App() {
   useEffect(() => {
     if (aberto === null) return
 
-    const STEP_PX = 36
+    const STEP_PX = 160
     const SWIPE_THRESHOLD = 8 // px mínimos pra considerar swipe (não tap)
 
     const onTouchStart = (e) => {
@@ -263,7 +293,13 @@ function App() {
   }
 
   return (
-    <div className={`home${aberto !== null ? ' home--menu-aberto' : ''}`} onClick={aberto !== null ? () => { setAberto(null); setHoveredSub(null) } : undefined}>
+    <>
+      {/* Loading screen */}
+      <div className={`home-loading${pronto ? ' home-loading--saiu' : ''}`}>
+        <div className="home-loading__spinner" />
+      </div>
+
+    <div className={`home${pronto ? ' home--pronto' : ''}${aberto !== null ? ' home--menu-aberto' : ''}`} onClick={aberto !== null ? () => { setAberto(null); setHoveredSub(null) } : undefined}>
 
       {/* Backgrounds: imagem do link (padrão ao abrir) + imagem por sublink (hover) */}
       {links.map((link, i) => {
@@ -356,7 +392,11 @@ function App() {
 
       {/* Topo */}
       <header className="home__top">
-        <div className="home__logo" onClick={e => e.stopPropagation()}>
+        <div
+          className="home__logo"
+          onClick={e => { e.stopPropagation(); if (contatoAberto) goTo('/') }}
+          style={contatoAberto ? { cursor: 'pointer' } : undefined}
+        >
           {logo?.logo && <img src={mediaUrl(logo.logo)} alt="TV1" />}
         </div>
         {/* câmera — visível no desktop dentro do header */}
@@ -385,8 +425,8 @@ function App() {
         {contatoAberto && (
           <div className="home__nav-contato">
             <a href="#" className="home__nav-link home__nav-link--contato" onClick={(e) => { e.preventDefault(); e.stopPropagation() }}>SEJA CLIENTE</a>
-            <a href="#" className="home__nav-link home__nav-link--contato" onClick={(e) => { e.preventDefault(); e.stopPropagation() }}>TRABALHE CONOSCO</a>
-            <a href="#" className="home__nav-link home__nav-link--contato" onClick={(e) => { e.preventDefault(); e.stopPropagation() }}>OUTROS ASSUNTOS</a>
+            <a href="/contato/trabalhe-conosco" className="home__nav-link home__nav-link--contato" onClick={(e) => { e.preventDefault(); e.stopPropagation(); goTo('/contato/trabalhe-conosco') }}>TRABALHE CONOSCO</a>
+            <a href="/contato/outros-assuntos" className="home__nav-link home__nav-link--contato" onClick={(e) => { e.preventDefault(); e.stopPropagation(); goTo('/contato/outros-assuntos') }}>OUTROS ASSUNTOS</a>
           </div>
         )}
 
@@ -464,7 +504,7 @@ function App() {
                     href={sub.url || '#'}
                     className={`home__submenu-link ${isActive ? 'home__submenu-link--ativo' : ''}`}
                     style={{ fontSize: `${sizes[j]}px`, opacity }}
-                    onMouseEnter={() => { setActiveSubIdx(j); setHoveredSub(sub) }}
+                    onMouseEnter={() => setHoveredSub(sub)}
                     onMouseLeave={() => setHoveredSub(null)}
                     onClick={e => { e.preventDefault(); sub.url && goTo(sub.url) }}
                   >
@@ -479,7 +519,10 @@ function App() {
 
       {/* Rodapé — marcas agora vêm de agencias */}
       <footer className="home__bottom" onClick={e => e.stopPropagation()}>
-        <button className="home__contato" onClick={(e) => { e.stopPropagation(); goTo('/contato') }}>Contato</button>
+        <button
+          className={`home__contato${contatoAberto ? ' home__contato--inativo' : ''}`}
+          onClick={(e) => { e.stopPropagation(); if (!contatoAberto) goTo('/contato') }}
+        >Contato</button>
 
         <div className={`home__marcas ${aberto !== null ? 'home__marcas--oculto' : ''}`}>
           {agencias?.filter(a => a.logo).map((a, i) => (
@@ -499,6 +542,7 @@ function App() {
       </footer>
 
     </div>
+    </>
   )
 }
 
