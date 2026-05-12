@@ -294,12 +294,7 @@ export default function CasePage() {
         `&populate[cliente]=true` +
         `&populate[agencia][populate]=logo` +
         `&populate[imagem_capa]=true` +
-        `&populate[blocos][populate][itens][populate]=*` +
-        `&populate[blocos][populate][imagem]=*` +
-        `&populate[blocos][populate][capa]=*` +
-        `&populate[blocos][populate][imagem_1]=*` +
-        `&populate[blocos][populate][imagem_2]=*` +
-        `&populate[blocos][populate][imagem_3]=*`
+        `&populate[blocos]=*`
       )
       .then(r => setData(r.data.data?.[0] ?? null))
       .catch(() => {})
