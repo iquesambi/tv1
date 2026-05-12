@@ -148,6 +148,17 @@ function Galeria({ itens = [] }) {
     return () => window.removeEventListener('keydown', onKey)
   }, [anterior, proximo])
 
+  // Preload de todas as imagens assim que a galeria monta
+  useEffect(() => {
+    imagemsOrdenadas.forEach(item => {
+      const url = mediaUrl(item?.imagem)
+      if (url) {
+        const img = new Image()
+        img.src = url
+      }
+    })
+  }, [imagemsOrdenadas])
+
   if (n === 0) return null
 
   return (
