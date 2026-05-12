@@ -294,7 +294,13 @@ export default function CasePage() {
         `&populate[cliente]=true` +
         `&populate[agencia][populate]=logo` +
         `&populate[imagem_capa]=true` +
-        `&populate[blocos]=*`
+        `&populate[blocos][on][blocks.galeria][populate][itens][populate]=imagem` +
+        `&populate[blocos][on][blocks.video][populate]=capa` +
+        `&populate[blocos][on][blocks.imagem-trio][populate][imagem_1]=*` +
+        `&populate[blocos][on][blocks.imagem-trio][populate][imagem_2]=*` +
+        `&populate[blocos][on][blocks.imagem-trio][populate][imagem_3]=*` +
+        `&populate[blocos][on][blocks.imagem-simples][populate]=imagem` +
+        `&populate[blocos][on][blocks.subcase][populate]=imagem`
       )
       .then(r => setData(r.data.data?.[0] ?? null))
       .catch(() => {})
