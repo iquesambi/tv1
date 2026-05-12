@@ -121,23 +121,14 @@ function Video({ block }) {
 }
 
 /* ── Galeria ────────────────────────────── */
-function Galeria({ itens = [] }) {
+function Galeria({ imagens = [] }) {
   const [ativo, setAtivo] = useState(0)
 
-  // Ordena por ordem (se definida), depois mantém a ordem original
-  const imagemsOrdenadas = [...itens].sort((a, b) => {
-    const aOrd = a.ordem ?? Infinity
-    const bOrd = b.ordem ?? Infinity
-    return aOrd - bOrd
-  })
-
-  const n = imagemsOrdenadas.length
-
   const anterior = useCallback(() =>
-    setAtivo(i => (i - 1 + n) % n), [n])
+    setAtivo(i => (i - 1 + imagens.length) % imagens.length), [imagens.length])
 
   const proximo = useCallback(() =>
-    setAtivo(i => (i + 1) % n), [n])
+    setAtivo(i => (i + 1) % imagens.length), [imagens.length])
 
   useEffect(() => {
     const onKey = (e) => {
@@ -148,14 +139,12 @@ function Galeria({ itens = [] }) {
     return () => window.removeEventListener('keydown', onKey)
   }, [anterior, proximo])
 
-  if (n === 0) return null
-
   return (
     <div className="block-galeria">
       <div className="block-galeria__slide">
-        <img src={mediaUrl(imagemsOrdenadas[ativo]?.imagem)} alt="" />
+        <img src={mediaUrl(imagens[ativo])} alt="" />
         <div className="block-galeria__stepper">
-          {imagemsOrdenadas.map((_, i) => (
+          {imagens.map((_, i) => (
             <button
               key={i}
               className={`block-galeria__step${i === ativo ? ' block-galeria__step--ativo' : ''}`}
@@ -224,7 +213,7 @@ function Block({ block }) {
       )
 
     case 'blocks.galeria':
-      return <Galeria itens={block.itens} />
+      return <Galeria imagens={block.imagens} />
 
     case 'blocks.imagem-trio':
       return (
