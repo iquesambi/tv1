@@ -262,7 +262,7 @@ export default function ClientePage() {
         `&populate[agencia][populate]=logo` +
         `&populate[imagem_capa]=true` +
         `&populate[blocos][populate]=*` +
-        `&sort[0]=ordem:asc&sort[1]=Data:asc`
+        `&sort=Data:asc`
       )
       .then(r => setEntradas(montarEntradas(r.data.data ?? [])))
       .catch(() => {})
