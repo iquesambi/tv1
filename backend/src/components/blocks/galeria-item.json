@@ -1,0 +1,8 @@
+{
+  "collectionName": "components_blocks_galeria_items",
+  "info": { "displayName": "Galeria Item", "icon": "image" },
+  "attributes": {
+    "imagem": { "type": "media", "multiple": false, "required": true, "allowedTypes": ["images"] },
+    "ordem": { "type": "integer" }
+  }
+}

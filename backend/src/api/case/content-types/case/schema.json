@@ -58,6 +58,7 @@
       "type": "dynamiczone",
       "components": [
         "blocks.subtitulo",
+        "blocks.subcase",
         "blocks.texto",
         "blocks.imagem-simples",
         "blocks.galeria",

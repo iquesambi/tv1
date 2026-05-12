@@ -8,6 +8,10 @@ const STRAPI = 'https://tv1-53ev.onrender.com'
 const api = (path) => axios.get(`${STRAPI}/api/${path}`).then(r => r.data.data).catch(() => null)
 const mediaUrl = (obj) => obj?.url ? `${STRAPI}${obj.url}` : null
 
+// Dados pré-carregados em build time pelo scripts/prefetch.js
+// Em dev (sem build) ficam null e o fetch normal é usado
+const _pf = window.__TV1_DATA__ ?? {}
+
 const externalUrl = (url) => {
   if (!url) return '#'
   return /^https?:\/\//i.test(url) ? url : `https://${url}`
@@ -19,11 +23,11 @@ const slugify = (str) => str.toLowerCase()
   .replace(/^-|-$/g, '')
 
 function App() {
-  const [nav, setNav]           = useState(null)
-  const [logo, setLogo]         = useState(null)
-  const [agencias, setAgencias] = useState(null) // marcas do rodapé + agência dos cases
-  const [quarentaAnos, setQA]   = useState(null)
-  const [redes, setRedes]       = useState(null)
+  const [nav, setNav]           = useState(_pf.nav ?? null)
+  const [logo, setLogo]         = useState(_pf.logo ?? null)
+  const [agencias, setAgencias] = useState(_pf.agencias ?? null)
+  const [quarentaAnos, setQA]   = useState(_pf.quarentaAnos ?? null)
+  const [redes, setRedes]       = useState(_pf.redes ?? null)
   const [equipe, setEquipe]     = useState(null)
   const [clientes, setClientes] = useState(null)
   const [aberto, setAberto]     = useState(null)
@@ -34,6 +38,8 @@ function App() {
   const contatoAberto = location.pathname === '/contato'
   const goTo = useGoTo()
   const lastScrollY = useRef(0)
+  const touchStartY = useRef(null)
+  const touchAccDelta = useRef(0)
 
   useEffect(() => {
     api('navigation?populate[links][populate][0]=imagem_hover&populate[links][populate][sublinks][populate]=imagem_hover').then(setNav)
@@ -43,6 +49,12 @@ function App() {
     api('redes-sociais?populate[redes][populate]=icone').then(setRedes)
     api('pessoas?filters[ativo][$eq]=true&populate=foto&sort=ordem').then(setEquipe)
     api('clientes?sort=nome:asc').then(setClientes)
+  }, [])
+
+  // Bloqueia scroll do body na home (impede barra do Chrome de se mover)
+  useEffect(() => {
+    document.body.classList.add('scroll-locked')
+    return () => document.body.classList.remove('scroll-locked')
   }, [])
 
   // Fechar menu ao scrollar pra cima
@@ -170,6 +182,67 @@ function App() {
   // Reset acumulador quando muda o menu
   useEffect(() => { accDelta.current = 0 }, [aberto])
 
+  // Touch scroll para roleta no mobile
+  const touchTotalMoved = useRef(0)
+
+  useEffect(() => {
+    if (aberto === null) return
+
+    const STEP_PX = 36
+    const SWIPE_THRESHOLD = 8 // px mínimos pra considerar swipe (não tap)
+
+    const onTouchStart = (e) => {
+      touchStartY.current = e.touches[0].clientY
+      touchAccDelta.current = 0
+      touchTotalMoved.current = 0
+    }
+
+    const onTouchMove = (e) => {
+      if (touchStartY.current === null) return
+      const link = links[aberto]
+      const sublinks = link ? getSublinks(link) : []
+      if (sublinks.length === 0) return
+
+      const delta = touchStartY.current - e.touches[0].clientY
+      touchTotalMoved.current += Math.abs(delta)
+      touchStartY.current = e.touches[0].clientY
+
+      // Só bloqueia o scroll nativo se for claramente um swipe, não um tap
+      if (touchTotalMoved.current > SWIPE_THRESHOLD) {
+        e.preventDefault()
+      }
+
+      touchAccDelta.current += delta
+
+      while (Math.abs(touchAccDelta.current) >= STEP_PX) {
+        if (touchAccDelta.current > 0) {
+          if (activeSubIdxRef.current < sublinks.length - 1) {
+            setActiveSubIdx(prev => prev + 1)
+            activeSubIdxRef.current += 1
+          }
+          touchAccDelta.current -= STEP_PX
+        } else {
+          if (activeSubIdxRef.current > 0) {
+            setActiveSubIdx(prev => prev - 1)
+            activeSubIdxRef.current -= 1
+          }
+          touchAccDelta.current += STEP_PX
+        }
+      }
+    }
+
+    const onTouchEnd = () => { touchStartY.current = null }
+
+    window.addEventListener('touchstart', onTouchStart, { passive: true })
+    window.addEventListener('touchmove', onTouchMove, { passive: false })
+    window.addEventListener('touchend', onTouchEnd)
+    return () => {
+      window.removeEventListener('touchstart', onTouchStart)
+      window.removeEventListener('touchmove', onTouchMove)
+      window.removeEventListener('touchend', onTouchEnd)
+    }
+  }, [aberto, links, equipe, clientes])
+
   const isMobile = () => window.innerWidth <= 768
 
   const handleLink = (e, i, link) => {
@@ -190,7 +263,7 @@ function App() {
   }
 
   return (
-    <div className="home" onClick={aberto !== null ? () => { setAberto(null); setHoveredSub(null) } : undefined}>
+    <div className={`home${aberto !== null ? ' home--menu-aberto' : ''}`} onClick={aberto !== null ? () => { setAberto(null); setHoveredSub(null) } : undefined}>
 
       {/* Backgrounds: imagem do link (padrão ao abrir) + imagem por sublink (hover) */}
       {links.map((link, i) => {
@@ -354,11 +427,12 @@ function App() {
         if (sublinks.length === 0) return null
 
         const isRoleta = sublinks.length >= 5
+        const mobile = window.innerWidth <= 768
 
         const sizes = sublinks.map((_, j) => {
-          if (!isRoleta) return 70
+          if (!isRoleta) return mobile ? 44 : 70
           const d = Math.abs(j - activeSubIdx)
-          return d === 0 ? 90 : Math.max(16, 56 - (d - 1) * 12)
+          return d === 0 ? (mobile ? 32 : 90) : Math.max(10, (mobile ? 24 : 56) - (d - 1) * (mobile ? 4 : 12))
         })
         const centers = []
         let acc = 0

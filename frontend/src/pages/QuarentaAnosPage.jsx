@@ -17,20 +17,42 @@ const FOTOS_FIGMA = [
 /* ── helpers carrossel/timeline ── */
 
 function montarEntradas(cases) {
-  return cases
-    .filter(c => c.imagem_capa)
-    .map(c => ({
-      id:   c.id,
-      ano:  c.Data ? new Date(c.Data).getFullYear() : null,
-      data: c.Data ? new Date(c.Data) : new Date(0),
-      nome: c.titulo || '',
-      capa: c.imagem_capa,
-      href: (c.cliente?.slug && c.slug) ? `/${c.cliente.slug}/${c.slug}` : '#',
-    }))
-    .sort((a, b) => {
-      if (a.ano !== b.ano) return (b.ano || 0) - (a.ano || 0)
-      return a.data - b.data
-    })
+  const entradas = []
+
+  cases.forEach(c => {
+    // Adiciona case principal se tiver capa
+    if (c.imagem_capa) {
+      entradas.push({
+        id:   c.id,
+        ano:  c.Data ? new Date(c.Data).getFullYear() : null,
+        data: c.Data ? new Date(c.Data) : new Date(0),
+        nome: c.titulo || '',
+        capa: c.imagem_capa,
+        href: (c.cliente?.slug && c.slug) ? `/${c.cliente.slug}/${c.slug}` : '#',
+      })
+    }
+
+    // Adiciona subcases com ancora_id
+    if (c.blocos && Array.isArray(c.blocos)) {
+      c.blocos.forEach(bloco => {
+        if (bloco.__component === 'blocks.subcase' && bloco.ancora_id && bloco.imagem) {
+          entradas.push({
+            id:   `${c.id}-${bloco.ancora_id}`,
+            ano:  c.Data ? new Date(c.Data).getFullYear() : null,
+            data: c.Data ? new Date(c.Data) : new Date(0),
+            nome: bloco.titulo || '',
+            capa: bloco.imagem,
+            href: (c.cliente?.slug && c.slug) ? `/${c.cliente.slug}/${c.slug}#${bloco.ancora_id}` : '#',
+          })
+        }
+      })
+    }
+  })
+
+  return entradas.sort((a, b) => {
+    if (a.ano !== b.ano) return (b.ano || 0) - (a.ano || 0)
+    return a.data - b.data
+  })
 }
 
 function gruposDeAnos(entradas) {
@@ -178,7 +200,8 @@ export default function QuarentaAnosPage() {
   const tiltDeltaRef      = useRef(0)
 
   useEffect(() => {
-    api('quarenta-anos?populate[0]=imagem&populate[1]=video_capa&populate[2]=fotos&populate[3]=cases_destaque.imagem_capa&populate[4]=cases_destaque.cliente').then(setData)
+    api('quarenta-anos?populate[0]=imagem&populate[1]=video_capa&populate[2]=fotos&populate[3]=cases_destaque.imagem_capa&populate[4]=cases_destaque.cliente&populate[5]=cases_destaque.blocos').then(setData)
+    document.body.classList.remove('scroll-locked')
   }, [])
 
   const fotos = data?.fotos?.length
@@ -368,7 +391,7 @@ export default function QuarentaAnosPage() {
 
           {/* TEXTOS */}
           {data?.descricao && (
-            <foreignObject x="802" y="154" width="524" height="200">
+            <foreignObject x="802" y="154" width="524" height="200" className="qa-fo-lorem">
               <div xmlns="http://www.w3.org/1999/xhtml" className="qa-lorem-fo">
                 {data.descricao}
               </div>
@@ -380,12 +403,23 @@ export default function QuarentaAnosPage() {
             <tspan x="360" y="481">DE</tspan>
           </text>
 
-          <text fontFamily="PP Hatton, serif" fontStyle="italic" fontWeight="500" fontSize="140" fill="white">
+          <text fontFamily="PP Hatton, serif" fontStyle="italic" fontWeight="500" fontSize="140" fill="white" className="qa-texto-sv-experiencias">
             <tspan x="802" y="451">experi</tspan>
             <tspan x="802" y="570">ências</tspan>
           </text>
 
         </svg>
+      </section>
+
+      {/* TEXTO MOBILE — lorem + experiências abaixo do SVG */}
+      <section className="qa-texto-mobile">
+        {data?.descricao && (
+          <p className="qa-texto-mobile__lorem">{data.descricao}</p>
+        )}
+        <div className="qa-texto-mobile__experiencias">
+          <span>experi</span>
+          <span>ências</span>
+        </div>
       </section>
 
       {/* CASES */}

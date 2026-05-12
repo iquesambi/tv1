@@ -288,11 +288,51 @@
   white-space: nowrap;
 }
 
+/* ── TEXTO MOBILE ─────────────────────── */
+
+.qa-texto-mobile {
+  display: none;
+}
+
 /* ── MOBILE ───────────────────────────── */
 
 @media (max-width: 768px) {
   .qa-hero {
     height: 100dvh;
+  }
+
+  /* Esconde elementos de texto do SVG — aparecem como HTML abaixo */
+  .qa-fo-lorem,
+  .qa-texto-sv-experiencias {
+    display: none;
+  }
+
+  /* Bloco de texto mobile */
+  .qa-texto-mobile {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    padding: 40px 20px;
+    background: #000001;
+  }
+
+  .qa-texto-mobile__lorem {
+    font-size: 13px;
+    font-weight: 400;
+    line-height: 1.7;
+    color: rgba(255, 255, 255, 0.6);
+    margin: 0;
+  }
+
+  .qa-texto-mobile__experiencias {
+    font-family: 'PP Hatton', serif;
+    font-style: italic;
+    font-weight: 500;
+    font-size: clamp(64px, 20vw, 88px);
+    line-height: 1;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
   }
 
   .qa-cases__titulo {
@@ -331,11 +371,12 @@
   .qa-static--3 .qa-case-card--ativo   { height: 48vh; }
 
   .qa-viewport {
-    height: 50vh;
+    height: 62vw;
   }
 
   .qa-case-card--carousel {
-    width: clamp(140px, 60vw, 240px);
+    width: 75vw;
+    height: 60vw !important;
   }
 
   .qa-timeline {

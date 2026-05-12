@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback, useRef } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import FooterBranco from '../components/FooterBranco.jsx'
 import MobileMenu from '../components/MobileMenu.jsx'
@@ -121,14 +121,23 @@ function Video({ block }) {
 }
 
 /* ── Galeria ────────────────────────────── */
-function Galeria({ imagens = [] }) {
+function Galeria({ itens = [] }) {
   const [ativo, setAtivo] = useState(0)
 
+  // Ordena por ordem (se definida), depois mantém a ordem original
+  const imagemsOrdenadas = [...itens].sort((a, b) => {
+    const aOrd = a.ordem ?? Infinity
+    const bOrd = b.ordem ?? Infinity
+    return aOrd - bOrd
+  })
+
+  const n = imagemsOrdenadas.length
+
   const anterior = useCallback(() =>
-    setAtivo(i => (i - 1 + imagens.length) % imagens.length), [imagens.length])
+    setAtivo(i => (i - 1 + n) % n), [n])
 
   const proximo = useCallback(() =>
-    setAtivo(i => (i + 1) % imagens.length), [imagens.length])
+    setAtivo(i => (i + 1) % n), [n])
 
   useEffect(() => {
     const onKey = (e) => {
@@ -139,12 +148,14 @@ function Galeria({ imagens = [] }) {
     return () => window.removeEventListener('keydown', onKey)
   }, [anterior, proximo])
 
+  if (n === 0) return null
+
   return (
     <div className="block-galeria">
       <div className="block-galeria__slide">
-        <img src={mediaUrl(imagens[ativo])} alt="" />
-<div className="block-galeria__stepper">
-          {imagens.map((_, i) => (
+        <img src={mediaUrl(imagemsOrdenadas[ativo]?.imagem)} alt="" />
+        <div className="block-galeria__stepper">
+          {imagemsOrdenadas.map((_, i) => (
             <button
               key={i}
               className={`block-galeria__step${i === ativo ? ' block-galeria__step--ativo' : ''}`}
@@ -172,6 +183,29 @@ function Block({ block }) {
         </h2>
       )
 
+    case 'blocks.subcase':
+      return (
+        <section className="block-subcase" id={block.ancora_id || undefined}>
+          <div className="block-subcase__content">
+            {block.subtitulo && (
+              <span className="block-subcase__breadcrumb">{block.subtitulo}</span>
+            )}
+            <h2 className="block-subcase__title">{block.titulo}</h2>
+            {block.descricao && (
+              <div
+                className="block-subcase__description"
+                dangerouslySetInnerHTML={{ __html: semViuvas(textoParaHtml(block.descricao)) }}
+              />
+            )}
+          </div>
+          {block.imagem && (
+            <div className="block-subcase__image">
+              <img src={mediaUrl(block.imagem)} alt={block.titulo} />
+            </div>
+          )}
+        </section>
+      )
+
     case 'blocks.texto':
     case 'blocks.descricao':
       return (
@@ -190,7 +224,7 @@ function Block({ block }) {
       )
 
     case 'blocks.galeria':
-      return <Galeria imagens={block.imagens} />
+      return <Galeria itens={block.itens} />
 
     case 'blocks.imagem-trio':
       return (
@@ -240,6 +274,7 @@ function Block({ block }) {
 /* ── Página ─────────────────────────────── */
 export default function CasePage() {
   const { cliente: clienteSlug, case: caseSlug } = useParams()
+  const navigate = useNavigate()
   const [data, setData] = useState(null)
   const [logo, setLogo] = useState(null)
   const [quarentaAnos, setQA] = useState(null)
@@ -247,6 +282,7 @@ export default function CasePage() {
   useEffect(() => {
     axios.get(`${STRAPI}/api/logo-site?populate=logo`).then(r => setLogo(r.data.data)).catch(() => {})
     axios.get(`${STRAPI}/api/quarenta-anos?populate=imagem`).then(r => setQA(r.data.data)).catch(() => {})
+    document.body.classList.remove('scroll-locked')
   }, [])
 
   useEffect(() => {
@@ -325,7 +361,13 @@ export default function CasePage() {
         </div>
         <div className="case-home-fold__center">
           {quarentaAnos?.imagem && (
-            <img className="case-home-fold__camera" src={mediaUrl(quarentaAnos.imagem)} alt="" />
+            <button
+              className="case-home-fold__camera-btn"
+              onClick={() => quarentaAnos?.ativo && navigate('/quarenta-anos')}
+              style={{ background: 'none', border: 'none', padding: 0, cursor: quarentaAnos?.ativo ? 'pointer' : 'default' }}
+            >
+              <img className="case-home-fold__camera" src={mediaUrl(quarentaAnos.imagem)} alt="" />
+            </button>
           )}
           <nav className="case-home-fold__nav">
             <a className="case-home-fold__nav-link" href="/clientes">Cases</a>

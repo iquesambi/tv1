@@ -17,6 +17,7 @@ export default function PessoasPage() {
 
   useEffect(() => {
     api('pessoas?filters[ativo][$eq]=true&populate=foto&sort=ordem').then(setEquipe)
+    document.body.classList.remove('scroll-locked')
   }, [])
 
   const membros = equipe ?? []

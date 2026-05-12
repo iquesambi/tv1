@@ -227,6 +227,7 @@ export default function EspecialidadePage() {
     axios.get(`${STRAPI}/api/logo-site?populate=logo`)
       .then(r => setLogo(r.data.data?.logo ?? null))
       .catch(() => {})
+    document.body.classList.remove('scroll-locked')
   }, [])
 
   /* fetch — cases filtrados por especialidade (via relation) */

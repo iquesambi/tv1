@@ -493,7 +493,13 @@
     transform: translate(-50%, -50%);
     z-index: 3;
     text-align: center;
-    pointer-events: none;
+    pointer-events: auto;
+    transition: opacity 0.3s ease;
+  }
+
+  /* Esconde a câmera quando um menu está aberto */
+  .home--menu-aberto .home__camera--mobile {
+    opacity: 0;
   }
 
   .home__camera--mobile img {
@@ -539,32 +545,24 @@
     align-items: center;
   }
 
-  /* reset de todas as animações de estado */
-  .home__nav-item,
-  .home__nav-item--ativo,
-  .home__nav-item--acima,
-  .home__nav-item--abaixo {
-    transform: none !important;
-    opacity: 1 !important;
-    transition: none;
+  /* Restaura animações de estado (igual ao desktop) */
+  .home__nav-item {
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+                opacity  0.4s ease;
   }
 
   .home__nav-link {
-    font-size: 70px;
+    font-size: clamp(44px, 16vw, 70px);
     line-height: 1;
     font-weight: 900;
     font-style: italic;
     text-transform: uppercase;
     color: #fff;
+    white-space: nowrap;
   }
 
   .home__nav-link--dimmed {
-    opacity: 1;
-  }
-
-  /* submenus ocultos no mobile */
-  .home__submenu {
-    display: none;
+    opacity: 0.4;
   }
 
   /* ── Rodapé ── */

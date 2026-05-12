@@ -1,0 +1,11 @@
+{
+  "collectionName": "components_blocks_subcases",
+  "info": { "displayName": "Subcase", "icon": "layout" },
+  "attributes": {
+    "subtitulo": { "type": "string" },
+    "titulo":    { "type": "string", "required": true },
+    "descricao": { "type": "text" },
+    "imagem":    { "type": "media", "multiple": false, "allowedTypes": ["images"] },
+    "ancora_id": { "type": "string" }
+  }
+}

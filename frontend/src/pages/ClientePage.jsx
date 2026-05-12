@@ -15,18 +15,16 @@ function montarEntradas(cases) {
     const clienteSlug = c.cliente?.slug
     const caseSlug    = c.slug
 
-    if (c.Data) {
-      entradas.push({
-        id:          `${c.id}-main`,
-        ano:         new Date(c.Data).getFullYear(),
-        data:        new Date(c.Data),
-        nome:        c.titulo,
-        capa:        c.imagem_capa,
-        href:        `/${clienteSlug}/${caseSlug}`,
-        agenciaLogo: c.agencia?.logo ?? null,
-        agenciaNome: c.agencia?.nome ?? null,
-      })
-    }
+    entradas.push({
+      id:          `${c.id}-main`,
+      ano:         c.Data ? new Date(c.Data).getFullYear() : null,
+      data:        c.Data ? new Date(c.Data) : new Date(0),
+      nome:        c.titulo,
+      capa:        c.imagem_capa,
+      href:        `/${clienteSlug}/${caseSlug}`,
+      agenciaLogo: c.agencia?.logo ?? null,
+      agenciaNome: c.agencia?.nome ?? null,
+    })
 
     for (const bloco of c.blocos ?? []) {
       if (
@@ -47,10 +45,13 @@ function montarEntradas(cases) {
       }
     }
   }
-  // Anos mais recentes à esquerda; dentro do mesmo ano, jan antes de dez
+  // Ordena por ano decrescente; sem data vai pro fim
   entradas.sort((a, b) => {
-    if (a.ano !== b.ano) return b.ano - a.ano   // ano descending
-    return a.data - b.data                        // dentro do ano: ascending
+    if (a.ano === null && b.ano === null) return 0
+    if (a.ano === null) return 1
+    if (b.ano === null) return -1
+    if (a.ano !== b.ano) return b.ano - a.ano
+    return a.data - b.data
   })
   return entradas
 }
@@ -246,6 +247,9 @@ export default function ClientePage() {
     axios.get(`${STRAPI}/api/logo-site?populate=logo`)
       .then(r => setLogo(r.data.data?.logo ?? null))
       .catch(() => {})
+    // Bloqueia scroll do body (página full screen, sem scroll)
+    document.body.classList.add('scroll-locked')
+    return () => document.body.classList.remove('scroll-locked')
   }, [])
 
   /* fetch — inclui logo da agência */
@@ -258,7 +262,7 @@ export default function ClientePage() {
         `&populate[agencia][populate]=logo` +
         `&populate[imagem_capa]=true` +
         `&populate[blocos][populate]=*` +
-        `&sort=Data:asc`
+        `&sort[0]=ordem:asc&sort[1]=Data:asc`
       )
       .then(r => setEntradas(montarEntradas(r.data.data ?? [])))
       .catch(() => {})
@@ -299,32 +303,39 @@ export default function ClientePage() {
 
       let novosLabels
       if (mobile) {
-        // Mobile: label em cada card individualmente
-        novosLabels = entradas.map((entrada, i) => {
-          const card = firstSetCards[i]
-          const center = card ? card.offsetLeft + card.offsetWidth / 2 : 0
-          const pos = (center / oneSet) * 100
-          return { label: String(entrada.ano), pos }
-        })
+        // Mobile: label em cada card individualmente (só os que têm ano)
+        novosLabels = entradas
+          .map((entrada, i) => {
+            if (!entrada.ano) return null
+            const card = firstSetCards[i]
+            const center = card ? card.offsetLeft + card.offsetWidth / 2 : 0
+            const pos = (center / oneSet) * 100
+            return { label: String(entrada.ano), pos }
+          })
+          .filter(Boolean)
       } else {
         // Desktop: label no primeiro card de cada grupo de ano
         const grupos = gruposDeAnos(entradas)
-        novosLabels = grupos.map(g => {
-          const firstIdx = g.indices[0]
-          const card = firstSetCards[firstIdx]
-          const center = card ? card.offsetLeft + card.offsetWidth / 2 : 0
-          const pos = (center / oneSet) * 100
-          return { label: String(g.ano), pos }
-        })
+        novosLabels = grupos
+          .filter(g => g.ano)
+          .map(g => {
+            const firstIdx = g.indices[0]
+            const card = firstSetCards[firstIdx]
+            const center = card ? card.offsetLeft + card.offsetWidth / 2 : 0
+            const pos = (center / oneSet) * 100
+            return { label: String(g.ano), pos }
+          })
       }
       setLabels(novosLabels)
     } else if (!usaCarrossel) {
       const grupos = gruposDeAnos(entradas)
-      const novosLabels = grupos.map(g => {
-        const firstIdx = g.indices[0]
-        const pos = ((firstIdx + 0.5) / n) * 100
-        return { label: String(g.ano), pos }
-      })
+      const novosLabels = grupos
+        .filter(g => g.ano)
+        .map(g => {
+          const firstIdx = g.indices[0]
+          const pos = ((firstIdx + 0.5) / n) * 100
+          return { label: String(g.ano), pos }
+        })
       setLabels(novosLabels)
     }
 
