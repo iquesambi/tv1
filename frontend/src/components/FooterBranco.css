@@ -53,7 +53,8 @@
   cursor: pointer;
 }
 
-.footer-branco__camera img {
+.footer-branco__camera img,
+.footer-branco__camera video {
   height: 100px;
   width: auto;
   object-fit: contain;
