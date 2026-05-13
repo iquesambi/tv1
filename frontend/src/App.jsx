@@ -569,18 +569,21 @@ function App() {
         return (
           <div className="home__submenu" onClick={e => e.stopPropagation()}>
             <div className="home__submenu-center" style={{ top: blockTop, transform: 'none', justifyContent: 'flex-start' }}>
-              {sublinks.map((sub, j) => (
-                <a
-                  key={j}
-                  href={sub.url || '#'}
-                  className="home__submenu-link"
-                  onMouseEnter={() => setHoveredSub(sub)}
-                  onMouseLeave={() => setHoveredSub(null)}
-                  onClick={handleSubClick(sub)}
-                >
-                  {sub.label}
-                </a>
-              ))}
+              {sublinks.map((sub, j) => {
+                const isAtivo = hoveredSub ? hoveredSub === sub : j === 0
+                return (
+                  <a
+                    key={j}
+                    href={sub.url || '#'}
+                    className={`home__submenu-link${isAtivo ? ' home__submenu-link--ativo' : ''}`}
+                    onMouseEnter={() => setHoveredSub(sub)}
+                    onMouseLeave={() => setHoveredSub(null)}
+                    onClick={handleSubClick(sub)}
+                  >
+                    {sub.label}
+                  </a>
+                )
+              })}
             </div>
           </div>
         )
