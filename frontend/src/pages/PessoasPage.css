@@ -102,14 +102,31 @@
 
 /* ── LOADING ──────────────────────────── */
 
-.pessoas-loading {
+.pessoas-page--loading {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 80px;
-  font-size: 14px;
-  font-weight: 500;
-  opacity: 0.4;
+  min-height: 100vh;
+}
+
+/* spinner reutiliza .cliente-loading / .cliente-loading__spinner de ClientePage.css */
+.pessoas-page--loading .cliente-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pessoas-page--loading .cliente-loading__spinner {
+  width: 32px;
+  height: 32px;
+  border: 2px solid rgba(0, 0, 0, 0.12);
+  border-top-color: #000001;
+  border-radius: 50%;
+  animation: pessoas-spin 0.8s linear infinite;
+}
+
+@keyframes pessoas-spin {
+  to { transform: rotate(360deg); }
 }
 
 /* ── RESPONSIVO ───────────────────────── */
