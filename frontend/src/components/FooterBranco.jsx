@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { useGoTo } from '../transition.jsx'
+import { useGoTo, useStartCamera } from '../transition.jsx'
 import axios from 'axios'
 import './FooterBranco.css'
 
@@ -28,6 +28,7 @@ export default function FooterBranco() {
   const [hoveredSub, setHoveredSub] = useState(null)
   const [activeSubIdx, setActiveSubIdx] = useState(0)
   const goTo = useGoTo()
+  const startCamera = useStartCamera()
   const lastScrollY       = useRef(0)
   const activeSubIdxRef   = useRef(0)
   const boundaryAcc       = useRef(0)
@@ -221,6 +222,16 @@ export default function FooterBranco() {
       {links.map((link, i) => {
         if (aberto !== i) return null
         const sublinks = getSublinks(link)
+        const isPessoas = link.label?.toLowerCase() === 'pessoas'
+
+        if (isPessoas) {
+          return link.imagem_hover
+            ? <div key={`${i}-main`} className="footer-branco__bg footer-branco__bg--ativo">
+                <img src={mediaUrl(link.imagem_hover)} alt="" />
+              </div>
+            : null
+        }
+
         return [
           link.imagem_hover && (
             <div
@@ -230,18 +241,14 @@ export default function FooterBranco() {
               <img src={mediaUrl(link.imagem_hover)} alt="" />
             </div>
           ),
-          ...sublinks.map((sub, j) => {
-            const img = sub.imagem_hover || link.imagem_hover
-            if (!img) return null
-            return (
-              <div
-                key={`${i}-${j}`}
-                className={`footer-branco__bg ${hoveredSub === sub || (hoveredSub === null && j === activeSubIdx) ? 'footer-branco__bg--ativo' : ''}`}
-              >
-                <img src={mediaUrl(img)} alt="" />
-              </div>
-            )
-          }),
+          ...sublinks.filter(s => s.imagem_hover).map((sub, j) => (
+            <div
+              key={`${i}-${j}`}
+              className={`footer-branco__bg ${hoveredSub === sub || (hoveredSub === null && j === activeSubIdx) ? 'footer-branco__bg--ativo' : ''}`}
+            >
+              <img src={mediaUrl(sub.imagem_hover)} alt="" />
+            </div>
+          )),
         ]
       })}
 
@@ -250,11 +257,14 @@ export default function FooterBranco() {
         <div className="footer-branco__logo" onClick={e => e.stopPropagation()}>
           {logo?.logo && <img src={mediaUrl(logo.logo)} alt="TV1" />}
         </div>
-        {qa?.ativo && qa?.imagem && (
-          <button className="footer-branco__camera" onClick={(e) => { e.stopPropagation(); goTo('/quarenta-anos') }} aria-label="40 Anos TV1">
-            <img src={mediaUrl(qa.imagem)} alt="" />
-          </button>
-        )}
+        <button className="footer-branco__camera" onClick={(e) => { e.stopPropagation(); if (qa?.ativo) startCamera(e.currentTarget.getBoundingClientRect()) }} aria-label="40 Anos TV1">
+          {qa?.ativo && (
+            <video muted playsInline preload="metadata" onLoadedMetadata={e => { e.target.currentTime = 3 }}>
+              <source src="/camera-rotation-alpha.webm" type="video/webm" />
+              <source src="/camera-rotation-alpha.mov" type="video/mp4; codecs=hvc1" />
+            </video>
+          )}
+        </button>
       </div>
 
       {/* Nav central */}

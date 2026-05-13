@@ -121,6 +121,10 @@
   color: #fff;
 }
 
+.footer-branco--aberto .footer-branco__nav-link {
+  color: #fff;
+}
+
 .footer-branco--aberto .footer-branco__nav-link:hover {
   color: #fff;
   opacity: 0.45;
