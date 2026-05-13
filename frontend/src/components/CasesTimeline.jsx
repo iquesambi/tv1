@@ -93,7 +93,7 @@ function CaseCard({ entrada, idx, carousel }) {
 }
 
 /* ── Timeline bar ── */
-function TimelineBar({ labels, xRef, tiltDeltaRef, timelineTrackRef, usaCarrossel }) {
+function TimelineBar({ labels, xRef, tiltDeltaRef, timelineTrackRef, usaCarrossel, onLabelClick }) {
   const isDragging = useRef(false)
   const dragStart  = useRef(0)
 
@@ -130,7 +130,7 @@ function TimelineBar({ labels, xRef, tiltDeltaRef, timelineTrackRef, usaCarrosse
               {[0, 1, 2].map(setIdx => (
                 <div className="timeline__labels-set" key={setIdx}>
                   {labels.map((l, i) => (
-                    <div key={i} className="timeline__label" style={{ left: `${l.pos}%` }}>{l.label}</div>
+                    <div key={i} className="timeline__label timeline__label--clicavel" style={{ left: `${l.pos}%` }} onClick={() => onLabelClick?.(l.cardIdx)}>{l.label}</div>
                   ))}
                 </div>
               ))}
@@ -164,8 +164,23 @@ export default function CasesTimeline({ tipo, slug }) {
   const trackRef         = useRef(null)
   const timelineTrackRef = useRef(null)
   const xRef             = useRef({ x: 0 })
+  const xTargetRef       = useRef(null)
+  const firstSetCardsRef = useRef([])
+  const oneSetRef        = useRef(0)
   const tiltDeltaRef     = useRef(0)
   const [labels, setLabels] = useState([])
+
+  const handleLabelClick = (cardIdx) => {
+    const cards     = firstSetCardsRef.current
+    const container = viewportRef.current
+    if (!cards[cardIdx] || !container) return
+    const cardCenter = cards[cardIdx].offsetLeft + cards[cardIdx].offsetWidth / 2
+    const base    = container.clientWidth / 2 - oneSetRef.current - cardCenter
+    const oneSet  = oneSetRef.current
+    const cur     = xRef.current.x
+    const options = [base - oneSet, base, base + oneSet]
+    xTargetRef.current = options.reduce((a, b) => Math.abs(b - cur) < Math.abs(a - cur) ? b : a)
+  }
 
   useEffect(() => {
     if (!slug) return
@@ -197,11 +212,17 @@ export default function CasesTimeline({ tipo, slug }) {
 
     const oneSet = usaCarrossel ? track.scrollWidth / 3 : 0
     xRef.current.x = usaCarrossel ? -oneSet : 0
+    xTargetRef.current = null
     tiltDeltaRef.current = 0
     let tilt = 0
     let raf
 
     const cards = Array.from(track.querySelectorAll('.cliente-card'))
+
+    if (usaCarrossel) {
+      firstSetCardsRef.current = cards.slice(0, n)
+      oneSetRef.current = oneSet
+    }
 
     if (usaCarrossel && timelineTrackRef.current) {
       const sets = timelineTrackRef.current.querySelectorAll('.timeline__labels-set')
@@ -210,9 +231,10 @@ export default function CasesTimeline({ tipo, slug }) {
       const firstSetCards = cards.slice(0, n)
       const grupos = gruposDeLabels(entradas)
       setLabels(grupos.map(g => {
-        const card = firstSetCards[g.indices[0]]
+        const firstIdx = g.indices[0]
+        const card = firstSetCards[firstIdx]
         const center = card ? card.offsetLeft + card.offsetWidth / 2 : 0
-        return { label: g.label, pos: (center / oneSet) * 100 }
+        return { label: g.label, pos: (center / oneSet) * 100, cardIdx: firstIdx }
       }))
     } else if (!usaCarrossel) {
       const grupos = gruposDeLabels(entradas)
@@ -229,6 +251,17 @@ export default function CasesTimeline({ tipo, slug }) {
     }
 
     const tick = () => {
+      if (xTargetRef.current !== null) {
+        const diff = xTargetRef.current - xRef.current.x
+        if (Math.abs(diff) < 1) {
+          xRef.current.x = xTargetRef.current
+          xTargetRef.current = null
+        } else {
+          xRef.current.x += diff * 0.1
+          tiltDeltaRef.current = 0
+        }
+      }
+
       const targetTilt = Math.max(-60, Math.min(60, tiltDeltaRef.current * 0.55))
       tilt += (targetTilt - tilt) * 0.08
       tiltDeltaRef.current *= 0.91
@@ -292,6 +325,7 @@ export default function CasesTimeline({ tipo, slug }) {
         tiltDeltaRef={tiltDeltaRef}
         timelineTrackRef={timelineTrackRef}
         usaCarrossel={usaCarrossel}
+        onLabelClick={handleLabelClick}
       />
     </div>
   )

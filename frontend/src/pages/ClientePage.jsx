@@ -117,7 +117,7 @@ function CaseCard({ entrada, idx, ativo = false, carousel = false, cardRef, clie
 }
 
 /* ── Timeline ── */
-function Timeline({ labels, xRef, tiltDeltaRef, timelineTrackRef, usaCarrossel }) {
+function Timeline({ labels, xRef, tiltDeltaRef, timelineTrackRef, usaCarrossel, onLabelClick }) {
   const isDragging = useRef(false)
   const dragStart  = useRef(0)
 
@@ -188,8 +188,9 @@ function Timeline({ labels, xRef, tiltDeltaRef, timelineTrackRef, usaCarrossel }
                   {labels.map((l, i) => (
                     <div
                       key={i}
-                      className="timeline__label"
+                      className="timeline__label timeline__label--clicavel"
                       style={{ left: `${l.pos}%` }}
+                      onClick={() => onLabelClick?.(l.cardIdx)}
                     >
                       {l.label}
                     </div>
@@ -239,9 +240,24 @@ export default function ClientePage() {
   const timelineTrackRef = useRef(null)
   // ref compartilhado entre o tick e o drag da timeline
   const xRef = useRef({ x: 0 })
+  const xTargetRef      = useRef(null)
+  const firstSetCardsRef = useRef([])
+  const oneSetRef        = useRef(0)
   // delta usado para calcular o tilt 3D dos cards (alimentado por wheel ou drag)
   const tiltDeltaRef = useRef(0)
   const goTo = useGoTo()
+
+  const handleLabelClick = (cardIdx) => {
+    const cards     = firstSetCardsRef.current
+    const container = viewportRef.current
+    if (!cards[cardIdx] || !container) return
+    const cardCenter = cards[cardIdx].offsetLeft + cards[cardIdx].offsetWidth / 2
+    const base    = container.clientWidth / 2 - oneSetRef.current - cardCenter
+    const oneSet  = oneSetRef.current
+    const cur     = xRef.current.x
+    const options = [base - oneSet, base, base + oneSet]
+    xTargetRef.current = options.reduce((a, b) => Math.abs(b - cur) < Math.abs(a - cur) ? b : a)
+  }
 
   /* fetch logo do site */
   useEffect(() => {
@@ -315,11 +331,17 @@ export default function ClientePage() {
 
     const oneSet = usaCarrossel ? track.scrollWidth / 3 : 0
     xRef.current.x = usaCarrossel ? -oneSet : 0
+    xTargetRef.current = null
     tiltDeltaRef.current = 0
     let tilt  = 0
     let raf
 
     let cards = Array.from(track.querySelectorAll('.cliente-card'))
+
+    if (usaCarrossel) {
+      firstSetCardsRef.current = cards.slice(0, n)
+      oneSetRef.current = oneSet
+    }
 
     const mobile = window.innerWidth <= 768
 
@@ -339,7 +361,7 @@ export default function ClientePage() {
             const card = firstSetCards[i]
             const center = card ? card.offsetLeft + card.offsetWidth / 2 : 0
             const pos = (center / oneSet) * 100
-            return { label: String(entrada.ano), pos }
+            return { label: String(entrada.ano), pos, cardIdx: i }
           })
           .filter(Boolean)
       } else {
@@ -352,7 +374,7 @@ export default function ClientePage() {
             const card = firstSetCards[firstIdx]
             const center = card ? card.offsetLeft + card.offsetWidth / 2 : 0
             const pos = (center / oneSet) * 100
-            return { label: String(g.ano), pos }
+            return { label: String(g.ano), pos, cardIdx: firstIdx }
           })
       }
       setLabels(novosLabels)
@@ -403,6 +425,18 @@ export default function ClientePage() {
     const isMobile = () => window.innerWidth <= 768
 
     const tick = () => {
+      // Animação para label clicado
+      if (xTargetRef.current !== null) {
+        const diff = xTargetRef.current - xRef.current.x
+        if (Math.abs(diff) < 1) {
+          xRef.current.x = xTargetRef.current
+          xTargetRef.current = null
+        } else {
+          xRef.current.x += diff * 0.1
+          tiltDeltaRef.current = 0
+        }
+      }
+
       const targetTilt = Math.max(-60, Math.min(60, tiltDeltaRef.current * 0.55))
       tilt  += (targetTilt - tilt) * 0.08
       tiltDeltaRef.current *= 0.91
@@ -522,6 +556,7 @@ export default function ClientePage() {
         tiltDeltaRef={tiltDeltaRef}
         timelineTrackRef={timelineTrackRef}
         usaCarrossel={usaCarrossel}
+        onLabelClick={handleLabelClick}
       />
 
     </div>

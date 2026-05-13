@@ -267,6 +267,15 @@
   white-space: nowrap;
 }
 
+.timeline__label--clicavel {
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.timeline__label--clicavel:hover {
+  opacity: 0.5;
+}
+
 /* ── LOADING ──────────────────────────── */
 
 .cliente-loading {
