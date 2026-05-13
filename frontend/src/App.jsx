@@ -44,7 +44,7 @@ function App() {
   const touchAccDelta = useRef(0)
 
   useEffect(() => {
-    api('navigation?populate[links][populate][0]=imagem_hover&populate[links][populate][sublinks][populate]=imagem_hover').then(setNav)
+    api('navigation?populate[links][populate][imagem_hover]=true&populate[links][populate][sublinks][populate][imagem_hover]=true').then(setNav)
     api('logo-site?populate=logo').then(setLogo)
     api('agencias?populate=logo&sort=ordem:asc').then(setAgencias)
     api('quarenta-anos?populate=imagem').then(setQA)
@@ -116,10 +116,10 @@ function App() {
 
   // Sublinks dinâmicos: /pessoas → navegação com slug; /clientes → clientes
   const getSublinks = (link) => {
-    if (link.url === '/pessoas') {
+    if (link.label?.toLowerCase() === 'pessoas') {
       return (link.sublinks ?? []).map(sub => ({
         label: sub.label,
-        url: `/pessoas#${sub.url.replace(/^\//, '')}`,
+        url: `/pessoas#${(sub.url ?? '').replace(/^\//, '')}`,
         imagem_hover: sub.imagem_hover ?? null,
       }))
     }
@@ -311,6 +311,17 @@ function App() {
       {links.map((link, i) => {
         if (aberto !== i) return null
         const sublinks = getSublinks(link)
+        const isPessoas = link.label?.toLowerCase() === 'pessoas'
+
+        // Pessoas: fundo fixo do link, nunca troca pelos sublinks
+        if (isPessoas) {
+          return link.imagem_hover
+            ? <div key={`${i}-main`} className="home__bg home__bg--ativo">
+                <img src={mediaUrl(link.imagem_hover)} alt="" />
+              </div>
+            : null
+        }
+
         return [
           // fundo padrão do link — aparece quando nenhum sublink hovered e o ativo não tem imagem
           link.imagem_hover && (
