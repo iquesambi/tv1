@@ -230,7 +230,8 @@ function Timeline({ labels, xRef, tiltDeltaRef, timelineTrackRef, usaCarrossel }
 
 /* ── Página ── */
 export default function ClientePage() {
-  const { cliente: clienteSlug } = useParams()
+  const params = useParams()
+  const clienteSlug = params.cliente ?? params.slug
   const [entradas, setEntradas]  = useState([])
   const [logo, setLogo]          = useState(null)
   const viewportRef = useRef(null)

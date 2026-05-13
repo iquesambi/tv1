@@ -284,7 +284,11 @@ function Block({ block }) {
 
 /* ── Página ─────────────────────────────── */
 export default function CasePage() {
-  const { cliente: clienteSlug, case: caseSlug } = useParams()
+  const params = useParams()
+  // Se veio por /:slug/:case → clienteSlug + caseSlug normais
+  // Se veio por /:slug sem case → é um case histórico sem cliente
+  const clienteSlug = params.case ? (params.cliente ?? params.slug) : null
+  const caseSlug    = params.case ?? params.slug
   const navigate = useNavigate()
   const [data, setData] = useState(null)
   const [logo, setLogo] = useState(null)
@@ -301,7 +305,7 @@ export default function CasePage() {
       .get(
         `${STRAPI}/api/cases` +
         `?filters[slug][$eq]=${caseSlug}` +
-        `&filters[cliente][slug][$eq]=${clienteSlug}` +
+        (clienteSlug ? `&filters[cliente][slug][$eq]=${clienteSlug}` : '') +
         `&populate[cliente]=true` +
         `&populate[agencia][populate]=logo` +
         `&populate[imagem_capa]=true` +

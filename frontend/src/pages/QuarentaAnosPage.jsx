@@ -28,7 +28,7 @@ function montarEntradas(cases) {
         data: c.Data ? new Date(c.Data) : new Date(0),
         nome: c.titulo || '',
         capa: c.imagem_capa,
-        href: (c.cliente?.slug && c.slug) ? `/${c.cliente.slug}/${c.slug}` : '#',
+        href: c.slug ? (c.cliente?.slug ? `/${c.cliente.slug}/${c.slug}` : `/${c.slug}`) : '#',
       })
     }
 
@@ -42,7 +42,7 @@ function montarEntradas(cases) {
             data: c.Data ? new Date(c.Data) : new Date(0),
             nome: bloco.titulo || '',
             capa: bloco.imagem,
-            href: (c.cliente?.slug && c.slug) ? `/${c.cliente.slug}/${c.slug}#${bloco.ancora_id}` : '#',
+            href: c.slug ? (c.cliente?.slug ? `/${c.cliente.slug}/${c.slug}#${bloco.ancora_id}` : `/${c.slug}#${bloco.ancora_id}`) : '#',
           })
         }
       })
@@ -200,7 +200,7 @@ export default function QuarentaAnosPage() {
   const tiltDeltaRef      = useRef(0)
 
   useEffect(() => {
-    api('quarenta-anos?populate[0]=imagem&populate[1]=video_capa&populate[2]=fotos&populate[3]=cases_destaque.imagem_capa&populate[4]=cases_destaque.cliente&populate[5]=cases_destaque.blocos').then(setData)
+    api('quarenta-anos?populate[imagem]=true&populate[video_capa]=true&populate[fotos]=true&populate[cases_destaque][populate][imagem_capa]=true&populate[cases_destaque][populate][cliente]=true&populate[cases_destaque][populate][blocos][populate]=*').then(setData)
     document.body.classList.remove('scroll-locked')
   }, [])
 
@@ -427,7 +427,7 @@ export default function QuarentaAnosPage() {
 
         <h2 className="qa-cases__titulo">
           <span className="qa-titulo-case">Case</span>
-          <span className="qa-titulo-historias">histórias</span>
+          <span className="qa-titulo-historias">históricos</span>
         </h2>
 
         {/* Estático (1-3) */}

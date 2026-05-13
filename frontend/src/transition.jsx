@@ -12,7 +12,7 @@ export function TransitionProvider({ children }) {
   const [ativa, setAtiva] = useState(false)
   const timer = useRef(null)
 
-  const goTo = useCallback((path) => {
+  const goTo = useCallback((path, onNavigated) => {
     clearTimeout(timer.current)
 
     // 1. cartela entra cobrindo a home (que continua montada)
@@ -23,6 +23,8 @@ export function TransitionProvider({ children }) {
       navigate(path)
       // 3. remove cartela instantaneamente — nova página já está lá
       setAtiva(false)
+      // 4. executa callback após navegação completar
+      if (onNavigated) onNavigated()
     }, 560)
   }, [navigate])
 

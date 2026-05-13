@@ -150,7 +150,15 @@
     margin-top: 0;
   }
 
+  .pessoa-nome {
+    font-size: clamp(28px, 9vw, 40px);
+    white-space: normal;
+    line-height: 0.95;
+  }
+
   .pessoa-cargo {
+    font-size: clamp(28px, 9vw, 40px);
     max-width: 100%;
+    line-height: 0.95;
   }
 }

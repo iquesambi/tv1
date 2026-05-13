@@ -17,6 +17,7 @@ export default function OutrosAssuntosPage() {
 
   useEffect(() => {
     api('logo-site?populate=logo').then(setLogo)
+    document.body.classList.remove('scroll-locked')
   }, [])
 
   const handleChange = (e) => {

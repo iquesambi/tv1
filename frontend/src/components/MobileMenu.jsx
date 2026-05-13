@@ -36,9 +36,9 @@ export default function MobileMenu({ logo, logoFiltro = 'brightness(0)' }) {
 
   const getSublinks = (link) => {
     if (link.url === '/pessoas') {
-      return (equipe ?? []).map(m => ({
-        label: m.nome,
-        url: `/pessoas#${slugify(m.nome)}`,
+      return (link.sublinks ?? []).map(sub => ({
+        label: sub.label,
+        url: `/pessoas#${sub.url.replace(/^\//, '')}`,
       }))
     }
     if (link.url === '/clientes') {

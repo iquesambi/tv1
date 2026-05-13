@@ -16,6 +16,7 @@ export default function TrabalheComenoscoPage() {
 
   useEffect(() => {
     api('logo-site?populate=logo').then(setLogo)
+    document.body.classList.remove('scroll-locked')
   }, [])
 
   useEffect(() => {

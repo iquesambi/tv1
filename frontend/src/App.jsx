@@ -113,7 +113,7 @@ function App() {
     if (link.url === '/pessoas') {
       return (link.sublinks ?? []).map(sub => ({
         label: sub.label,
-        url: `/pessoas#${sub.url}`,
+        url: `/pessoas#${sub.url.replace(/^\//, '')}`,
         imagem_hover: sub.imagem_hover ?? null,
       }))
     }
@@ -506,7 +506,15 @@ function App() {
                     style={{ fontSize: `${sizes[j]}px`, opacity }}
                     onMouseEnter={() => setHoveredSub(sub)}
                     onMouseLeave={() => setHoveredSub(null)}
-                    onClick={e => { e.preventDefault(); sub.url && goTo(sub.url) }}
+                    onClick={e => {
+                      e.preventDefault()
+                      if (sub.url) {
+                        const [path, hash] = sub.url.split('#')
+                        goTo(path || '/', () => {
+                          if (hash) window.location.hash = hash
+                        })
+                      }
+                    }}
                   >
                     {sub.label}
                   </a>

@@ -46,7 +46,7 @@ export default function PessoasPage() {
         {membros.map((m, i) => (
           <section
             key={i}
-            id={slugify(m.nome)}
+            id={m.slug}
             className="pessoa-bloco"
           >
             {m.foto && (

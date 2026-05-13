@@ -6,6 +6,7 @@ import App from './App.jsx'
 import CasePage from './pages/CasePage.jsx'
 import ClientePage from './pages/ClientePage.jsx'
 import EspecialidadePage from './pages/EspecialidadePage.jsx'
+import SlugRouter from './pages/SlugRouter.jsx'
 import PessoasPage from './pages/PessoasPage.jsx'
 import QuarentaAnosPage from './pages/QuarentaAnosPage.jsx'
 import TrabalheComenoscoPage from './pages/TrabalheComenoscoPage.jsx'
@@ -24,8 +25,8 @@ createRoot(document.getElementById('root')).render(
           <Route path="/pessoas" element={<PessoasPage />} />
           <Route path="/quarenta-anos" element={<QuarentaAnosPage />} />
           <Route path="/cases/:especialidade" element={<EspecialidadePage />} />
-          <Route path="/:cliente" element={<ClientePage />} />
-          <Route path="/:cliente/:case" element={<CasePage />} />
+          <Route path="/:slug" element={<SlugRouter />} />
+          <Route path="/:slug/:case" element={<CasePage />} />
         </Routes>
       </TransitionProvider>
     </BrowserRouter>

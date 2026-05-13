@@ -212,7 +212,8 @@ function Timeline({ labels, xRef, tiltDeltaRef, timelineTrackRef, usaCarrossel }
 
 /* ── Página ── */
 export default function EspecialidadePage() {
-  const { especialidade: especialidadeSlug } = useParams()
+  const params = useParams()
+  const especialidadeSlug = params.especialidade ?? params.slug
   const [entradas, setEntradas]  = useState([])
   const [logo, setLogo]          = useState(null)
   const viewportRef = useRef(null)

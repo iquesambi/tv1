@@ -38,10 +38,10 @@ export default function FooterBranco() {
 
   const getSublinks = (link) => {
     if (link.url === '/pessoas') {
-      return (equipe ?? []).map(m => ({
-        label: m.nome,
-        url: `/pessoas#${slugify(m.nome)}`,
-        imagem_hover: m.foto ?? null,
+      return (link.sublinks ?? []).map(sub => ({
+        label: sub.label,
+        url: `/pessoas#${sub.url.replace(/^\//, '')}`,
+        imagem_hover: sub.imagem_hover ?? null,
       }))
     }
     if (link.url === '/clientes') {
@@ -269,7 +269,15 @@ export default function FooterBranco() {
                     style={{ fontSize: `${sizes[j]}px`, opacity }}
                     onMouseEnter={() => setHoveredSub(sub)}
                     onMouseLeave={() => setHoveredSub(null)}
-                    onClick={e => { e.preventDefault(); sub.url && goTo(sub.url) }}
+                    onClick={e => {
+                      e.preventDefault()
+                      if (sub.url) {
+                        const [path, hash] = sub.url.split('#')
+                        goTo(path || '/', () => {
+                          if (hash) window.location.hash = hash
+                        })
+                      }
+                    }}
                   >
                     {sub.label}
                   </a>
