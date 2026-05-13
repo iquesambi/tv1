@@ -1,8 +1,9 @@
 import { useEffect, useState, useCallback, useRef } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams, useNavigate, useLocation } from 'react-router-dom'
 import axios from 'axios'
 import FooterBranco from '../components/FooterBranco.jsx'
 import MobileMenu from '../components/MobileMenu.jsx'
+import CasesTimeline from '../components/CasesTimeline.jsx'
 import './CasePage.css'
 
 const STRAPI = 'https://tv1-53ev.onrender.com'
@@ -285,11 +286,16 @@ function Block({ block }) {
 /* ── Página ─────────────────────────────── */
 export default function CasePage() {
   const params = useParams()
+  const location = useLocation()
   // Se veio por /:slug/:case → clienteSlug + caseSlug normais
   // Se veio por /:slug sem case → é um case histórico sem cliente
   const clienteSlug = params.case ? (params.cliente ?? params.slug) : null
   const caseSlug    = params.case ?? params.slug
   const navigate = useNavigate()
+
+  // Origem da navegação: 'cliente' ou 'especialidade'
+  const navFrom  = location.state?.from ?? 'cliente'
+  const navSlug  = location.state?.slug ?? clienteSlug
   const [data, setData] = useState(null)
   const [logo, setLogo] = useState(null)
   const [quarentaAnos, setQA] = useState(null)
@@ -367,6 +373,8 @@ export default function CasePage() {
       {data.blocos?.map((block, i) => (
         <Block key={i} block={block} />
       ))}
+
+      {navSlug && <CasesTimeline tipo={navFrom} slug={navSlug} />}
 
       <FooterBranco />
 

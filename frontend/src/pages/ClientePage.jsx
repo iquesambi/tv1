@@ -84,7 +84,7 @@ const ALTURAS = [460, 340, 400, 310, 380]
 function alturaParaIdx(idx) { return ALTURAS[idx % ALTURAS.length] }
 
 /* ── Card ── */
-function CaseCard({ entrada, idx, ativo = false, carousel = false, cardRef }) {
+function CaseCard({ entrada, idx, ativo = false, carousel = false, cardRef, clienteSlug }) {
   const goTo = useGoTo()
   return (
     <div
@@ -95,7 +95,7 @@ function CaseCard({ entrada, idx, ativo = false, carousel = false, cardRef }) {
         carousel  ? 'cliente-card--carousel' : '',
       ].join(' ')}
       style={carousel ? { height: alturaParaIdx(idx) } : undefined}
-      onClick={() => goTo(entrada.href)}
+      onClick={() => goTo(entrada.href, null, { from: 'cliente', slug: clienteSlug })}
     >
       {entrada.capa && (
         <img src={mediaUrl(entrada.capa)} alt={entrada.nome} className="cliente-card__img" />
@@ -276,6 +276,34 @@ export default function ClientePage() {
   // labels com posição em % calculada a partir dos cards reais (medidos)
   const [labels, setLabels] = useState([])
 
+  // Preload das capas — pula spinner se já tiver cache local
+  const lsKey = `tv1-timeline-${clienteSlug}`
+  const [pronto, setPronto] = useState(() => {
+    try { return JSON.parse(localStorage.getItem(lsKey) ?? '[]').length > 0 } catch { return false }
+  })
+
+  // Mount: precarrega do localStorage para aquecer o cache HTTP
+  useEffect(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem(lsKey) ?? '[]')
+      saved.forEach(url => { const img = new Image(); img.src = url })
+    } catch {}
+  }, [lsKey])
+
+  // Quando entradas carregam: salva URLs + aguarda imagens (1ª visita)
+  useEffect(() => {
+    if (!n) return
+    const urls = entradas.map(e => mediaUrl(e.capa)).filter(Boolean)
+    try { localStorage.setItem(lsKey, JSON.stringify(urls)) } catch {}
+    if (pronto) return   // já estava em cache, não precisa esperar
+    if (!urls.length) { setPronto(true); return }
+    const timeout = setTimeout(() => setPronto(true), 6000)
+    let count = 0
+    const done = () => { if (++count >= urls.length) { clearTimeout(timeout); setPronto(true) } }
+    urls.forEach(url => { const img = new Image(); img.onload = img.onerror = done; img.src = url })
+    return () => clearTimeout(timeout)
+  }, [entradas])
+
   /* ── Scroll: tilt sempre; movimento X só no carrossel ── */
   useEffect(() => {
     if (!n) return
@@ -418,11 +446,13 @@ export default function ClientePage() {
       container.removeEventListener('touchend', onTouchEnd)
       cancelAnimationFrame(raf)
     }
-  }, [n, usaCarrossel])
+  }, [n, usaCarrossel, pronto])
 
-  if (!n) return (
+  if (!n || !pronto) return (
     <div className="cliente-page">
-      <div className="cliente-loading">Carregando...</div>
+      <div className="cliente-loading">
+        <div className="cliente-loading__spinner" />
+      </div>
     </div>
   )
 
@@ -462,6 +492,7 @@ export default function ClientePage() {
               idx={e._idx}
               ativo={e._idx === ativoIdx}
               carousel={false}
+              clienteSlug={clienteSlug}
             />
           ))}
         </div>
@@ -478,6 +509,7 @@ export default function ClientePage() {
                 idx={e._idx}
                 ativo={false}
                 carousel={true}
+                clienteSlug={clienteSlug}
               />
             ))}
           </div>

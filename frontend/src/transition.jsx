@@ -19,11 +19,11 @@ export function TransitionProvider({ children }) {
   const overlayVideoRef = useRef(null)
   const cameraTriggered = useRef(false)
 
-  const goTo = useCallback((path, onNavigated) => {
+  const goTo = useCallback((path, onNavigated, state) => {
     clearTimeout(timer.current)
     setAtiva(true)
     timer.current = setTimeout(() => {
-      navigate(path)
+      navigate(path, state ? { state } : undefined)
       setAtiva(false)
       if (onNavigated) onNavigated()
     }, 560)
@@ -56,7 +56,6 @@ export function TransitionProvider({ children }) {
       {cameraAnim && (
         <video
           ref={overlayVideoRef}
-          src="/camera-rotation.mp4"
           playsInline
           muted
           style={{
@@ -76,7 +75,10 @@ export function TransitionProvider({ children }) {
               navigate('/quarenta-anos')
             }
           }}
-        />
+        >
+          <source src="/camera-rotation-alpha.webm" type="video/webm" />
+          <source src="/camera-rotation-alpha.mov" type="video/mp4; codecs=hvc1" />
+        </video>
       )}
     </Ctx.Provider>
   )

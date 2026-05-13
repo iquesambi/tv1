@@ -59,15 +59,20 @@ function App() {
     } catch {}
   }, [])
 
-  // Preloader: aguarda logo + câmera + agências + redes antes de exibir
+  // Preloader: aguarda logo + câmera + agências + redes + hover images antes de exibir
   useEffect(() => {
-    if (!logo || !agencias || !redes) return
+    if (!logo || !agencias || !redes || !nav) return
 
     const urls = [
       mediaUrl(logo?.logo),
       mediaUrl(quarentaAnos?.imagem),
       ...(agencias ?? []).filter(a => a.logo).map(a => mediaUrl(a.logo)),
       ...(redes?.redes ?? []).filter(r => r.icone).map(r => mediaUrl(r.icone)),
+      // hover images dos links e sublinks da nav
+      ...(nav?.links ?? []).flatMap(link => [
+        link.imagem_hover ? mediaUrl(link.imagem_hover) : null,
+        ...(link.sublinks ?? []).map(sub => sub.imagem_hover ? mediaUrl(sub.imagem_hover) : null),
+      ]),
     ].filter(Boolean)
 
     // Salva URLs no localStorage para pré-carregar na próxima visita
@@ -83,7 +88,7 @@ function App() {
     urls.forEach(url => { const img = new Image(); img.onload = img.onerror = done; img.src = url })
 
     return () => clearTimeout(timeout)
-  }, [logo, agencias, redes, quarentaAnos])
+  }, [logo, agencias, redes, quarentaAnos, nav])
 
   // Bloqueia scroll do body na home (impede barra do Chrome de se mover)
   useEffect(() => {
@@ -403,11 +408,10 @@ function App() {
         {/* câmera — visível no desktop dentro do header */}
         <button className="home__camera home__camera--desktop" onClick={(e) => { e.stopPropagation(); if (quarentaAnos?.ativo) { startCamera(e.currentTarget.getBoundingClientRect()) } }} aria-label="40 Anos TV1">
           {quarentaAnos?.ativo && (
-            <video
-              src="/camera-rotation.mp4"
-              muted playsInline preload="metadata"
-              onLoadedMetadata={e => { e.target.currentTime = 3 }}
-            />
+            <video muted playsInline preload="metadata" onLoadedMetadata={e => { e.target.currentTime = 3 }}>
+              <source src="/camera-rotation-alpha.webm" type="video/webm" />
+              <source src="/camera-rotation-alpha.mov" type="video/mp4; codecs=hvc1" />
+            </video>
           )}
         </button>
         {/* hamburguer — visível só no mobile */}
@@ -419,11 +423,10 @@ function App() {
       {/* câmera mobile — centralizada abaixo do header */}
       <button className="home__camera home__camera--mobile" onClick={(e) => { e.stopPropagation(); if (quarentaAnos?.ativo) { startCamera(e.currentTarget.getBoundingClientRect()) } }} aria-label="40 Anos TV1">
         {quarentaAnos?.ativo && (
-          <video
-            src="/camera-rotation.mp4"
-            muted playsInline preload="metadata"
-            onLoadedMetadata={e => { e.target.currentTime = 3 }}
-          />
+          <video muted playsInline preload="metadata" onLoadedMetadata={e => { e.target.currentTime = 3 }}>
+            <source src="/camera-rotation-alpha.webm" type="video/webm" />
+            <source src="/camera-rotation-alpha.mov" type="video/mp4; codecs=hvc1" />
+          </video>
         )}
       </button>
 

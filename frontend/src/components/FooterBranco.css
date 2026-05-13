@@ -98,7 +98,7 @@
   font-family: 'Gilroy', sans-serif;
   font-weight: 900;
   font-style: italic;
-  font-size: clamp(72px, 11vw, 150px);
+  font-size: clamp(104px, 15.8vw, 216px);
   text-transform: uppercase;
   color: #000001;
   line-height: 0.75;
@@ -249,7 +249,7 @@
   }
 
   .footer-branco__nav-link {
-    font-size: clamp(48px, 14vw, 68px);
+    font-size: clamp(70px, 20.2vw, 98px);
   }
 
   .footer-branco__submenu {

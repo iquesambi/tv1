@@ -274,9 +274,24 @@
   align-items: center;
   justify-content: center;
   flex: 1;
-  font-family: 'Gilroy', sans-serif;
-  font-size: 14px;
-  font-weight: 500;
+}
+
+.cliente-loading__spinner {
+  width: 32px;
+  height: 32px;
+  border: 2px solid rgba(0, 0, 0, 0.12);
+  border-top-color: #000001;
+  border-radius: 50%;
+  animation: cliente-spin 0.8s linear infinite;
+}
+
+@keyframes cliente-spin {
+  to { transform: rotate(360deg); }
+}
+
+.cliente-page--oculto {
+  opacity: 0;
+  pointer-events: none;
 }
 
 
