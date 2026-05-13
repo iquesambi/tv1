@@ -61,6 +61,23 @@
   transform: scale(1.04);
 }
 
+/* ── SOMBRA SUPERIOR DIREITA (calça o logo) ── */
+
+.cliente-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at top right, rgba(0,0,0,0.72) 0%, transparent 55%);
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.cliente-card:hover::before {
+  opacity: 1;
+}
+
 /* ── LOGO DA AGÊNCIA ─────────────────── */
 
 .cliente-card__agencia {
@@ -90,6 +107,7 @@
 .cliente-card__overlay {
   position: absolute;
   inset: 0;
+  z-index: 1;
   background: linear-gradient(180deg, transparent 45%, rgba(0, 0, 0, 0.78) 100%);
   display: flex;
   flex-direction: column;
@@ -105,20 +123,14 @@
 }
 
 .cliente-card__titulo {
-  font-size: 16px;
+  font-size: clamp(11px, 1.1vw, 18px);
   font-weight: 900;
-  font-style: italic;
+  font-style: normal;
   text-transform: uppercase;
   line-height: 1.05;
   color: #fff;
   margin: 0;
   text-wrap: balance;
-}
-
-/* Título maior no card ativo OU no hover */
-.cliente-card--ativo .cliente-card__titulo,
-.cliente-card:hover .cliente-card__titulo {
-  font-size: clamp(22px, 2.6vw, 44px);
 }
 
 /* ── LAYOUT ESTÁTICO — 1 ITEM ────────── */
