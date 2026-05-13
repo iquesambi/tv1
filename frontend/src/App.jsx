@@ -108,13 +108,13 @@ function App() {
 
   const links = nav?.links ?? []
 
-  // Sublinks dinâmicos: /pessoas → membros da equipe; /clientes → clientes
+  // Sublinks dinâmicos: /pessoas → navegação com slug; /clientes → clientes
   const getSublinks = (link) => {
     if (link.url === '/pessoas') {
-      return (equipe ?? []).map(m => ({
-        label: m.nome,
-        url: `/pessoas#${slugify(m.nome)}`,
-        imagem_hover: m.foto ?? null,
+      return (link.sublinks ?? []).map(sub => ({
+        label: sub.label,
+        url: `/pessoas#${sub.url}`,
+        imagem_hover: sub.imagem_hover ?? null,
       }))
     }
     if (link.url === '/clientes') {
