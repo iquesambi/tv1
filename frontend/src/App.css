@@ -106,7 +106,8 @@
   cursor: pointer;
 }
 
-.home__camera img {
+.home__camera img,
+.home__camera video {
   height: 100px;
   width: auto;
   object-fit: contain;
@@ -541,7 +542,8 @@
     opacity: 0;
   }
 
-  .home__camera--mobile img {
+  .home__camera--mobile img,
+  .home__camera--mobile video {
     height: 90px;
     width: auto;
     object-fit: contain;
@@ -549,7 +551,8 @@
     margin: 0 auto;
   }
 
-  .home__camera--desktop img {
+  .home__camera--desktop img,
+  .home__camera--desktop video {
     height: 100px;
   }
 
@@ -610,3 +613,4 @@
   }
 
 }
+

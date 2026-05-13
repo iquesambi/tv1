@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import axios from 'axios'
-import { useGoTo } from './transition.jsx'
+import { useGoTo, useStartCamera } from './transition.jsx'
 import './App.css'
 
 const STRAPI = 'https://tv1-53ev.onrender.com'
@@ -38,6 +38,7 @@ function App() {
   const location = useLocation()
   const contatoAberto = location.pathname.startsWith('/contato')
   const goTo = useGoTo()
+  const startCamera = useStartCamera()
   const lastScrollY = useRef(0)
   const touchStartY = useRef(null)
   const touchAccDelta = useRef(0)
@@ -400,9 +401,13 @@ function App() {
           {logo?.logo && <img src={mediaUrl(logo.logo)} alt="TV1" />}
         </div>
         {/* câmera — visível no desktop dentro do header */}
-        <button className="home__camera home__camera--desktop" onClick={(e) => { e.stopPropagation(); quarentaAnos?.ativo && goTo('/quarenta-anos') }} aria-label="40 Anos TV1">
-          {quarentaAnos?.ativo && quarentaAnos?.imagem && (
-            <img src={mediaUrl(quarentaAnos.imagem)} alt="" />
+        <button className="home__camera home__camera--desktop" onClick={(e) => { e.stopPropagation(); if (quarentaAnos?.ativo) { startCamera(e.currentTarget.getBoundingClientRect()) } }} aria-label="40 Anos TV1">
+          {quarentaAnos?.ativo && (
+            <video
+              src="/camera-rotation.mp4"
+              muted playsInline preload="metadata"
+              onLoadedMetadata={e => { e.target.currentTime = 3 }}
+            />
           )}
         </button>
         {/* hamburguer — visível só no mobile */}
@@ -412,9 +417,13 @@ function App() {
       </header>
 
       {/* câmera mobile — centralizada abaixo do header */}
-      <button className="home__camera home__camera--mobile" onClick={(e) => { e.stopPropagation(); quarentaAnos?.ativo && goTo('/quarenta-anos') }} aria-label="40 Anos TV1">
-        {quarentaAnos?.ativo && quarentaAnos?.imagem && (
-          <img src={mediaUrl(quarentaAnos.imagem)} alt="" />
+      <button className="home__camera home__camera--mobile" onClick={(e) => { e.stopPropagation(); if (quarentaAnos?.ativo) { startCamera(e.currentTarget.getBoundingClientRect()) } }} aria-label="40 Anos TV1">
+        {quarentaAnos?.ativo && (
+          <video
+            src="/camera-rotation.mp4"
+            muted playsInline preload="metadata"
+            onLoadedMetadata={e => { e.target.currentTime = 3 }}
+          />
         )}
       </button>
 
