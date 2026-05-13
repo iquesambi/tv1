@@ -163,7 +163,7 @@ export default function FooterBranco() {
           link.imagem_hover && (
             <div
               key={`${i}-main`}
-              className={`footer-branco__bg ${hoveredSub === null ? 'footer-branco__bg--ativo' : ''}`}
+              className={`footer-branco__bg ${hoveredSub === null && !sublinks[activeSubIdx]?.imagem_hover ? 'footer-branco__bg--ativo' : ''}`}
             >
               <img src={mediaUrl(link.imagem_hover)} alt="" />
             </div>
@@ -174,7 +174,7 @@ export default function FooterBranco() {
             return (
               <div
                 key={`${i}-${j}`}
-                className={`footer-branco__bg ${hoveredSub === sub ? 'footer-branco__bg--ativo' : ''}`}
+                className={`footer-branco__bg ${hoveredSub === sub || (hoveredSub === null && j === activeSubIdx) ? 'footer-branco__bg--ativo' : ''}`}
               >
                 <img src={mediaUrl(img)} alt="" />
               </div>

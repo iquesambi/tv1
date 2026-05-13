@@ -307,20 +307,20 @@ function App() {
         if (aberto !== i) return null
         const sublinks = getSublinks(link)
         return [
-          // fundo padrão do link — aparece quando nenhum sublink está em hover
+          // fundo padrão do link — aparece quando nenhum sublink hovered e o ativo não tem imagem
           link.imagem_hover && (
             <div
               key={`${i}-main`}
-              className={`home__bg ${hoveredSub === null ? 'home__bg--ativo' : ''}`}
+              className={`home__bg ${hoveredSub === null && !sublinks[activeSubIdx]?.imagem_hover ? 'home__bg--ativo' : ''}`}
             >
               <img src={mediaUrl(link.imagem_hover)} alt="" />
             </div>
           ),
-          // fundo individual de cada sublink
+          // fundo individual de cada sublink — ativo por hover OU por ser o item ativo da roleta
           ...sublinks.filter(s => s.imagem_hover).map((sub, j) => (
             <div
               key={`${i}-${j}`}
-              className={`home__bg ${hoveredSub === sub ? 'home__bg--ativo' : ''}`}
+              className={`home__bg ${hoveredSub === sub || (hoveredSub === null && j === activeSubIdx) ? 'home__bg--ativo' : ''}`}
             >
               <img src={mediaUrl(sub.imagem_hover)} alt="" />
             </div>
