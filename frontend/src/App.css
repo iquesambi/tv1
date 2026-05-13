@@ -133,7 +133,7 @@
   flex-direction: column;
   align-items: center;
   transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1),
-              opacity  0.4s ease;
+              opacity  0.35s ease;
 }
 
 /* item clicado: sobe para o topo */
@@ -191,20 +191,58 @@
   z-index: 5;
 }
 
-.home__submenu-list {
+/* Janela clipeada — mostra SUBMENU_VISIBLE itens; altura via JS */
+.home__submenu-window {
   position: absolute;
-  top: 0;
-  left: 50%;
+  left: 0;
+  right: 0;
+  transform: translateY(-50%);
+  overflow: hidden;
+  pointer-events: none;
+  display: flex;
+  justify-content: center;
+  /* fade suave no topo e no fundo — esconde itens fora da janela */
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    black 48px,
+    black calc(100% - 48px),
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    black 48px,
+    black calc(100% - 48px),
+    transparent 100%
+  );
+}
+
+/* Lista deslizante dentro da janela (filho flex, não absoluto) */
+.home__submenu-list {
+  flex-shrink: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
   pointer-events: none;
-  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
   will-change: transform;
+  transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Bloco centralizado para 1–5 itens */
+.home__submenu-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
 }
 
 .home__submenu-link {
   pointer-events: auto;
+  font-size: 70px;
   font-weight: 900;
   font-style: italic;
   text-transform: uppercase;
@@ -213,8 +251,20 @@
   line-height: 1;
   white-space: nowrap;
   cursor: pointer;
-  transition: font-size 0.5s cubic-bezier(0.22, 1, 0.36, 1),
-              opacity   0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  display: block;
+  opacity: 0.35;
+  transition: opacity 0.2s ease;
+}
+
+/* Item ativo (topmost visível) e hoverable = 100% */
+.home__submenu-link--ativo,
+.home__submenu-link:hover {
+  opacity: 1;
+}
+
+/* Fora da janela (bloco 1-5): todos visíveis */
+.home__submenu-center .home__submenu-link {
+  opacity: 1;
 }
 
 /* ── RODAPÉ ───────────────────────────── */
@@ -334,6 +384,7 @@
 }
 
 /* ── MENU ABERTO: reverte para dark ──────── */
+
 
 .home--menu-aberto .home__logo img {
   filter: none;
@@ -637,6 +688,11 @@
 
   .home__nav-link--dimmed {
     opacity: 0.4;
+  }
+
+  /* ── Submenu mobile ── */
+  .home__submenu-link {
+    font-size: 46px;
   }
 
   /* ── Rodapé ── */

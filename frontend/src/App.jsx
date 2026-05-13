@@ -22,6 +22,11 @@ const slugify = (str) => str.toLowerCase()
   .replace(/[^a-z0-9]+/g, '-')
   .replace(/^-|-$/g, '')
 
+const SUBMENU_VISIBLE = 7   // itens visíveis na janela
+const ITEM_H_D = 70         // altura de cada item no desktop (px)
+const ITEM_H_M = 46         // altura de cada item no mobile (px)
+const WIN_PAD   = 48        // padding interno top/bottom da janela (px)
+
 function App() {
   const [nav, setNav]           = useState(_pf.nav ?? null)
   const [logo, setLogo]         = useState(_pf.logo ?? null)
@@ -161,16 +166,17 @@ function App() {
       const now = Date.now()
 
       if (sublinks.length > 0) {
+        const isRoleta  = sublinks.length >= SUBMENU_VISIBLE
+        const maxOffset = isRoleta ? sublinks.length - SUBMENU_VISIBLE : 0
+
         if (direcao > 0) {
-          if (activeSubIdxRef.current < sublinks.length - 1) {
-            // no meio da lista: throttle normal
+          if (isRoleta && activeSubIdxRef.current < maxOffset) {
             boundaryAcc.current = 0
             if (now - lastRoletaTime.current < ROLETA_MS) return
             lastRoletaTime.current = now
             setActiveSubIdx(prev => prev + 1)
             activeSubIdxRef.current += 1
           } else {
-            // no último item: precisa acumular scroll forte pra sair
             boundaryAcc.current += Math.abs(e.deltaY)
             if (boundaryAcc.current < NAV_THRESH) return
             boundaryAcc.current = 0
@@ -180,15 +186,13 @@ function App() {
             activeSubIdxRef.current = 0
           }
         } else {
-          if (activeSubIdxRef.current > 0) {
-            // no meio da lista: throttle normal
+          if (isRoleta && activeSubIdxRef.current > 0) {
             boundaryAcc.current = 0
             if (now - lastRoletaTime.current < ROLETA_MS) return
             lastRoletaTime.current = now
             setActiveSubIdx(prev => prev - 1)
             activeSubIdxRef.current -= 1
           } else {
-            // no primeiro item: precisa acumular scroll forte pra sair
             boundaryAcc.current += Math.abs(e.deltaY)
             if (boundaryAcc.current < NAV_THRESH) return
             boundaryAcc.current = 0
@@ -250,9 +254,13 @@ function App() {
 
       touchAccDelta.current += delta
 
+      const isRoleta  = sublinks.length >= SUBMENU_VISIBLE
+      const maxOffset = isRoleta ? sublinks.length - SUBMENU_VISIBLE : 0
+      if (!isRoleta) return
+
       while (Math.abs(touchAccDelta.current) >= STEP_PX) {
         if (touchAccDelta.current > 0) {
-          if (activeSubIdxRef.current < sublinks.length - 1) {
+          if (activeSubIdxRef.current < maxOffset) {
             setActiveSubIdx(prev => prev + 1)
             activeSubIdxRef.current += 1
           }
@@ -483,66 +491,96 @@ function App() {
         })}
       </nav>
 
-      {/* Submenu Roleta - fora do nav (porque nav tem transform que quebraria position: fixed) */}
+      {/* Submenu - fora do nav (porque nav tem transform que quebraria position: fixed) */}
       {aberto !== null && !contatoAberto && (() => {
         const link = links[aberto]
         const sublinks = link ? getSublinks(link) : []
         if (sublinks.length === 0) return null
 
-        const isRoleta = sublinks.length >= 5
-        const mobile = window.innerWidth <= 768
+        const mobile   = window.innerWidth <= 768
+        const itemH    = mobile ? ITEM_H_M : ITEM_H_D
+        const isRoleta = sublinks.length >= SUBMENU_VISIBLE
 
-        const sizes = sublinks.map((_, j) => {
-          if (!isRoleta) return mobile ? 44 : 70
-          const d = Math.abs(j - activeSubIdx)
-          return d === 0 ? (mobile ? 32 : 90) : Math.max(10, (mobile ? 24 : 56) - (d - 1) * (mobile ? 4 : 12))
-        })
-        const centers = []
-        let acc = 0
-        sizes.forEach(h => { centers.push(acc + h / 2); acc += h })
-        const totalHeight = acc
+        const handleSubClick = (sub) => (e) => {
+          e.preventDefault()
+          if (sub.url) {
+            const [path, hash] = sub.url.split('#')
+            goTo(path || '/', () => { if (hash) window.location.hash = hash })
+          }
+        }
 
-        // Para não-roleta: targetY varia por posição do item ativo
-        // Primeiro item → 35%, último item → 62%, intermediários → interpolado
-        const ratio = links.length > 1 ? aberto / (links.length - 1) : 0.5
-        const normalTargetY = window.innerHeight * (0.35 + ratio * 0.27)
+        // ── 6+ itens: janela clipeada, topmost = ativo ──
+        if (isRoleta) {
+          const offset     = Math.max(0, Math.min(activeSubIdx, sublinks.length - SUBMENU_VISIBLE))
+          const winPad     = mobile ? 28 : WIN_PAD
+          const windowH    = SUBMENU_VISIBLE * itemH + winPad * 2
 
-        const listShift = isRoleta
-          ? window.innerHeight * 0.58 - centers[activeSubIdx]
-          : normalTargetY - totalHeight / 2
+          // Posiciona a janela logo abaixo do nav item ativo (calculado analiticamente)
+          const vw = window.innerWidth
+          const vh = window.innerHeight
+          const navFontSize = Math.min(Math.max(104, 0.158 * vw), 216)
+          const navItemH    = navFontSize * 0.75           // line-height 0.75
+          const N           = links.length
+          const itemCenterY = vh * 0.5 + (aberto - (N - 1) / 2) * navItemH - vh * 0.35
+          const itemBottomY = itemCenterY + navItemH / 2
+          // top da janela = logo abaixo do item de nav ativo; overflow é clipado pelo parent
+          const windowTop   = itemBottomY + 30
+
+          const listOffset = winPad - offset * itemH
+          return (
+            <div className="home__submenu" onClick={e => e.stopPropagation()}>
+              <div className="home__submenu-window" style={{ height: windowH, top: windowTop, transform: 'none' }}>
+                <div
+                  className="home__submenu-list"
+                  style={{ transform: `translateY(${listOffset}px)` }}
+                >
+                  {sublinks.map((sub, j) => {
+                    const isAtivo = hoveredSub ? hoveredSub === sub : j === offset
+                    return (
+                    <a
+                      key={j}
+                      href={sub.url || '#'}
+                      className={`home__submenu-link${isAtivo ? ' home__submenu-link--ativo' : ''}`}
+                      style={{ height: itemH, lineHeight: `${itemH}px` }}
+                      onMouseEnter={() => { setHoveredSub(sub) }}
+                      onMouseLeave={() => { setHoveredSub(null) }}
+                      onClick={handleSubClick(sub)}
+                    >
+                      {sub.label}
+                    </a>
+                  )
+                  })}
+                </div>
+              </div>
+            </div>
+          )
+        }
+
+        // ── 1–5 itens: bloco posicionado abaixo do nav item ativo ──
+        const vw2 = window.innerWidth
+        const vh2 = window.innerHeight
+        const navFontSize2 = Math.min(Math.max(104, 0.158 * vw2), 216)
+        const navItemH2    = navFontSize2 * 0.75
+        const N2           = links.length
+        const itemCenterY2 = vh2 * 0.5 + (aberto - (N2 - 1) / 2) * navItemH2 - vh2 * 0.35
+        const itemBottomY2 = itemCenterY2 + navItemH2 / 2
+        const blockTop     = Math.max(itemBottomY2 + 30, vh2 * 0.26)
 
         return (
           <div className="home__submenu" onClick={e => e.stopPropagation()}>
-            <div
-              className="home__submenu-list"
-              style={{ transform: `translate(-50%, ${listShift}px)` }}
-            >
-              {sublinks.map((sub, j) => {
-                const d = Math.abs(j - activeSubIdx)
-                const opacity = isRoleta ? Math.max(0.06, 1 - d * 0.18) : 1
-                const isActive = j === activeSubIdx
-                return (
-                  <a
-                    key={j}
-                    href={sub.url || '#'}
-                    className={`home__submenu-link ${isActive ? 'home__submenu-link--ativo' : ''}`}
-                    style={{ fontSize: `${sizes[j]}px`, opacity }}
-                    onMouseEnter={() => setHoveredSub(sub)}
-                    onMouseLeave={() => setHoveredSub(null)}
-                    onClick={e => {
-                      e.preventDefault()
-                      if (sub.url) {
-                        const [path, hash] = sub.url.split('#')
-                        goTo(path || '/', () => {
-                          if (hash) window.location.hash = hash
-                        })
-                      }
-                    }}
-                  >
-                    {sub.label}
-                  </a>
-                )
-              })}
+            <div className="home__submenu-center" style={{ top: blockTop, transform: 'none', justifyContent: 'flex-start' }}>
+              {sublinks.map((sub, j) => (
+                <a
+                  key={j}
+                  href={sub.url || '#'}
+                  className="home__submenu-link"
+                  onMouseEnter={() => setHoveredSub(sub)}
+                  onMouseLeave={() => setHoveredSub(null)}
+                  onClick={handleSubClick(sub)}
+                >
+                  {sub.label}
+                </a>
+              ))}
             </div>
           </div>
         )
