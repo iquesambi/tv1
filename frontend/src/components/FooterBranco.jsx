@@ -11,10 +11,10 @@ const externalUrl = (url) => {
   return /^https?:\/\//i.test(url) ? url : `https://${url}`
 }
 
-const slugify = (str) => str.toLowerCase()
-  .normalize('NFD').replace(/[̀-ͯ]/g, '')
-  .replace(/[^a-z0-9]+/g, '-')
-  .replace(/^-|-$/g, '')
+const SUBMENU_VISIBLE = 7
+const ITEM_H_D = 70
+const ITEM_H_M = 46
+const WIN_PAD   = 48
 
 export default function FooterBranco() {
   const [nav, setNav]               = useState(null)
@@ -28,19 +28,21 @@ export default function FooterBranco() {
   const [hoveredSub, setHoveredSub] = useState(null)
   const [activeSubIdx, setActiveSubIdx] = useState(0)
   const goTo = useGoTo()
-  const lastScrollY = useRef(0)
-  const scrollLocked = useRef(false)
-  const activeSubIdxRef = useRef(0)
-  const boundaryAcc = useRef(0)
+  const lastScrollY       = useRef(0)
+  const activeSubIdxRef   = useRef(0)
+  const boundaryAcc       = useRef(0)
+  const lastRoletaTime    = useRef(0)
+  const touchStartY       = useRef(null)
+  const touchAccDelta     = useRef(0)
+  const touchTotalMoved   = useRef(0)
 
-  // Declarado antes dos useEffects que dependem de links
   const links = nav?.links ?? []
 
   const getSublinks = (link) => {
-    if (link.url === '/pessoas') {
+    if (link.label?.toLowerCase() === 'pessoas') {
       return (link.sublinks ?? []).map(sub => ({
         label: sub.label,
-        url: `/pessoas#${sub.url.replace(/^\//, '')}`,
+        url: `/pessoas#${(sub.url ?? '').replace(/^\//, '')}`,
         imagem_hover: sub.imagem_hover ?? null,
       }))
     }
@@ -55,7 +57,7 @@ export default function FooterBranco() {
   }
 
   useEffect(() => {
-    api('navigation?populate[links][populate][0]=imagem_hover&populate[links][populate][sublinks][populate]=imagem_hover').then(setNav)
+    api('navigation?populate[links][populate][imagem_hover]=true&populate[links][populate][sublinks][populate][imagem_hover]=true').then(setNav)
     api('logo-site?populate=logo').then(setLogo)
     api('agencias?populate=logo&sort=ordem:asc').then(setAgencias)
     api('redes-sociais?populate[redes][populate]=icone').then(setRedes)
@@ -78,75 +80,135 @@ export default function FooterBranco() {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [aberto])
 
-  // Reset roleta ao trocar de menu
   useEffect(() => { setActiveSubIdx(0) }, [aberto])
-
   useEffect(() => { activeSubIdxRef.current = activeSubIdx }, [activeSubIdx])
+  useEffect(() => { lastRoletaTime.current = 0; boundaryAcc.current = 0 }, [aberto])
 
-  // Roleta: wheel scroll dentro do submenu
-  const footerLastRoletaTime = useRef(0)
-  const footerLastNavTime = useRef(0)
-
+  // Wheel scroll — idêntico à home
   useEffect(() => {
-    if (aberto === null) return
-    const link = links[aberto]
-    const sublinks = link ? getSublinks(link) : []
-    if (sublinks.length === 0) return
-
     const ROLETA_MS  = 700
     const NAV_THRESH = 400
 
     const onWheel = (e) => {
+      if (aberto === null) return
+      const link = links[aberto]
+      const sublinks = link ? getSublinks(link) : []
       e.preventDefault()
 
       const direcao = Math.sign(e.deltaY)
       if (direcao === 0) return
       const now = Date.now()
 
-      if (direcao > 0) {
-        if (activeSubIdxRef.current < sublinks.length - 1) {
-          boundaryAcc.current = 0
-          if (now - footerLastRoletaTime.current < ROLETA_MS) return
-          footerLastRoletaTime.current = now
-          setActiveSubIdx(prev => prev + 1)
-          activeSubIdxRef.current += 1
+      if (sublinks.length > 0) {
+        const isRoleta  = sublinks.length >= SUBMENU_VISIBLE
+        const maxOffset = isRoleta ? sublinks.length - SUBMENU_VISIBLE : 0
+
+        if (direcao > 0) {
+          if (isRoleta && activeSubIdxRef.current < maxOffset) {
+            boundaryAcc.current = 0
+            if (now - lastRoletaTime.current < ROLETA_MS) return
+            lastRoletaTime.current = now
+            setActiveSubIdx(prev => prev + 1)
+            activeSubIdxRef.current += 1
+          } else {
+            boundaryAcc.current += Math.abs(e.deltaY)
+            if (boundaryAcc.current < NAV_THRESH) return
+            boundaryAcc.current = 0
+            setAberto(aberto < links.length - 1 ? aberto + 1 : null)
+            setActiveSubIdx(0)
+            activeSubIdxRef.current = 0
+          }
         } else {
-          boundaryAcc.current += Math.abs(e.deltaY)
-          if (boundaryAcc.current < NAV_THRESH) return
-          boundaryAcc.current = 0
-          setAberto(aberto < links.length - 1 ? aberto + 1 : null)
-          setActiveSubIdx(0)
-          activeSubIdxRef.current = 0
+          if (isRoleta && activeSubIdxRef.current > 0) {
+            boundaryAcc.current = 0
+            if (now - lastRoletaTime.current < ROLETA_MS) return
+            lastRoletaTime.current = now
+            setActiveSubIdx(prev => prev - 1)
+            activeSubIdxRef.current -= 1
+          } else {
+            boundaryAcc.current += Math.abs(e.deltaY)
+            if (boundaryAcc.current < NAV_THRESH) return
+            boundaryAcc.current = 0
+            setAberto(aberto > 0 ? aberto - 1 : null)
+            setActiveSubIdx(0)
+            activeSubIdxRef.current = 0
+          }
         }
+        setHoveredSub(null)
       } else {
-        if (activeSubIdxRef.current > 0) {
-          boundaryAcc.current = 0
-          if (now - footerLastRoletaTime.current < ROLETA_MS) return
-          footerLastRoletaTime.current = now
-          setActiveSubIdx(prev => prev - 1)
-          activeSubIdxRef.current -= 1
-        } else {
-          boundaryAcc.current += Math.abs(e.deltaY)
-          if (boundaryAcc.current < NAV_THRESH) return
-          boundaryAcc.current = 0
-          setAberto(aberto > 0 ? aberto - 1 : null)
-          setActiveSubIdx(0)
-          activeSubIdxRef.current = 0
-        }
+        boundaryAcc.current += Math.abs(e.deltaY)
+        if (boundaryAcc.current < NAV_THRESH) return
+        boundaryAcc.current = 0
+        if (direcao < 0) setAberto(aberto > 0 ? aberto - 1 : null)
+        else setAberto(aberto < links.length - 1 ? aberto + 1 : null)
+        setHoveredSub(null)
       }
     }
+
     window.addEventListener('wheel', onWheel, { passive: false })
     return () => window.removeEventListener('wheel', onWheel)
   }, [aberto, links, equipe, clientes])
 
-  const handleLink = (e, i, link) => {
-    e.preventDefault()
-    // Sempre toggle submenu — nunca navega pelo clique no menu principal
-    if (aberto === i) {
-      setAberto(null); setHoveredSub(null)
-    } else {
-      setAberto(i); setHoveredSub(null)
+  // Touch scroll — idêntico à home
+  useEffect(() => {
+    if (aberto === null) return
+    const STEP_PX = 160
+    const SWIPE_THRESHOLD = 8
+
+    const onTouchStart = (e) => {
+      touchStartY.current = e.touches[0].clientY
+      touchAccDelta.current = 0
+      touchTotalMoved.current = 0
     }
+
+    const onTouchMove = (e) => {
+      if (touchStartY.current === null) return
+      const link = links[aberto]
+      const sublinks = link ? getSublinks(link) : []
+      if (sublinks.length === 0) return
+
+      const delta = touchStartY.current - e.touches[0].clientY
+      touchTotalMoved.current += Math.abs(delta)
+      touchStartY.current = e.touches[0].clientY
+
+      if (touchTotalMoved.current > SWIPE_THRESHOLD) e.preventDefault()
+
+      touchAccDelta.current += delta
+
+      const isRoleta  = sublinks.length >= SUBMENU_VISIBLE
+      const maxOffset = isRoleta ? sublinks.length - SUBMENU_VISIBLE : 0
+      if (!isRoleta) return
+
+      while (Math.abs(touchAccDelta.current) >= STEP_PX) {
+        if (touchAccDelta.current > 0) {
+          if (activeSubIdxRef.current < maxOffset) {
+            setActiveSubIdx(prev => prev + 1)
+            activeSubIdxRef.current += 1
+          }
+          touchAccDelta.current -= STEP_PX
+        } else {
+          if (activeSubIdxRef.current > 0) {
+            setActiveSubIdx(prev => prev - 1)
+            activeSubIdxRef.current -= 1
+          }
+          touchAccDelta.current += STEP_PX
+        }
+      }
+      setHoveredSub(null)
+    }
+
+    window.addEventListener('touchstart', onTouchStart, { passive: true })
+    window.addEventListener('touchmove', onTouchMove, { passive: false })
+    return () => {
+      window.removeEventListener('touchstart', onTouchStart)
+      window.removeEventListener('touchmove', onTouchMove)
+    }
+  }, [aberto, links, equipe, clientes])
+
+  const handleLink = (e, i) => {
+    e.preventDefault()
+    if (aberto === i) { setAberto(null); setHoveredSub(null) }
+    else { setAberto(i); setHoveredSub(null) }
   }
 
   return (
@@ -183,7 +245,7 @@ export default function FooterBranco() {
         ]
       })}
 
-      {/* Topo: logo esq + câmera dir */}
+      {/* Topo */}
       <div className="footer-branco__top">
         <div className="footer-branco__logo" onClick={e => e.stopPropagation()}>
           {logo?.logo && <img src={mediaUrl(logo.logo)} alt="TV1" />}
@@ -195,13 +257,12 @@ export default function FooterBranco() {
         )}
       </div>
 
-      {/* Centro: nav gigante */}
+      {/* Nav central */}
       <nav className="footer-branco__nav">
         {links.map((link, i) => {
           const esteAberto = aberto === i
           const acima      = aberto !== null && !esteAberto && i < aberto
           const abaixo     = aberto !== null && !esteAberto && i > aberto
-          const sublinks   = getSublinks(link)
 
           return (
             <div
@@ -217,7 +278,7 @@ export default function FooterBranco() {
               <a
                 href={link.url || '#'}
                 className={`footer-branco__nav-link ${(acima || abaixo) ? 'footer-branco__nav-link--dimmed' : ''}`}
-                onClick={e => handleLink(e, i, link)}
+                onClick={e => handleLink(e, i)}
               >
                 {link.label}
               </a>
@@ -226,58 +287,83 @@ export default function FooterBranco() {
         })}
       </nav>
 
-      {/* Submenu Roleta - fora do nav (porque nav pode ter transform que quebra position: fixed) */}
+      {/* Submenu — fora do nav (transform quebraria position: fixed) */}
       {aberto !== null && (() => {
         const link = links[aberto]
         const sublinks = link ? getSublinks(link) : []
         if (sublinks.length === 0) return null
 
-        const isRoleta = sublinks.length >= 5
+        const mobile   = window.innerWidth <= 768
+        const itemH    = mobile ? ITEM_H_M : ITEM_H_D
+        const isRoleta = sublinks.length >= SUBMENU_VISIBLE
 
-        const sizes = sublinks.map((_, j) => {
-          if (!isRoleta) return 70
-          const d = Math.abs(j - activeSubIdx)
-          return d === 0 ? 90 : Math.max(16, 56 - (d - 1) * 12)
-        })
-        const centers = []
-        let acc = 0
-        sizes.forEach(h => { centers.push(acc + h / 2); acc += h })
-        const totalHeight = acc
+        const handleSubClick = (sub) => (e) => {
+          e.preventDefault()
+          if (sub.url) {
+            const [path, hash] = sub.url.split('#')
+            goTo(path || '/', () => { if (hash) window.location.hash = hash })
+          }
+        }
 
-        const ratio = links.length > 1 ? aberto / (links.length - 1) : 0.5
-        const normalTargetY = window.innerHeight * (0.35 + ratio * 0.27)
+        // Posição do nav item ativo (analítica, igual à home)
+        const vw = window.innerWidth
+        const vh = window.innerHeight
+        const navFontSize = Math.min(Math.max(104, 0.158 * vw), 216)
+        const navItemH    = navFontSize * 0.75
+        const N           = links.length
+        const itemCenterY = vh * 0.5 + (aberto - (N - 1) / 2) * navItemH - vh * 0.35
+        const itemBottomY = itemCenterY + navItemH / 2
 
-        const listShift = isRoleta
-          ? window.innerHeight * 0.58 - centers[activeSubIdx]
-          : normalTargetY - totalHeight / 2
+        // ── 7+ itens: janela clipeada ──
+        if (isRoleta) {
+          const offset     = Math.max(0, Math.min(activeSubIdx, sublinks.length - SUBMENU_VISIBLE))
+          const winPad     = mobile ? 28 : WIN_PAD
+          const windowH    = SUBMENU_VISIBLE * itemH + winPad * 2
+          const windowTop  = itemBottomY + 30
+          const listOffset = winPad - offset * itemH
+
+          return (
+            <div className="home__submenu" onClick={e => e.stopPropagation()}>
+              <div className="home__submenu-window" style={{ height: windowH, top: windowTop, transform: 'none' }}>
+                <div className="home__submenu-list" style={{ transform: `translateY(${listOffset}px)` }}>
+                  {sublinks.map((sub, j) => {
+                    const isAtivo = hoveredSub ? hoveredSub === sub : j === offset
+                    return (
+                      <a
+                        key={j}
+                        href={sub.url || '#'}
+                        className={`home__submenu-link${isAtivo ? ' home__submenu-link--ativo' : ''}`}
+                        style={{ height: itemH, lineHeight: `${itemH}px` }}
+                        onMouseEnter={() => setHoveredSub(sub)}
+                        onMouseLeave={() => setHoveredSub(null)}
+                        onClick={handleSubClick(sub)}
+                      >
+                        {sub.label}
+                      </a>
+                    )
+                  })}
+                </div>
+              </div>
+            </div>
+          )
+        }
+
+        // ── 1–6 itens: bloco abaixo do nav item ──
+        const blockTop = Math.max(itemBottomY + 30, vh * 0.26)
 
         return (
-          <div className="footer-branco__submenu" onClick={e => e.stopPropagation()}>
-            <div
-              className="footer-branco__submenu-list"
-              style={{ transform: `translate(-50%, ${listShift}px)` }}
-            >
+          <div className="home__submenu" onClick={e => e.stopPropagation()}>
+            <div className="home__submenu-center" style={{ top: blockTop, transform: 'none', justifyContent: 'flex-start' }}>
               {sublinks.map((sub, j) => {
-                const d = Math.abs(j - activeSubIdx)
-                const opacity = isRoleta ? Math.max(0.06, 1 - d * 0.18) : 1
-                const isActive = j === activeSubIdx
+                const isAtivo = hoveredSub ? hoveredSub === sub : j === 0
                 return (
                   <a
                     key={j}
                     href={sub.url || '#'}
-                    className={`footer-branco__submenu-link ${isActive ? 'footer-branco__submenu-link--ativo' : ''}`}
-                    style={{ fontSize: `${sizes[j]}px`, opacity }}
+                    className={`home__submenu-link${isAtivo ? ' home__submenu-link--ativo' : ''}`}
                     onMouseEnter={() => setHoveredSub(sub)}
                     onMouseLeave={() => setHoveredSub(null)}
-                    onClick={e => {
-                      e.preventDefault()
-                      if (sub.url) {
-                        const [path, hash] = sub.url.split('#')
-                        goTo(path || '/', () => {
-                          if (hash) window.location.hash = hash
-                        })
-                      }
-                    }}
+                    onClick={handleSubClick(sub)}
                   >
                     {sub.label}
                   </a>
@@ -290,7 +376,12 @@ export default function FooterBranco() {
 
       {/* Barra inferior */}
       <div className="footer-branco__bottom" onClick={e => e.stopPropagation()}>
-        <a href="mailto:contato@tv1.com.br" className="footer-branco__contato">Contato</a>
+        <button
+          className="footer-branco__contato"
+          onClick={(e) => { e.stopPropagation(); goTo('/contato') }}
+        >
+          Contato
+        </button>
 
         <div className={`footer-branco__marcas ${aberto !== null ? 'footer-branco__marcas--oculto' : ''}`}>
           {agencias?.filter(a => a.logo).map((a, i) => (
