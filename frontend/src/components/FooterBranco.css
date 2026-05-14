@@ -131,8 +131,7 @@
 }
 
 .footer-branco--aberto .footer-branco__nav-link {
-  color: #fff;
-  text-shadow: 0px 14px 24px rgba(0, 0, 0, 0.45);
+  color: #000001;
 }
 
 .footer-branco--aberto .footer-branco__nav-link:hover {
