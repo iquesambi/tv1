@@ -76,25 +76,30 @@ export default function PessoasPage() {
     <div className="pessoas-page">
 
       <main className="pessoas-main">
-        {membros.map((m, i) => (
-          <section
-            key={i}
-            id={m.slug}
-            className="pessoa-bloco"
-          >
-            {m.foto && (
-              <div className="pessoa-foto">
-                <img src={mediaUrl(m.foto)} alt={m.nome} />
-              </div>
-            )}
+        {membros.map((m, i) => {
+          const primeiro = membros[0]
+          const foto = m.foto || primeiro.foto
+          const bio  = m.bio  || primeiro.bio
+          return (
+            <section
+              key={i}
+              id={m.slug}
+              className="pessoa-bloco"
+            >
+              {foto && (
+                <div className="pessoa-foto">
+                  <img src={mediaUrl(foto)} alt={m.nome} />
+                </div>
+              )}
 
-            <div className="pessoa-texto">
-              <h2 className="pessoa-nome">{m.nome}</h2>
-              {m.cargo && <p className="pessoa-cargo">{m.cargo}</p>}
-              {m.bio   && <p className="pessoa-bio">{m.bio}</p>}
-            </div>
-          </section>
-        ))}
+              <div className="pessoa-texto">
+                <h2 className="pessoa-nome">{m.nome}</h2>
+                {m.cargo && <p className="pessoa-cargo">{m.cargo}</p>}
+                {bio     && <p className="pessoa-bio">{bio}</p>}
+              </div>
+            </section>
+          )
+        })}
       </main>
 
       <FooterBranco />
