@@ -41,10 +41,10 @@ export default function FooterBranco() {
 
   const getSublinks = (link) => {
     if (link.label?.toLowerCase() === 'pessoas') {
-      return (link.sublinks ?? []).map(sub => ({
-        label: sub.label,
-        url: `/pessoas#${(sub.url ?? '').replace(/^\//, '')}`,
-        imagem_hover: sub.imagem_hover ?? null,
+      return (equipe ?? []).map(p => ({
+        label: p.nome,
+        url: `/pessoas#${p.slug}`,
+        imagem_hover: null,
       }))
     }
     if (link.url === '/clientes') {
@@ -102,7 +102,7 @@ export default function FooterBranco() {
 
       if (sublinks.length > 0) {
         const isRoleta  = sublinks.length >= SUBMENU_VISIBLE
-        const maxOffset = isRoleta ? sublinks.length - SUBMENU_VISIBLE : 0
+        const maxOffset = isRoleta ? sublinks.length - 1 : 0
 
         if (direcao > 0) {
           if (isRoleta && activeSubIdxRef.current < maxOffset) {
@@ -111,14 +111,8 @@ export default function FooterBranco() {
             lastRoletaTime.current = now
             setActiveSubIdx(prev => prev + 1)
             activeSubIdxRef.current += 1
-          } else {
-            boundaryAcc.current += Math.abs(e.deltaY)
-            if (boundaryAcc.current < NAV_THRESH) return
-            boundaryAcc.current = 0
-            setAberto(aberto < links.length - 1 ? aberto + 1 : null)
-            setActiveSubIdx(0)
-            activeSubIdxRef.current = 0
           }
+          // na borda inferior: não fecha, só para
         } else {
           if (isRoleta && activeSubIdxRef.current > 0) {
             boundaryAcc.current = 0
@@ -126,14 +120,8 @@ export default function FooterBranco() {
             lastRoletaTime.current = now
             setActiveSubIdx(prev => prev - 1)
             activeSubIdxRef.current -= 1
-          } else {
-            boundaryAcc.current += Math.abs(e.deltaY)
-            if (boundaryAcc.current < NAV_THRESH) return
-            boundaryAcc.current = 0
-            setAberto(aberto > 0 ? aberto - 1 : null)
-            setActiveSubIdx(0)
-            activeSubIdxRef.current = 0
           }
+          // na borda superior: não fecha, só para
         }
         setHoveredSub(null)
       } else {
@@ -177,7 +165,7 @@ export default function FooterBranco() {
       touchAccDelta.current += delta
 
       const isRoleta  = sublinks.length >= SUBMENU_VISIBLE
-      const maxOffset = isRoleta ? sublinks.length - SUBMENU_VISIBLE : 0
+      const maxOffset = isRoleta ? sublinks.length - 1 : 0
       if (!isRoleta) return
 
       while (Math.abs(touchAccDelta.current) >= STEP_PX) {
@@ -326,7 +314,7 @@ export default function FooterBranco() {
 
         // ── 7+ itens: janela clipeada ──
         if (isRoleta) {
-          const offset     = Math.max(0, Math.min(activeSubIdx, sublinks.length - SUBMENU_VISIBLE))
+          const offset     = Math.max(0, Math.min(activeSubIdx, sublinks.length - 1))
           const winPad     = mobile ? 28 : WIN_PAD
           const windowH    = SUBMENU_VISIBLE * itemH + winPad * 2
           const windowTop  = itemBottomY + 30

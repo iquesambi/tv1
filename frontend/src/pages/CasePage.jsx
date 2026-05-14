@@ -300,6 +300,19 @@ export default function CasePage() {
   const [logo, setLogo] = useState(null)
   const [quarentaAnos, setQA] = useState(null)
 
+  const lsKey = `tv1-case-${caseSlug}`
+  const [pronto, setPronto] = useState(() => {
+    try { return JSON.parse(localStorage.getItem(lsKey) ?? '[]').length > 0 } catch { return false }
+  })
+
+  // Mount: aquece cache HTTP com URLs salvas anteriormente
+  useEffect(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem(lsKey) ?? '[]')
+      saved.forEach(url => { const img = new Image(); img.src = url })
+    } catch {}
+  }, [lsKey])
+
   useEffect(() => {
     axios.get(`${STRAPI}/api/logo-site?populate=logo`).then(r => setLogo(r.data.data)).catch(() => {})
     axios.get(`${STRAPI}/api/quarenta-anos?populate=imagem`).then(r => setQA(r.data.data)).catch(() => {})
@@ -325,6 +338,30 @@ export default function CasePage() {
       .catch(() => {})
   }, [clienteSlug, caseSlug])
 
+  // Quando data carrega: salva URLs no localStorage e aguarda hero carregar
+  useEffect(() => {
+    if (!data) return
+    const urls = [
+      mediaUrl(data.imagem_capa),
+      ...(data.blocos ?? []).flatMap(b => {
+        if (b.__component === 'blocks.imagem-simples') return [mediaUrl(b.imagem)]
+        if (b.__component === 'blocks.subcase')       return [mediaUrl(b.imagem)]
+        if (b.__component === 'blocks.video')         return [mediaUrl(b.capa)]
+        if (b.__component === 'blocks.imagem-trio')   return [mediaUrl(b.imagem_1), mediaUrl(b.imagem_2), mediaUrl(b.imagem_3)]
+        if (b.__component === 'blocks.galeria')       return (b.itens ?? []).map(it => mediaUrl(it?.imagem))
+        return []
+      }),
+    ].filter(Boolean)
+    try { localStorage.setItem(lsKey, JSON.stringify(urls)) } catch {}
+    if (pronto) return
+    if (!urls.length) { setPronto(true); return }
+    const timeout = setTimeout(() => setPronto(true), 6000)
+    let count = 0
+    const done = () => { if (++count >= urls.length) { clearTimeout(timeout); setPronto(true) } }
+    urls.forEach(url => { const img = new Image(); img.onload = img.onerror = done; img.src = url })
+    return () => clearTimeout(timeout)
+  }, [data])
+
   // rola até a âncora depois que os blocos renderizam
   useEffect(() => {
     if (!data) return
@@ -341,7 +378,11 @@ export default function CasePage() {
     tentar()
   }, [data])
 
-  if (!data) return <div style={{ padding: 40 }}>Carregando...</div>
+  if (!data || !pronto) return (
+    <div className="cliente-loading" style={{ height: '100vh' }}>
+      <div className="cliente-loading__spinner" />
+    </div>
+  )
 
   return (
     <div className="case-page">

@@ -182,6 +182,17 @@ export default function CasesTimeline({ tipo, slug }) {
     xTargetRef.current = options.reduce((a, b) => Math.abs(b - cur) < Math.abs(a - cur) ? b : a)
   }
 
+  const lsKey = `tv1-cases-${tipo}-${slug}`
+
+  // Mount: aquece cache HTTP com URLs salvas anteriormente
+  useEffect(() => {
+    if (!slug) return
+    try {
+      const saved = JSON.parse(localStorage.getItem(lsKey) ?? '[]')
+      saved.forEach(url => { const img = new Image(); img.src = url })
+    } catch {}
+  }, [lsKey])
+
   useEffect(() => {
     if (!slug) return
     const filtro = tipo === 'especialidade'
@@ -197,7 +208,12 @@ export default function CasesTimeline({ tipo, slug }) {
       `&populate[blocos][populate]=*` +
       `&sort=Data:desc`
     )
-      .then(r => setEntradas(montarEntradas(r.data.data ?? [], tipo)))
+      .then(r => {
+        const novas = montarEntradas(r.data.data ?? [], tipo)
+        setEntradas(novas)
+        const urls = novas.map(e => mediaUrl(e.capa)).filter(Boolean)
+        try { localStorage.setItem(lsKey, JSON.stringify(urls)) } catch {}
+      })
       .catch(() => {})
   }, [tipo, slug])
 
