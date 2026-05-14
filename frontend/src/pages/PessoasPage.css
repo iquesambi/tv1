@@ -32,7 +32,7 @@
 .pessoa-bloco {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  grid-template-rows: auto;
+  height: calc(100vh - 80px);
   gap: 60px;
   align-items: start;
 }
@@ -40,32 +40,24 @@
 /* foto: lado direito */
 .pessoa-foto {
   grid-column: 2;
-  grid-row: 1;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  align-self: start;
-  position: sticky;
-  top: 0;
+  height: 100%;
   pointer-events: none;
   z-index: 0;
 }
 
 .pessoa-foto img {
   display: block;
-  width: auto;
-  height: calc(100vh - 80px);
-  aspect-ratio: 3/4;
+  width: 100%;
+  height: 100%;
   object-fit: cover;
 }
 
 /* texto: lado esquerdo */
 .pessoa-texto {
   grid-column: 1;
-  grid-row: 1;
   padding-bottom: 48px;
   z-index: 1;
-  align-self: start;
+  align-self: center;
 }
 
 /* ── TIPOGRAFIA ───────────────────────── */
