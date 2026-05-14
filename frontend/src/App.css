@@ -75,7 +75,7 @@
   content: '';
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 1, 0.45);
+  background: rgba(0, 0, 1, 0.65);
 }
 
 /* ── TOPO ─────────────────────────────── */
@@ -388,7 +388,6 @@
 
 .home--menu-aberto .home__nav-link {
   color: #fff;
-  text-shadow: 0px 14px 24px rgba(0, 0, 0, 0.45);
 }
 
 .home--menu-aberto .home__submenu-link {
