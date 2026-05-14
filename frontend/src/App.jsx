@@ -101,16 +101,13 @@ function App() {
     return () => document.body.classList.remove('scroll-locked')
   }, [])
 
-  // Fechar menu ao scrollar pra cima
+  // Fechar menu ao scrollar
   useEffect(() => {
     const handleScroll = () => {
-      const currentScrollY = window.scrollY
-      // Se está scrollando pra cima (scrollY diminui) e menu está aberto, fecha
-      if (currentScrollY < lastScrollY.current && aberto !== null) {
+      if (aberto !== null) {
         setAberto(null)
         setHoveredSub(null)
       }
-      lastScrollY.current = currentScrollY
     }
 
     window.addEventListener('scroll', handleScroll, { passive: true })
