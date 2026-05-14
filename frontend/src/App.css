@@ -364,6 +364,11 @@
 .home__nav-link--contato {
   opacity: 1 !important;
   font-size: clamp(56px, 8vw, 110px);
+  color: #000001 !important;
+}
+
+.home__nav-link--contato:hover {
+  color: #000001 !important;
 }
 
 /* Botão de contato sem estilo de link */
