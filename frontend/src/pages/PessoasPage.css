@@ -50,8 +50,8 @@
 
 .pessoa-foto img {
   display: block;
-  width: 100%;
-  height: auto;
+  width: auto;
+  height: calc(100vh - 80px);
   aspect-ratio: 3/4;
   object-fit: cover;
 }
