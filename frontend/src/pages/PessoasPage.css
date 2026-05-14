@@ -32,10 +32,9 @@
 .pessoa-bloco {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  grid-template-rows: auto;
+  grid-template-rows: calc(100vh - 80px);
   gap: 60px;
   align-items: start;
-  min-height: 90vh;
 }
 
 /* foto: lado direito */
