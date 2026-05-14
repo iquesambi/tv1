@@ -53,7 +53,7 @@
 .pessoa-foto img {
   display: block;
   width: auto;
-  height: 80vh;
+  height: calc(100vh - 80px);
   aspect-ratio: 3/4;
   object-fit: cover;
 }
