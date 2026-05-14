@@ -340,6 +340,8 @@
 
 .home__nav--contato {
   opacity: 1;
+  top: 50% !important;
+  transform: translate(-50%, -50%) !important;
 }
 
 .home__nav-contato {
