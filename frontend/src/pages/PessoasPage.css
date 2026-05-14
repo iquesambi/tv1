@@ -38,6 +38,11 @@
 
 .pessoa-foto {
   flex-shrink: 0;
+  order: 2;
+}
+
+.pessoa-texto {
+  order: 1;
 }
 
 .pessoa-foto img {
