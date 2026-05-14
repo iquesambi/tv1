@@ -71,14 +71,13 @@
 }
 
 .pessoa-cargo {
-  font-size: clamp(14px, 1.8vw, 24px);
-  font-weight: 600;
+  font-size: 13px;
+  font-weight: 500;
   font-style: normal;
   text-transform: uppercase;
-  line-height: 1.2;
-  color: #666;
-  margin: 0 0 24px;
-  white-space: nowrap;
+  line-height: 1.4;
+  color: #000001;
+  margin: 8px 0 28px;
   letter-spacing: 0.5px;
 }
 
