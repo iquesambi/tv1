@@ -30,19 +30,14 @@
 */
 
 .pessoa-bloco {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  height: calc(100vh - 80px);
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
   gap: 60px;
-  align-items: start;
 }
 
-/* foto: lado direito */
 .pessoa-foto {
-  grid-column: 2;
-  height: 100%;
-  pointer-events: none;
-  z-index: 0;
+  flex-shrink: 0;
 }
 
 .pessoa-foto img {
@@ -50,15 +45,11 @@
   width: 420px;
   height: 560px;
   object-fit: cover;
-  flex-shrink: 0;
 }
 
-/* texto: lado esquerdo */
 .pessoa-texto {
-  grid-column: 1;
-  padding-bottom: 48px;
-  z-index: 1;
-  align-self: center;
+  flex: 1;
+  padding-top: 8px;
 }
 
 /* ── TIPOGRAFIA ───────────────────────── */
