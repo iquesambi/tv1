@@ -117,6 +117,14 @@ function App() {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [aberto])
 
+  // Resetar menu quando sai da home
+  useEffect(() => {
+    if (location.pathname !== '/') {
+      setAberto(null)
+      setHoveredSub(null)
+    }
+  }, [location.pathname])
+
   const links = nav?.links ?? []
 
   // Sublinks dinâmicos: /pessoas → navegação com slug; /clientes → clientes
