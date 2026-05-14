@@ -47,7 +47,7 @@
 
 .pessoa-foto img {
   display: block;
-  width: 420px;
+  width: 35vw;
   height: 80vh;
   object-fit: cover;
 }
