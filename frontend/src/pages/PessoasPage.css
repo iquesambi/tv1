@@ -31,40 +31,36 @@
 
 .pessoa-bloco {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: 1fr 1fr;
   grid-template-rows: auto;
-  max-width: 100%;
-  margin: 0 auto;
+  gap: 60px;
+  align-items: start;
 }
 
-/* foto: alinhada pelo centro do grid (coluna 6 de 12) */
+/* foto: lado direito */
 .pessoa-foto {
-  grid-column: 1;
+  grid-column: 2;
   grid-row: 1;
-  margin-left: 50%;            /* começa na coluna central */
   display: flex;
-  justify-content: center;     /* centra a imagem dentro do container de 6 colunas */
+  justify-content: center;
   align-items: flex-start;
-  align-self: start;
   pointer-events: none;
   z-index: 0;
 }
 
 .pessoa-foto img {
   display: block;
-  width: auto;
-  height: 80vh;
+  width: 100%;
+  height: auto;
   aspect-ratio: 3/4;
   object-fit: cover;
 }
 
-/* texto: mesma célula, sobreposto por cima da foto */
+/* texto: lado esquerdo */
 .pessoa-texto {
   grid-column: 1;
   grid-row: 1;
-  max-width: 33%;              /* ocupa 4 colunas de 12 */
   padding-bottom: 48px;
-  margin-top: clamp(-80px, -8%, 0);  /* invade a imagem pra cima */
   z-index: 1;
   align-self: start;
 }
