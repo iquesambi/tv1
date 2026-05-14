@@ -50,10 +50,10 @@
 
 .pessoa-foto img {
   display: block;
-  width: auto;
+  width: 100%;
   height: auto;
-  max-width: 100%;             /* landscape: preenche o container (6 col) */
-  max-height: 75vh;            /* portrait: limitado em altura, fica ~4 col */
+  aspect-ratio: 3/4;
+  object-fit: cover;
 }
 
 /* texto: mesma célula, sobreposto por cima da foto */
@@ -70,25 +70,26 @@
 /* ── TIPOGRAFIA ───────────────────────── */
 
 .pessoa-nome {
-  font-size: clamp(40px, 5.2vw, 68px);
+  font-size: clamp(48px, 6.8vw, 88px);
   font-weight: 900;
   font-style: italic;
   text-transform: uppercase;
   line-height: 0.92;
   color: #000001;
-  margin: 0;
+  margin: 0 0 16px;
   white-space: nowrap; /* nome numa linha só, invade a foto */
 }
 
 .pessoa-cargo {
-  font-size: clamp(40px, 5.2vw, 68px);
-  font-weight: 900;
-  font-style: italic;
+  font-size: clamp(14px, 1.8vw, 24px);
+  font-weight: 600;
+  font-style: normal;
   text-transform: uppercase;
-  line-height: 0.95;
-  color: #000001;
-  margin: 0 0 32px;
+  line-height: 1.2;
+  color: #666;
+  margin: 0 0 24px;
   max-width: 55%; /* cargo quebra mas só no espaço livre */
+  letter-spacing: 0.5px;
 }
 
 .pessoa-bio {
