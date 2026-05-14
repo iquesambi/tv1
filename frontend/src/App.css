@@ -188,7 +188,7 @@
   height: 100vh;
   overflow: hidden;
   pointer-events: none;
-  z-index: 5;
+  z-index: 10;
 }
 
 /* Janela clipeada — mostra SUBMENU_VISIBLE itens; altura via JS */
