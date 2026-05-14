@@ -186,7 +186,8 @@ function Timeline({ labels, xRef, tiltDeltaRef, timelineTrackRef, usaCarrossel, 
 
 export default function QuarentaAnosPage() {
 
-  const [data, setData] = useState(null)
+  const [data, setData]   = useState(null)
+  const [logo, setLogo]   = useState(null)
   const [playing, setPlaying] = useState(false)
 
   const videoRef = useRef(null)
@@ -201,6 +202,7 @@ export default function QuarentaAnosPage() {
 
   useEffect(() => {
     api('quarenta-anos?populate[imagem]=true&populate[video_capa]=true&populate[fotos]=true&populate[cases_destaque][populate][imagem_capa]=true&populate[cases_destaque][populate][cliente]=true&populate[cases_destaque][populate][blocos][populate]=*').then(setData)
+    api('logo-site?populate=logo').then(setLogo)
     document.body.classList.remove('scroll-locked')
   }, [])
 
@@ -340,7 +342,7 @@ export default function QuarentaAnosPage() {
     <div className="qa-page">
 
       {/* HERO */}
-      <section className="qa-hero">
+      <section className="qa-hero" onClick={() => data?.video_url && !playing && setPlaying(true)}>
         {playing && data?.video_url
           ? <video ref={videoRef} className="qa-hero__bg" src={data.video_url} autoPlay playsInline />
           : data?.video_capa
@@ -348,25 +350,52 @@ export default function QuarentaAnosPage() {
           : null
         }
         <div className="qa-hero__overlay" />
+        <div className="qa-hero__ui">
+          {logo?.logo && (
+            <img className="qa-hero__logo" src={mediaUrl(logo.logo)} alt="TV1" />
+          )}
+          {!playing && data?.video_url && (
+            <button className="qa-hero__play" aria-label="Assistir vídeo">
+              <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="32" cy="32" r="30" fill="none" stroke="#fff" strokeWidth="1.5" />
+                <polygon points="26,20 26,44 46,32" fill="#fff" />
+              </svg>
+            </button>
+          )}
+        </div>
       </section>
 
-      {/* COMPOSIÇÃO — tudo dentro do SVG, coordenadas 1:1 com o frame Figma 516:2603 */}
+      {/* COMPOSIÇÃO */}
       <section className="qa-composicao">
         <svg
           className="qa-svg"
-          viewBox="0 0 1366 1720"
+          viewBox="-43 -220 1453 2120"
           xmlns="http://www.w3.org/2000/svg"
         >
 
-          {/* ── FOTOS (camada mais atrás) ────────────────────────── */}
-          {fotos[0] && (
-            <image href={fotos[0]} x="40" y="814" width="578" height="375" preserveAspectRatio="xMidYMid slice" />
+          {/* Máquina/typewriter — alinhada à esquerda de "experiências" */}
+          {fotos[3] && (
+            <image href={fotos[3]} x="734" y="-120" width="120" height="75" preserveAspectRatio="xMidYMid meet" />
           )}
-          {fotos[2] && (
-            <image href={fotos[2]} x="40" y="1240" width="578" height="374" preserveAspectRatio="xMidYMid slice" />
+
+          {/* Texto descricao — largura de "experiências" */}
+          <foreignObject x="744" y="0" width="510" height="400" className="qa-fo-lorem">
+            <div xmlns="http://www.w3.org/1999/xhtml" className="qa-lorem-fo">
+              <p style={{fontWeight: 700, margin: '0 0 1em'}}>Nós não apenas vivemos 40 anos de história.<br/>O que importa é como usamos esses 40 anos<br/>para construir o depois.</p>
+              <p style={{margin: '0 0 1em'}}>Quatro décadas atravessando mudanças de tecnologia,<br/>mídia, comportamento e cultura nos ensinaram algo<br/>essencial: futuro não é previsão, é construção diária.<br/>Cada experiência que criamos para ajudar a transformar<br/>pessoas, marcas e negócios nos abre novos caminhos<br/>de evolução.</p>
+              <p style={{margin: 0}}>Assim, nasce uma nova perspectiva: conhecimento e<br/>experiência materializados em uma plataforma que cura<br/>tendências e as aplica em cada um dos próximos desafios.</p>
+            </div>
+          </foreignObject>
+
+          {/* ── FOTOS empilhadas à esquerda — 16:9, com margem dos dois lados ── */}
+          {fotos[0] && (
+            <image href={fotos[0]} x="30" y="900" width="400" height="225" preserveAspectRatio="xMidYMid slice" />
           )}
           {fotos[1] && (
-            <image href={fotos[1]} x="775" y="988" width="578" height="328" preserveAspectRatio="xMidYMid slice" />
+            <image href={fotos[1]} x="30" y="1135" width="400" height="225" preserveAspectRatio="xMidYMid slice" />
+          )}
+          {fotos[2] && (
+            <image href={fotos[2]} x="30" y="1370" width="400" height="225" preserveAspectRatio="xMidYMid slice" />
           )}
 
           {/* "4" */}
@@ -384,28 +413,25 @@ export default function QuarentaAnosPage() {
             />
           </g>
 
-          {/* Máquina */}
-          {fotos[3] && (
-            <image href={fotos[3]} x="673" y="1316" width="524" height="376" preserveAspectRatio="xMidYMid slice" />
-          )}
-
-          {/* TEXTOS */}
-          {data?.descricao && (
-            <foreignObject x="802" y="154" width="524" height="200" className="qa-fo-lorem">
-              <div xmlns="http://www.w3.org/1999/xhtml" className="qa-lorem-fo">
-                {data.descricao}
-              </div>
-            </foreignObject>
-          )}
-
-          <text fontFamily="Gilroy, sans-serif" fontWeight="900" fontStyle="italic" fontSize="72" fill="white">
-            <tspan x="360" y="416">ANOS</tspan>
-            <tspan x="360" y="481">DE</tspan>
+          {/* ANOS DE — uma linha, sem italic, topo alinhado com "experi" */}
+          <text fontFamily="Gilroy, sans-serif" fontWeight="900" fontStyle="normal" fontSize="108" fill="white">
+            <tspan x="260" y="510">ANOS DE</tspan>
           </text>
 
-          <text fontFamily="PP Hatton, serif" fontStyle="italic" fontWeight="500" fontSize="140" fill="white" className="qa-texto-sv-experiencias">
-            <tspan x="802" y="451">experi</tspan>
-            <tspan x="802" y="570">ências</tspan>
+          {/* experi ências */}
+          <text fontFamily="PP Hatton, serif" fontStyle="italic" fontWeight="500" fontSize="190" fill="white" className="qa-texto-sv-experiencias">
+            <tspan x="730" y="520">experi</tspan>
+            <tspan x="730" y="669">ências</tspan>
+          </text>
+
+          {/* SEJAM BEM-VINDOS ao futuro — alinhados à esquerda de "experiências" */}
+          <text fontFamily="Gilroy, sans-serif" fontWeight="900" fontStyle="italic" fontSize="40" fill="white" textAnchor="start">
+            <tspan x="730" y="1730">SEJAM </tspan>
+              <tspan x="730" y="1767">BEM-VINDOS</tspan>
+            
+          </text>
+          <text fontFamily="PP Hatton, serif" fontStyle="italic" fontWeight="500" fontSize="105" fill="white" textAnchor="start">
+            <tspan x="730" y="1860">ao futuro</tspan>
           </text>
 
         </svg>
@@ -419,6 +445,10 @@ export default function QuarentaAnosPage() {
         <div className="qa-texto-mobile__experiencias">
           <span>experi</span>
           <span>ências</span>
+        </div>
+        <div className="qa-texto-mobile__bv">
+          <span className="qa-texto-mobile__bv-sejam">SEJAM BEM-VINDOS</span>
+          <span className="qa-texto-mobile__bv-futuro">ao futuro</span>
         </div>
       </section>
 
@@ -466,7 +496,6 @@ export default function QuarentaAnosPage() {
 
       </section>
 
-      {/* TIMELINE */}
       <Timeline
         labels={labels}
         xRef={xRef}

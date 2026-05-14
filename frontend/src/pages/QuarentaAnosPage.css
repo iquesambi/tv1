@@ -15,6 +15,7 @@
   width: 100vw;
   height: 100vh;
   overflow: hidden;
+  cursor: pointer;
 }
 
 .qa-hero__bg {
@@ -28,7 +29,50 @@
 .qa-hero__overlay {
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 1, 0.55);
+  background: rgba(0, 0, 1, 0.45);
+}
+
+.qa-hero__ui {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 40px;
+  z-index: 2;
+}
+
+.qa-hero__logo {
+  height: 36px;
+  width: auto;
+  object-fit: contain;
+  display: block;
+  filter: brightness(0) invert(1);
+}
+
+.qa-hero__play {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  align-self: center;
+  margin-top: auto;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.qa-hero__play svg {
+  width: 80px;
+  height: 80px;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.qa-hero__play:hover svg {
+  transform: scale(1.1);
+  opacity: 0.85;
 }
 
 /* ── COMPOSIÇÃO ─────────────────────── */
@@ -38,6 +82,8 @@
   width: 100%;
   background: #000001;
   overflow: hidden;
+  padding: 0 80px;
+  box-sizing: border-box;
 }
 
 /* SVG ocupa 100% da largura; altura é determinada pelo viewBox 0 0 1366 1720 */
@@ -52,9 +98,9 @@
 
 .qa-lorem-fo {
   font-family: 'Gilroy', sans-serif;
-  font-size: 13px;
-  line-height: 1.7;
-  color: rgba(255, 255, 255, 0.6);
+  font-size: 18px;
+  line-height: 1.5;
+  color: #fff;
   margin: 0;
 }
 
@@ -301,6 +347,11 @@
     height: 100dvh;
   }
 
+  .qa-composicao {
+    padding: 0 24px;
+
+  }
+
   /* Esconde elementos de texto do SVG — aparecem como HTML abaixo */
   .qa-fo-lorem,
   .qa-texto-sv-experiencias {
@@ -333,6 +384,30 @@
     color: #fff;
     display: flex;
     flex-direction: column;
+  }
+
+  .qa-texto-mobile__bv {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-top: 16px;
+  }
+
+  .qa-texto-mobile__bv-sejam {
+    font-family: 'Gilroy', sans-serif;
+    font-weight: 900;
+    font-style: italic;
+    font-size: 22px;
+    text-transform: uppercase;
+    color: #fff;
+  }
+
+  .qa-texto-mobile__bv-futuro {
+    font-family: 'PP Hatton', serif;
+    font-style: italic;
+    font-size: clamp(52px, 16vw, 72px);
+    line-height: 1;
+    color: #fff;
   }
 
   .qa-cases__titulo {
