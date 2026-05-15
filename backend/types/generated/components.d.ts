@@ -37,7 +37,19 @@ export interface BlocksGaleria extends Struct.ComponentSchema {
     icon: 'layout';
   };
   attributes: {
-    imagens: Schema.Attribute.Media<'images', true> & Schema.Attribute.Required;
+    itens: Schema.Attribute.Component<'blocks.galeria-item', true>;
+  };
+}
+
+export interface BlocksGaleriaItem extends Struct.ComponentSchema {
+  collectionName: 'components_blocks_galeria_items';
+  info: {
+    displayName: 'Galeria Item';
+    icon: 'image';
+  };
+  attributes: {
+    imagem: Schema.Attribute.Media<'images'> & Schema.Attribute.Required;
+    ordem: Schema.Attribute.Integer;
   };
 }
 
@@ -70,6 +82,21 @@ export interface BlocksImagemTrio extends Struct.ComponentSchema {
         },
         number
       >;
+  };
+}
+
+export interface BlocksSubcase extends Struct.ComponentSchema {
+  collectionName: 'components_blocks_subcases';
+  info: {
+    displayName: 'Subcase';
+    icon: 'layout';
+  };
+  attributes: {
+    ancora_id: Schema.Attribute.String;
+    descricao: Schema.Attribute.Text;
+    imagem: Schema.Attribute.Media<'images'>;
+    subtitulo: Schema.Attribute.String;
+    titulo: Schema.Attribute.String & Schema.Attribute.Required;
   };
 }
 
@@ -175,8 +202,10 @@ declare module '@strapi/strapi' {
       'blocks.big-number-item': BlocksBigNumberItem;
       'blocks.big-numbers': BlocksBigNumbers;
       'blocks.galeria': BlocksGaleria;
+      'blocks.galeria-item': BlocksGaleriaItem;
       'blocks.imagem-simples': BlocksImagemSimples;
       'blocks.imagem-trio': BlocksImagemTrio;
+      'blocks.subcase': BlocksSubcase;
       'blocks.subtitulo': BlocksSubtitulo;
       'blocks.texto': BlocksTexto;
       'blocks.video': BlocksVideo;

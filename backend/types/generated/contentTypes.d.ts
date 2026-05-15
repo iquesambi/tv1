@@ -478,6 +478,7 @@ export interface ApiCaseCase extends Struct.CollectionTypeSchema {
     blocos: Schema.Attribute.DynamicZone<
       [
         'blocks.subtitulo',
+        'blocks.subcase',
         'blocks.texto',
         'blocks.imagem-simples',
         'blocks.galeria',
