@@ -316,7 +316,11 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
       else if (link.url) goTo(link.url)
       return
     }
-    // Desktop (home e footer): toggle submenu
+    // Desktop: sem sublinks → navega direto; com sublinks → toggle submenu
+    if (sublinks.length === 0) {
+      if (link.url) goTo(link.url)
+      return
+    }
     if (aberto === i) { setAberto(null); setHoveredSub(null) }
     else { setAberto(i); setHoveredSub(null) }
   }
