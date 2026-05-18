@@ -564,9 +564,8 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
                     href={link.url || '#'}
                     className={`home__nav-link ${(acima || abaixo) ? 'home__nav-link--dimmed' : ''}`}
                     onClick={e => handleLink(e, i, link)}
-                  >
-                    {link.label}
-                  </a>
+                    dangerouslySetInnerHTML={{ __html: link.label.replace(/\|/g, '<span class="home__nav-sep">|</span>') }}
+                  />
                 </div>
               )
             })}
