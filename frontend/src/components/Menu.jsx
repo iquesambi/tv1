@@ -3,7 +3,7 @@ import { useLocation } from 'react-router-dom'
 import axios from 'axios'
 import { useGoTo, useStartCamera } from '../transition.jsx'
 import '../App.css'
-import './FooterBranco.css'
+import './Menu.css'
 
 const STRAPI = 'https://tv1-53ev.onrender.com'
 const api = (path) => axios.get(`${STRAPI}/api/${path}`).then(r => r.data.data).catch(() => null)
