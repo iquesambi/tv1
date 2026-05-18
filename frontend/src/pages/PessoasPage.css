@@ -67,7 +67,6 @@
   line-height: 0.92;
   color: #000001;
   margin: 0 0 16px;
-  white-space: nowrap; /* nome numa linha só, invade a foto */
 }
 
 .pessoa-cargo {

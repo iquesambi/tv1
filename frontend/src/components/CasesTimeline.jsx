@@ -233,6 +233,40 @@ export default function CasesTimeline({ tipo, slug }) {
     let tilt = 0
     let raf
 
+    // ── Drag com mouse no viewport dos cards ──
+    let isDragging = false
+    let dragStartX = 0
+    let dragMoved = false
+
+    const onMouseDown = (e) => {
+      isDragging = true
+      dragMoved = false
+      dragStartX = e.clientX
+      container.style.cursor = 'grabbing'
+    }
+    const onMouseMove = (e) => {
+      if (!isDragging || !usaCarrossel) return
+      const delta = e.clientX - dragStartX
+      if (Math.abs(delta) > 3) dragMoved = true
+      dragStartX = e.clientX
+      xRef.current.x += delta
+      tiltDeltaRef.current = -delta * 4
+    }
+    const onMouseUp = () => {
+      isDragging = false
+      container.style.cursor = ''
+    }
+
+    // Previne clique nos cards após arrastar
+    const onClickCapture = (e) => {
+      if (dragMoved) { e.stopPropagation(); dragMoved = false }
+    }
+
+    container.addEventListener('mousedown', onMouseDown)
+    container.addEventListener('click', onClickCapture, true)
+    window.addEventListener('mousemove', onMouseMove)
+    window.addEventListener('mouseup', onMouseUp)
+
     const cards = Array.from(track.querySelectorAll('.cliente-card'))
 
     if (usaCarrossel) {
@@ -261,9 +295,16 @@ export default function CasesTimeline({ tipo, slug }) {
     }
 
     const onWheel = (e) => {
-      e.preventDefault()
-      tiltDeltaRef.current = e.deltaY
-      if (usaCarrossel) xRef.current.x -= e.deltaY * 0.5
+      const dx = Math.abs(e.deltaX)
+      const dy = Math.abs(e.deltaY)
+
+      // Só intercepta quando o scroll for predominantemente horizontal
+      if (dx > dy && usaCarrossel) {
+        e.preventDefault()
+        tiltDeltaRef.current = -e.deltaX * 4
+        xRef.current.x -= e.deltaX
+      }
+      // Scroll vertical: não previne — deixa a página rolar normalmente
     }
 
     const tick = () => {
@@ -303,6 +344,10 @@ export default function CasesTimeline({ tipo, slug }) {
 
     return () => {
       container.removeEventListener('wheel', onWheel)
+      container.removeEventListener('mousedown', onMouseDown)
+      container.removeEventListener('click', onClickCapture, true)
+      window.removeEventListener('mousemove', onMouseMove)
+      window.removeEventListener('mouseup', onMouseUp)
       cancelAnimationFrame(raf)
     }
   }, [n, usaCarrossel])

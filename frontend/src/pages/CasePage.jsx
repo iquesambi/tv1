@@ -299,6 +299,7 @@ export default function CasePage() {
   const [data, setData] = useState(null)
   const [logo, setLogo] = useState(null)
   const [quarentaAnos, setQA] = useState(null)
+  const footerRef = useRef(null)
 
   const lsKey = `tv1-case-${caseSlug}`
   const [pronto, setPronto] = useState(() => {
@@ -390,6 +391,14 @@ export default function CasePage() {
       {/* Hero: título, descrição e imagem capa */}
       <section className="case-hero">
         <div className="case-hero__content">
+          {logo?.logo && (
+            <button
+              className="case-hero__logo"
+              onClick={() => footerRef.current?.scrollIntoView({ behavior: 'smooth' })}
+            >
+              <img src={mediaUrl(logo.logo)} alt="TV1" />
+            </button>
+          )}
           <span className="case-hero__breadcrumb">
             cases / {data.cliente?.nome} / {data.titulo}
           </span>
@@ -417,14 +426,11 @@ export default function CasePage() {
 
       {navSlug && <CasesTimeline tipo={navFrom} slug={navSlug} />}
 
-      <FooterBranco />
+      <div ref={footerRef}><FooterBranco /></div>
 
       {/* Última dobra mobile: versão branca da home */}
       <section className="case-home-fold">
         <div className="case-home-fold__header">
-          <div className="case-home-fold__logo">
-            {logo?.logo && <img src={mediaUrl(logo.logo)} alt="TV1" />}
-          </div>
           <MobileMenu logoFiltro="brightness(0)" />
         </div>
         <div className="case-home-fold__center">
