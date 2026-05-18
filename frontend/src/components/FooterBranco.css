@@ -182,7 +182,7 @@
 .footer-branco__marcas {
   display: flex;
   align-items: center;
-  gap: 32px;
+  gap: 40px;
   transition: opacity 0.3s;
 }
 
@@ -192,10 +192,8 @@
 }
 
 .footer-branco__marcas img {
-  height: 16px;
-  width: auto;
-  object-fit: contain;
   display: block;
+  object-fit: contain;
 }
 
 .footer-branco__redes {
