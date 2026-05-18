@@ -125,31 +125,6 @@
   opacity: 0.4;
 }
 
-/* Quando menu está aberto: replica as regras do home--menu-aberto */
-.footer-branco--aberto .home__submenu-link {
-  color: #fff;
-}
-
-.footer-branco--aberto .footer-branco__nav-link {
-  color: #000001;
-}
-
-.footer-branco--aberto .footer-branco__nav-link:hover {
-  color: #fff;
-  opacity: 0.45;
-}
-
-.footer-branco--aberto .footer-branco__logo img {
-  filter: none;
-}
-
-.footer-branco--aberto .footer-branco__contato {
-  color: #fff;
-}
-
-.footer-branco--aberto .footer-branco__redes img {
-  filter: brightness(0) invert(1);
-}
 
 /* Barra inferior */
 .footer-branco__bottom {

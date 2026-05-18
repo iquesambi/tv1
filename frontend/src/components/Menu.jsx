@@ -397,39 +397,6 @@ export default function Menu({ isHome = false }) {
     )
   }
 
-  // Renderização dos backgrounds de hover
-  const renderBgs = () => links.map((link, i) => {
-    if (aberto !== i) return null
-    const sublinks = getSublinks(link)
-    const isPessoas = link.label?.toLowerCase() === 'pessoas'
-
-    if (isPessoas) {
-      return link.imagem_hover
-        ? <div key={`${i}-main`} className={`${p}__bg ${p}__bg--ativo`}>
-            <img src={mediaUrl(link.imagem_hover)} alt="" />
-          </div>
-        : null
-    }
-
-    return [
-      link.imagem_hover && (
-        <div
-          key={`${i}-main`}
-          className={`${p}__bg ${hoveredSub === null && !sublinks[activeSubIdx]?.imagem_hover ? `${p}__bg--ativo` : ''}`}
-        >
-          <img src={mediaUrl(link.imagem_hover)} alt="" />
-        </div>
-      ),
-      ...sublinks.filter(s => s.imagem_hover).map((sub, j) => (
-        <div
-          key={`${i}-${j}`}
-          className={`${p}__bg ${hoveredSub === sub || (hoveredSub === null && j === activeSubIdx) ? `${p}__bg--ativo` : ''}`}
-        >
-          <img src={mediaUrl(sub.imagem_hover)} alt="" />
-        </div>
-      )),
-    ]
-  })
 
   // ── HOME ──────────────────────────────────────────────────────────────────
   if (isHome) {
@@ -441,11 +408,9 @@ export default function Menu({ isHome = false }) {
         </div>
 
         <div
-          className={`home${pronto ? ' home--pronto' : ''}${aberto !== null ? ' home--menu-aberto' : ''}`}
+          className={`home${pronto ? ' home--pronto' : ''}`}
           onClick={aberto !== null ? () => { setAberto(null); setHoveredSub(null) } : undefined}
         >
-          {/* Backgrounds */}
-          {renderBgs()}
 
           {/* Menu mobile overlay */}
           <div className={`home__menu-mobile ${menuMobile ? 'home__menu-mobile--aberto' : ''}`} onClick={() => setMenuMobile(false)}>
@@ -598,11 +563,9 @@ export default function Menu({ isHome = false }) {
   // ── FOOTER ────────────────────────────────────────────────────────────────
   return (
     <section
-      className={`footer-branco ${aberto !== null ? 'footer-branco--aberto' : ''}`}
+      className="footer-branco"
       onClick={aberto !== null ? () => { setAberto(null); setHoveredSub(null) } : undefined}
     >
-      {/* Backgrounds */}
-      {renderBgs()}
 
       {/* Topo */}
       <div className="footer-branco__top">

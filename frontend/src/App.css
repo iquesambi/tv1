@@ -173,8 +173,7 @@
   color: #aaaaaa;
 }
 
-.home--menu-aberto .home__nav-link:hover {
-  color: #fff;
+.home__nav-link:hover {
   opacity: 0.45;
 }
 
@@ -388,32 +387,6 @@
   transition: opacity 0.2s;
 }
 
-/* ── MENU ABERTO: reverte para dark ──────── */
-
-
-.home--menu-aberto .home__logo img {
-  filter: none;
-}
-
-.home--menu-aberto .home__nav-link {
-  color: #fff;
-}
-
-.home--menu-aberto .home__submenu-link {
-  color: #fff;
-}
-
-.home--menu-aberto .home__contato {
-  color: #fff;
-}
-
-.home--menu-aberto .home__redes img {
-  filter: brightness(0) invert(1);
-}
-
-.home--menu-aberto .home__hamburger span {
-  background: #ffffff;
-}
 
 /* ── HAMBURGUER (desktop: oculto) ─────── */
 
@@ -619,15 +592,6 @@
     transition: opacity 0.3s ease;
   }
 
-  /* Esconde a câmera quando um menu está aberto */
-  .home--menu-aberto .home__camera--mobile {
-    opacity: 0;
-  }
-
-  /* Header mobile volta ao escuro quando menu abre */
-  .home--menu-aberto .home__top {
-    background: rgba(0, 0, 1, 0.95);
-  }
 
   .home__camera--mobile img,
   .home__camera--mobile video {
