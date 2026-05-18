@@ -331,7 +331,7 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
     if (isHome && contatoAberto) return null
 
     const link = links[aberto]
-    const isClientes = link && (link.url?.includes('clientes') || link.label?.toLowerCase().includes('clientes') || link.label?.toLowerCase().includes('cases'))
+    const isClientes = link && (link.url?.includes('clientes') || link.label?.toLowerCase().includes('clientes'))
     const sublinks = link ? getSublinks(link) : []
     if (!isClientes && sublinks.length === 0) return null
 
@@ -349,10 +349,10 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
 
     const vw = window.innerWidth
     const vh = window.innerHeight
-    const navFontSize = Math.min(Math.max(104, 0.158 * vw), 216)
-    const navItemH    = navFontSize * 0.75
     const N           = links.length
-    const itemCenterY = vh * 0.5 + (aberto - (N - 1) / 2) * navItemH - vh * 0.35
+    const navFontSize = Math.min(Math.min(Math.max(52, 0.158 * vw), 216), (0.68 * vh) / (N * 0.75))
+    const navItemH    = navFontSize * 0.75
+    const itemCenterY = vh * 0.47 + (aberto - (N - 1) / 2) * navItemH
     const itemBottomY = itemCenterY + navItemH / 2
 
     // Grid de logos para Clientes
