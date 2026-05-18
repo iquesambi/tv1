@@ -15,7 +15,7 @@
       "component": "navigation.link",
       "repeatable": true,
       "required": true,
-      "max": 4
+      "max": 6
     }
   }
 }
