@@ -76,6 +76,11 @@
     width: auto;
     object-fit: contain;
     display: block;
+    transition: opacity 0.25s ease;
+  }
+
+  .mobile-menu__logo:hover img {
+    opacity: 0.4;
   }
 
   .mobile-menu__fechar {

@@ -402,11 +402,6 @@ export default function CasePage() {
           <span className="case-hero__breadcrumb">
             cases / {data.cliente?.nome} / {data.titulo}
           </span>
-          {data.agencia?.logo && (
-            <div className="case-hero__agency">
-              <img src={mediaUrl(data.agencia.logo)} alt={data.agencia.nome} />
-            </div>
-          )}
           <h1 className="case-hero__title">{data.titulo}</h1>
           {data.descricao && (
             <div className="case-hero__description" dangerouslySetInnerHTML={{ __html: semViuvas(textoParaHtml(data.descricao)) }} />

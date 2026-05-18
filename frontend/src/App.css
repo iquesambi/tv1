@@ -98,6 +98,11 @@
   object-fit: contain;
   display: block;
   filter: brightness(0);
+  transition: opacity 0.25s ease;
+}
+
+.home__logo:hover img {
+  opacity: 0.4;
 }
 
 .home__camera {

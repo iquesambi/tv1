@@ -775,37 +775,6 @@ export interface ApiTrabalheConoscoTrabalheConosco
   };
 }
 
-export interface ApiVagaVaga extends Struct.CollectionTypeSchema {
-  collectionName: 'vagas';
-  info: {
-    displayName: 'Vaga';
-    pluralName: 'vagas';
-    singularName: 'vaga';
-  };
-  options: {
-    draftAndPublish: true;
-  };
-  attributes: {
-    createdAt: Schema.Attribute.DateTime;
-    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
-      Schema.Attribute.Private;
-    descricao: Schema.Attribute.Text & Schema.Attribute.Required;
-    link_aplicacao: Schema.Attribute.String;
-    locale: Schema.Attribute.String & Schema.Attribute.Private;
-    localizations: Schema.Attribute.Relation<'oneToMany', 'api::vaga.vaga'> &
-      Schema.Attribute.Private;
-    publishedAt: Schema.Attribute.DateTime;
-    titulo: Schema.Attribute.String & Schema.Attribute.Required;
-    trabalhe_conosco: Schema.Attribute.Relation<
-      'manyToOne',
-      'api::trabalhe-conosco.trabalhe-conosco'
-    >;
-    updatedAt: Schema.Attribute.DateTime;
-    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
-      Schema.Attribute.Private;
-  };
-}
-
 export interface PluginContentReleasesRelease
   extends Struct.CollectionTypeSchema {
   collectionName: 'strapi_releases';
@@ -1327,7 +1296,6 @@ declare module '@strapi/strapi' {
       'api::quarenta-anos.quarenta-anos': ApiQuarentaAnosQuarentaAnos;
       'api::redes-sociais.redes-sociais': ApiRedesSociaisRedesSociais;
       'api::trabalhe-conosco.trabalhe-conosco': ApiTrabalheConoscoTrabalheConosco;
-      'api::vaga.vaga': ApiVagaVaga;
       'plugin::content-releases.release': PluginContentReleasesRelease;
       'plugin::content-releases.release-action': PluginContentReleasesReleaseAction;
       'plugin::i18n.locale': PluginI18NLocale;

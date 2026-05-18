@@ -46,6 +46,11 @@
   object-fit: contain;
   display: block;
   filter: brightness(0);
+  transition: opacity 0.25s ease;
+}
+
+.case-hero__logo:hover img {
+  opacity: 0.4;
 }
 
 .case-hero__breadcrumb {
@@ -64,18 +69,6 @@
   text-wrap: balance;
 }
 
-.case-hero__agency {
-  height: 40px;
-  display: flex;
-  align-items: center;
-}
-
-.case-hero__agency img {
-  max-height: 40px;
-  width: auto;
-  object-fit: contain;
-  display: block;
-}
 
 .case-hero__description {
   font-size: 14px;
@@ -512,18 +505,6 @@
     font-weight: 500;
   }
 
-  .case-hero__agency {
-    height: auto !important;
-    min-height: 0;
-    overflow: visible;
-    margin: 4px 0;
-  }
-
-  .case-hero__agency img {
-    height: 35px !important;
-    max-height: none !important;
-    width: auto;
-  }
 
   .case-hero__title {
     font-size: 64px;

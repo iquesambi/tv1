@@ -1,39 +1,78 @@
 import { useEffect, useRef, useState } from 'react'
 import axios from 'axios'
 import { useGoTo } from '../transition.jsx'
+import MobileMenu from '../components/MobileMenu.jsx'
 import '../pages/ClientePage.css'
+import './CasesTimeline.css'
 
 const STRAPI = 'https://tv1-53ev.onrender.com'
+const apiGet = (path) => axios.get(`${STRAPI}/api/${path}`).then(r => r.data.data).catch(() => null)
 const mediaUrl = (obj) => obj?.url ? `${STRAPI}${obj.url}` : null
 
 const ALTURAS = [460, 340, 400, 310, 380]
 const alturaParaIdx = (idx) => ALTURAS[idx % ALTURAS.length]
 
 /* ── monta entradas ── */
-function montarEntradas(cases, tipo) {
+function montarEntradas(cases, tipoResolvido) {
   const entradas = []
+
+  if (tipoResolvido === 'quarentaAnos') {
+    for (const c of cases) {
+      const clienteSlug = c.cliente?.slug
+      const caseSlug    = c.slug
+      if (c.imagem_capa) {
+        entradas.push({
+          id:          `${c.id}-main`,
+          label:       c.Data ? new Date(c.Data).getFullYear() : null,
+          data:        c.Data ? new Date(c.Data) : new Date(0),
+          nome:        c.titulo || '',
+          capa:        c.imagem_capa,
+          href:        clienteSlug && caseSlug ? `/${clienteSlug}/${caseSlug}` : `/${caseSlug ?? ''}`,
+          agenciaLogo: null,
+          agenciaNome: null,
+        })
+      }
+      for (const bloco of c.blocos ?? []) {
+        if (bloco.__component === 'blocks.subcase' && bloco.ancora_id && bloco.imagem) {
+          entradas.push({
+            id:          `${c.id}-${bloco.ancora_id}`,
+            label:       c.Data ? new Date(c.Data).getFullYear() : null,
+            data:        c.Data ? new Date(c.Data) : new Date(0),
+            nome:        bloco.titulo || '',
+            capa:        bloco.imagem,
+            href:        clienteSlug && caseSlug
+              ? `/${clienteSlug}/${caseSlug}#${bloco.ancora_id}`
+              : `/${caseSlug ?? ''}#${bloco.ancora_id}`,
+            agenciaLogo: null,
+            agenciaNome: null,
+          })
+        }
+      }
+    }
+    return entradas.sort((a, b) => b.data - a.data)
+  }
+
+  // marca / especialidade
   for (const c of cases) {
     const clienteSlug = c.cliente?.slug
     const caseSlug    = c.slug
-
     entradas.push({
-      id:               `${c.id}-main`,
-      label:            tipo === 'cliente'
+      id:          `${c.id}-main`,
+      label:       tipoResolvido === 'marca'
         ? (c.Data ? new Date(c.Data).getFullYear() : null)
         : (c.sub_especialidade || ''),
-      data:             c.Data ? new Date(c.Data) : new Date(0),
-      nome:             c.titulo,
-      capa:             c.imagem_capa,
-      href:             clienteSlug && caseSlug ? `/${clienteSlug}/${caseSlug}` : `/${caseSlug}`,
-      agenciaLogo:      c.agencia?.logo ?? null,
-      agenciaNome:      c.agencia?.nome ?? null,
+      data:        c.Data ? new Date(c.Data) : new Date(0),
+      nome:        c.titulo,
+      capa:        c.imagem_capa,
+      href:        clienteSlug && caseSlug ? `/${clienteSlug}/${caseSlug}` : `/${caseSlug}`,
+      agenciaLogo: c.agencia?.logo ?? null,
+      agenciaNome: c.agencia?.nome ?? null,
     })
-
     for (const bloco of c.blocos ?? []) {
       if (bloco.__component === 'blocks.subtitulo' && bloco.timeline && bloco.timeline_data) {
         entradas.push({
           id:          `${c.id}-sub-${bloco.id}`,
-          label:       tipo === 'cliente'
+          label:       tipoResolvido === 'marca'
             ? new Date(bloco.timeline_data).getFullYear()
             : (c.sub_especialidade || ''),
           data:        new Date(bloco.timeline_data),
@@ -48,11 +87,7 @@ function montarEntradas(cases, tipo) {
       }
     }
   }
-
-  entradas.sort((a, b) => {
-    if (a.data - b.data !== 0) return b.data - a.data
-    return 0
-  })
+  entradas.sort((a, b) => b.data - a.data || 0)
   return entradas
 }
 
@@ -69,21 +104,16 @@ function gruposDeLabels(entradas) {
 }
 
 /* ── Card ── */
-function CaseCard({ entrada, idx, carousel }) {
+function CaseCard({ entrada, idx, carousel, navState = null }) {
   const goTo = useGoTo()
   return (
     <div
       className={['cliente-card', 'cliente-card--ativo', carousel ? 'cliente-card--carousel' : ''].join(' ')}
       style={carousel ? { height: alturaParaIdx(idx) } : undefined}
-      onClick={() => goTo(entrada.href)}
+      onClick={() => goTo(entrada.href, null, navState)}
     >
       {entrada.capa && (
         <img src={mediaUrl(entrada.capa)} alt={entrada.nome} className="cliente-card__img" />
-      )}
-      {entrada.agenciaLogo && (
-        <div className="cliente-card__agencia">
-          <img src={mediaUrl(entrada.agenciaLogo)} alt={entrada.agenciaNome ?? ''} />
-        </div>
       )}
       <div className="cliente-card__overlay">
         <h3 className="cliente-card__titulo">{entrada.nome}</h3>
@@ -130,7 +160,12 @@ function TimelineBar({ labels, xRef, tiltDeltaRef, timelineTrackRef, usaCarrosse
               {[0, 1, 2].map(setIdx => (
                 <div className="timeline__labels-set" key={setIdx}>
                   {labels.map((l, i) => (
-                    <div key={i} className="timeline__label timeline__label--clicavel" style={{ left: `${l.pos}%` }} onClick={() => onLabelClick?.(l.cardIdx)}>{l.label}</div>
+                    <div
+                      key={i}
+                      className="timeline__label timeline__label--clicavel"
+                      style={{ left: `${l.pos}%` }}
+                      onClick={() => onLabelClick?.(l.cardIdx)}
+                    >{l.label}</div>
                   ))}
                 </div>
               ))}
@@ -158,8 +193,20 @@ function TimelineBar({ labels, xRef, tiltDeltaRef, timelineTrackRef, usaCarrosse
 }
 
 /* ── Componente principal ── */
-export default function CasesTimeline({ tipo, slug }) {
+export default function CasesTimeline({
+  conteudo,               // 'marca' | 'especialidade' | 'quarentaAnos'
+  tipo,                   // retrocompat: 'cliente' | 'especialidade'
+  slug,
+  contexto = 'case',      // 'pagina' | 'case'
+  tema     = 'claro',     // 'claro'  | 'escuro'
+  navState = null,
+}) {
+  // Resolve tipo/conteudo
+  const tipoResolvido = conteudo ?? (tipo === 'cliente' ? 'marca' : (tipo ?? 'marca'))
+
   const [entradas, setEntradas] = useState([])
+  const [logo, setLogo]         = useState(null)
+
   const viewportRef      = useRef(null)
   const trackRef         = useRef(null)
   const timelineTrackRef = useRef(null)
@@ -170,32 +217,39 @@ export default function CasesTimeline({ tipo, slug }) {
   const tiltDeltaRef     = useRef(0)
   const [labels, setLabels] = useState([])
 
-  const handleLabelClick = (cardIdx) => {
-    const cards     = firstSetCardsRef.current
-    const container = viewportRef.current
-    if (!cards[cardIdx] || !container) return
-    const cardCenter = cards[cardIdx].offsetLeft + cards[cardIdx].offsetWidth / 2
-    const base    = container.clientWidth / 2 - oneSetRef.current - cardCenter
-    const oneSet  = oneSetRef.current
-    const cur     = xRef.current.x
-    const options = [base - oneSet, base, base + oneSet]
-    xTargetRef.current = options.reduce((a, b) => Math.abs(b - cur) < Math.abs(a - cur) ? b : a)
-  }
-
-  const lsKey = `tv1-cases-${tipo}-${slug}`
-
-  // Mount: aquece cache HTTP com URLs salvas anteriormente
+  // Logo para contexto 'pagina' (não quarentaAnos)
   useEffect(() => {
-    if (!slug) return
+    if (contexto === 'pagina' && tipoResolvido !== 'quarentaAnos') {
+      apiGet('logo-site?populate=logo').then(setLogo)
+    }
+  }, [contexto, tipoResolvido])
+
+  // Aquece cache HTTP
+  useEffect(() => {
+    if (!slug || tipoResolvido === 'quarentaAnos') return
     try {
-      const saved = JSON.parse(localStorage.getItem(lsKey) ?? '[]')
+      const saved = JSON.parse(localStorage.getItem(`tv1-cases-${tipoResolvido}-${slug}`) ?? '[]')
       saved.forEach(url => { const img = new Image(); img.src = url })
     } catch {}
-  }, [lsKey])
+  }, [tipoResolvido, slug])
 
+  // Fetch de dados
   useEffect(() => {
+    if (tipoResolvido === 'quarentaAnos') {
+      apiGet(
+        'quarenta-anos' +
+        '?populate[cases_destaque][populate][imagem_capa]=true' +
+        '&populate[cases_destaque][populate][cliente]=true' +
+        '&populate[cases_destaque][populate][blocos][populate]=*'
+      ).then(data => {
+        setEntradas(montarEntradas(data?.cases_destaque ?? [], 'quarentaAnos'))
+      })
+      return
+    }
+
     if (!slug) return
-    const filtro = tipo === 'especialidade'
+
+    const filtro = tipoResolvido === 'especialidade'
       ? `filters[especialidade][slug][$eq]=${slug}`
       : `filters[cliente][slug][$eq]=${slug}`
 
@@ -209,16 +263,28 @@ export default function CasesTimeline({ tipo, slug }) {
       `&sort=Data:desc`
     )
       .then(r => {
-        const novas = montarEntradas(r.data.data ?? [], tipo)
+        const novas = montarEntradas(r.data.data ?? [], tipoResolvido)
         setEntradas(novas)
         const urls = novas.map(e => mediaUrl(e.capa)).filter(Boolean)
-        try { localStorage.setItem(lsKey, JSON.stringify(urls)) } catch {}
+        try { localStorage.setItem(`tv1-cases-${tipoResolvido}-${slug}`, JSON.stringify(urls)) } catch {}
       })
       .catch(() => {})
-  }, [tipo, slug])
+  }, [tipoResolvido, slug])
 
   const n            = entradas.length
   const usaCarrossel = n >= 4
+
+  const handleLabelClick = (cardIdx) => {
+    const cards     = firstSetCardsRef.current
+    const container = viewportRef.current
+    if (!cards[cardIdx] || !container) return
+    const cardCenter = cards[cardIdx].offsetLeft + cards[cardIdx].offsetWidth / 2
+    const base    = container.clientWidth / 2 - oneSetRef.current - cardCenter
+    const oneSet  = oneSetRef.current
+    const cur     = xRef.current.x
+    const options = [base - oneSet, base, base + oneSet]
+    xTargetRef.current = options.reduce((a, b) => Math.abs(b - cur) < Math.abs(a - cur) ? b : a)
+  }
 
   useEffect(() => {
     if (!n) return
@@ -227,24 +293,18 @@ export default function CasesTimeline({ tipo, slug }) {
     if (!container || !track) return
 
     const oneSet = usaCarrossel ? track.scrollWidth / 3 : 0
-    xRef.current.x = usaCarrossel ? -oneSet : 0
+    xRef.current.x   = usaCarrossel ? -oneSet : 0
     xTargetRef.current = null
     tiltDeltaRef.current = 0
     let tilt = 0
     let raf
 
-    // ── Drag com mouse no viewport dos cards ──
+    // Drag com mouse
     let isDragging = false
     let dragStartX = 0
-    let dragMoved = false
-
-    const onMouseDown = (e) => {
-      isDragging = true
-      dragMoved = false
-      dragStartX = e.clientX
-      container.style.cursor = 'grabbing'
-    }
-    const onMouseMove = (e) => {
+    let dragMoved  = false
+    const onMouseDown  = (e) => { isDragging = true; dragMoved = false; dragStartX = e.clientX; container.style.cursor = 'grabbing' }
+    const onMouseMove  = (e) => {
       if (!isDragging || !usaCarrossel) return
       const delta = e.clientX - dragStartX
       if (Math.abs(delta) > 3) dragMoved = true
@@ -252,15 +312,8 @@ export default function CasesTimeline({ tipo, slug }) {
       xRef.current.x += delta
       tiltDeltaRef.current = -delta * 4
     }
-    const onMouseUp = () => {
-      isDragging = false
-      container.style.cursor = ''
-    }
-
-    // Previne clique nos cards após arrastar
-    const onClickCapture = (e) => {
-      if (dragMoved) { e.stopPropagation(); dragMoved = false }
-    }
+    const onMouseUp = () => { isDragging = false; container.style.cursor = '' }
+    const onClickCapture = (e) => { if (dragMoved) { e.stopPropagation(); dragMoved = false } }
 
     container.addEventListener('mousedown', onMouseDown)
     container.addEventListener('click', onClickCapture, true)
@@ -268,74 +321,48 @@ export default function CasesTimeline({ tipo, slug }) {
     window.addEventListener('mouseup', onMouseUp)
 
     const cards = Array.from(track.querySelectorAll('.cliente-card'))
-
-    if (usaCarrossel) {
-      firstSetCardsRef.current = cards.slice(0, n)
-      oneSetRef.current = oneSet
-    }
+    if (usaCarrossel) { firstSetCardsRef.current = cards.slice(0, n); oneSetRef.current = oneSet }
 
     if (usaCarrossel && timelineTrackRef.current) {
       const sets = timelineTrackRef.current.querySelectorAll('.timeline__labels-set')
       sets.forEach(s => { s.style.width = `${oneSet}px` })
-
       const firstSetCards = cards.slice(0, n)
       const grupos = gruposDeLabels(entradas)
       setLabels(grupos.map(g => {
-        const firstIdx = g.indices[0]
-        const card = firstSetCards[firstIdx]
+        const card   = firstSetCards[g.indices[0]]
         const center = card ? card.offsetLeft + card.offsetWidth / 2 : 0
-        return { label: g.label, pos: (center / oneSet) * 100, cardIdx: firstIdx }
+        return { label: g.label, pos: (center / oneSet) * 100, cardIdx: g.indices[0] }
       }))
     } else if (!usaCarrossel) {
       const grupos = gruposDeLabels(entradas)
-      setLabels(grupos.map(g => ({
-        label: g.label,
-        pos: ((g.indices[0] + 0.5) / n) * 100,
-      })))
+      setLabels(grupos.map(g => ({ label: g.label, pos: ((g.indices[0] + 0.5) / n) * 100 })))
     }
 
     const onWheel = (e) => {
-      const dx = Math.abs(e.deltaX)
-      const dy = Math.abs(e.deltaY)
-
-      // Só intercepta quando o scroll for predominantemente horizontal
-      if (dx > dy && usaCarrossel) {
+      // Sempre: só scroll horizontal move o carrossel (vertical é livre em ambos os contextos)
+      if (Math.abs(e.deltaX) > Math.abs(e.deltaY) && usaCarrossel) {
         e.preventDefault()
-        tiltDeltaRef.current = -e.deltaX * 4
         xRef.current.x -= e.deltaX
+        tiltDeltaRef.current = -e.deltaX * 4
       }
-      // Scroll vertical: não previne — deixa a página rolar normalmente
     }
 
     const tick = () => {
       if (xTargetRef.current !== null) {
         const diff = xTargetRef.current - xRef.current.x
-        if (Math.abs(diff) < 1) {
-          xRef.current.x = xTargetRef.current
-          xTargetRef.current = null
-        } else {
-          xRef.current.x += diff * 0.1
-          tiltDeltaRef.current = 0
-        }
+        if (Math.abs(diff) < 1) { xRef.current.x = xTargetRef.current; xTargetRef.current = null }
+        else { const move = diff * 0.1; xRef.current.x += move; tiltDeltaRef.current = -move * 4 }
       }
-
       const targetTilt = Math.max(-60, Math.min(60, tiltDeltaRef.current * 0.55))
       tilt += (targetTilt - tilt) * 0.08
       tiltDeltaRef.current *= 0.91
-
       if (usaCarrossel) {
         if (xRef.current.x < -2 * oneSet) xRef.current.x += oneSet
         if (xRef.current.x > 0)           xRef.current.x -= oneSet
         track.style.transform = `translateX(${xRef.current.x}px)`
-        if (timelineTrackRef.current) {
-          timelineTrackRef.current.style.transform = `translateX(${xRef.current.x}px)`
-        }
+        if (timelineTrackRef.current) timelineTrackRef.current.style.transform = `translateX(${xRef.current.x}px)`
       }
-
-      cards.forEach(card => {
-        card.style.transform = `perspective(700px) rotateY(${tilt}deg)`
-      })
-
+      cards.forEach(card => { card.style.transform = `perspective(700px) rotateY(${tilt}deg)` })
       raf = requestAnimationFrame(tick)
     }
 
@@ -350,7 +377,7 @@ export default function CasesTimeline({ tipo, slug }) {
       window.removeEventListener('mouseup', onMouseUp)
       cancelAnimationFrame(raf)
     }
-  }, [n, usaCarrossel])
+  }, [n, usaCarrossel, contexto])
 
   if (!n) return null
 
@@ -362,24 +389,44 @@ export default function CasesTimeline({ tipo, slug }) {
       ]
     : entradas.map((e, i) => ({ ...e, _key: e.id, _idx: i }))
 
+  const rootClass = [
+    'cases-timeline',
+    `cases-timeline--${contexto}`,
+    tema === 'escuro' ? 'cases-timeline--escuro' : '',
+  ].filter(Boolean).join(' ')
+
   return (
-    <div className="cliente-page" style={{ position: 'relative', minHeight: 'unset' }}>
+    <div className={rootClass}>
+
+      {/* ── Header ── */}
+      {tipoResolvido === 'quarentaAnos' && (
+        <div className="cases-timeline__header">
+          <h2 className="cases-timeline__titulo">
+            <span className="cases-timeline__titulo-case">Case</span>
+            <span className="cases-timeline__titulo-historicos">históricos</span>
+          </h2>
+        </div>
+      )}
+      {contexto === 'pagina' && tipoResolvido !== 'quarentaAnos' && (
+        <div className="cases-timeline__header cases-timeline__header--pagina">
+          <MobileMenu logo={logo?.logo} logoFiltro="brightness(0)" />
+        </div>
+      )}
+
+      {/* ── Cards ── */}
       {usaCarrossel ? (
         <div className="cliente-viewport" ref={viewportRef}>
           <div className="cliente-track" ref={trackRef}>
-            {triplicadas.map(e => (
-              <CaseCard key={e._key} entrada={e} idx={e._idx} carousel />
-            ))}
+            {triplicadas.map(e => <CaseCard key={e._key} entrada={e} idx={e._idx} carousel navState={navState} />)}
           </div>
         </div>
       ) : (
         <div className={`cliente-static cliente-static--${n}`} ref={viewportRef}>
-          {triplicadas.map(e => (
-            <CaseCard key={e._key} entrada={e} idx={e._idx} carousel={false} />
-          ))}
+          {triplicadas.map(e => <CaseCard key={e._key} entrada={e} idx={e._idx} carousel={false} navState={navState} />)}
         </div>
       )}
 
+      {/* ── Timeline bar ── */}
       <TimelineBar
         labels={labels}
         xRef={xRef}
@@ -388,6 +435,7 @@ export default function CasesTimeline({ tipo, slug }) {
         usaCarrossel={usaCarrossel}
         onLabelClick={handleLabelClick}
       />
+
     </div>
   )
 }

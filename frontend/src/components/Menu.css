@@ -51,7 +51,11 @@
   object-fit: contain;
   display: block;
   filter: brightness(0);
-  transition: filter 0.35s ease;
+  transition: filter 0.35s ease, opacity 0.25s ease;
+}
+
+.footer-branco__logo:hover img {
+  opacity: 0.4;
 }
 
 .footer-branco__camera {
