@@ -542,7 +542,7 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
           </button>
 
           {/* Nav central */}
-          <nav className={`home__nav ${aberto !== null ? 'home__nav--aberto' : ''} ${contatoAberto ? 'home__nav--contato' : ''}`}>
+          <nav className={`home__nav ${aberto !== null ? 'home__nav--aberto' : ''} ${contatoAberto ? 'home__nav--contato' : ''}`} style={{ '--nav-count': links.length }}>
             {contatoAberto && (
               <div className="home__nav-contato">
                 <a href="#" className="home__nav-link home__nav-link--contato" onClick={(e) => { e.preventDefault(); e.stopPropagation() }}>SEJA CLIENTE</a>

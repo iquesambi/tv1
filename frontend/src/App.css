@@ -124,9 +124,9 @@
 
 .home__nav {
   position: absolute;
-  top: calc(50vh - 287px);
+  top: 47%;
   left: 50%;
-  transform: translateX(-50%);
+  transform: translate(-50%, -50%);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -158,7 +158,7 @@
 
 .home__nav-link {
   display: block;
-  font-size: clamp(104px, 15.8vw, 216px);
+  font-size: min(clamp(52px, 15.8vw, 216px), calc(68vh / var(--nav-count, 3) / 0.75));
   font-weight: 900;
   font-style: italic;
   text-transform: uppercase;
