@@ -2,6 +2,11 @@
   "collectionName": "components_blocks_galerias",
   "info": { "displayName": "Galeria", "icon": "layout" },
   "attributes": {
-    "itens": { "type": "component", "repeatable": true, "component": "blocks.galeria-item" }
+    "imagens": {
+      "type": "media",
+      "multiple": true,
+      "required": false,
+      "allowedTypes": ["images"]
+    }
   }
 }
