@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import axios from 'axios'
-import FooterBranco from '../components/FooterBranco.jsx'
+import Menu from '../components/Menu.jsx'
 import './PessoasPage.css'
 
 const STRAPI = 'https://tv1-53ev.onrender.com'
@@ -102,7 +102,7 @@ export default function PessoasPage() {
         })}
       </main>
 
-      <FooterBranco />
+      <Menu />
 
     </div>
   )

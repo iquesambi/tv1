@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback, useRef } from 'react'
 import { useParams, useNavigate, useLocation } from 'react-router-dom'
 import axios from 'axios'
-import FooterBranco from '../components/FooterBranco.jsx'
+import Menu from '../components/Menu.jsx'
 import MobileMenu from '../components/MobileMenu.jsx'
 import CasesTimeline from '../components/CasesTimeline.jsx'
 import './CasePage.css'
@@ -426,7 +426,7 @@ export default function CasePage() {
 
       {navSlug && <CasesTimeline tipo={navFrom} slug={navSlug} />}
 
-      <div ref={footerRef}><FooterBranco /></div>
+      <div ref={footerRef}><Menu /></div>
 
       {/* Última dobra mobile: versão branca da home */}
       <section className="case-home-fold">
