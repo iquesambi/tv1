@@ -44,7 +44,8 @@ function AgenciaLogos({ agencias, className }) {
   )
 }
 
-export default function Menu({ isHome = false }) {
+export default function Menu({ isHome = false, variant = 'claro', semMarcas = false }) {
+  const escuro = !isHome && variant === 'escuro'
   const p = isHome ? 'home' : 'footer-branco'
 
   // Estado compartilhado
@@ -563,7 +564,7 @@ export default function Menu({ isHome = false }) {
   // ── FOOTER ────────────────────────────────────────────────────────────────
   return (
     <section
-      className="footer-branco"
+      className={`footer-branco${escuro ? ' footer-branco--escuro' : ''}`}
       onClick={aberto !== null ? () => { setAberto(null); setHoveredSub(null) } : undefined}
     >
 
@@ -619,7 +620,7 @@ export default function Menu({ isHome = false }) {
           className="footer-branco__contato"
           onClick={(e) => { e.stopPropagation(); goTo('/contato') }}
         >Contato</button>
-        <AgenciaLogos agencias={agencias} className={`footer-branco__marcas ${aberto !== null ? 'footer-branco__marcas--oculto' : ''}`} />
+        {!semMarcas && <AgenciaLogos agencias={agencias} className={`footer-branco__marcas ${aberto !== null ? 'footer-branco__marcas--oculto' : ''}`} />}
         <div className="footer-branco__redes">
           {redes?.redes?.map((rede, i) => (
             <a key={i} href={externalUrl(rede.url)} target="_blank" rel="noreferrer">

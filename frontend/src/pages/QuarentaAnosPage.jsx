@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { motion, useScroll, useTransform } from 'framer-motion'
 import axios from 'axios'
 import { useGoTo } from '../transition.jsx'
+import Menu from '../components/Menu.jsx'
 import './QuarentaAnosPage.css'
 
 const STRAPI = 'https://tv1-53ev.onrender.com'
@@ -363,10 +364,7 @@ export default function QuarentaAnosPage() {
         </motion.div>
         <div className="qa-hero__overlay" />
         <div className="qa-hero__ui">
-          {logo?.logo && (
-            <img className="qa-hero__logo" src={mediaUrl(logo.logo)} alt="TV1" />
-          )}
-          {!playing && data?.video_url && (
+          {!playing && (
             <button className="qa-hero__play" aria-label="Assistir vídeo">
               <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
                 <circle cx="32" cy="32" r="30" fill="none" stroke="#fff" strokeWidth="1.5" />
@@ -517,6 +515,8 @@ export default function QuarentaAnosPage() {
         usaCarrossel={usaCarrossel}
         fallback={fallbackLabels}
       />
+
+      <Menu variant="escuro" semMarcas />
 
     </div>
   )

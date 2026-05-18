@@ -189,6 +189,29 @@
 
 .footer-branco__redes a:hover img { opacity: 0.45; }
 
+/* ── VARIANTE ESCURA ──────────────────── */
+
+.footer-branco--escuro {
+  background: #000001;
+  color: #fff;
+}
+
+.footer-branco--escuro .footer-branco__logo img {
+  filter: brightness(0) invert(1);
+}
+
+.footer-branco--escuro .footer-branco__nav-link {
+  color: #fff;
+}
+
+.footer-branco--escuro .footer-branco__contato {
+  color: #fff;
+}
+
+.footer-branco--escuro .footer-branco__redes img {
+  filter: brightness(0) invert(1);
+}
+
 /* ── MOBILE ───────────────────────────── */
 
 @media (max-width: 768px) {
@@ -231,5 +254,9 @@
 
   .footer-branco__bottom {
     display: none;
+  }
+
+  .footer-branco--escuro .footer-branco__top {
+    background: rgba(0, 0, 1, 0.98);
   }
 }
