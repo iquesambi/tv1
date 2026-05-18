@@ -9,27 +9,30 @@
   "options": {
     "draftAndPublish": true
   },
+  "pluginOptions": {},
   "attributes": {
-    "nome": {
+    "Nome": {
       "type": "string",
       "required": true
     },
-    "slug": {
+    "Slug": {
       "type": "uid",
-      "targetField": "nome",
       "required": true
     },
-    "logo": {
+    "Logo": {
       "type": "media",
       "multiple": false,
-      "allowedTypes": ["images"]
+      "allowedTypes": [
+        "images"
+      ]
     },
-    "url_externo": {
+    "url_externa": {
       "type": "string"
     },
-    "ordem": {
+    "posicao": {
       "type": "integer",
-      "default": 0
+      "default": 1,
+      "min": 1
     },
     "cases": {
       "type": "relation",

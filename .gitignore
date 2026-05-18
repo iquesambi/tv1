@@ -1,2 +1,21 @@
 .DS_Store
 *.local
+
+# Media / assets soltos na raiz (apenas root)
+/*.jpg
+/*.jpeg
+/*.png
+/*.gif
+/*.webp
+/*.mp4
+/*.mov
+/*.avi
+/*.zip
+/*.ai
+/*.pdf
+/*.svg
+/logos/
+/shell/
+/mequi no lolla/
+/↪ Desktop/
+frontend/.firebase/

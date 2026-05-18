@@ -37,7 +37,7 @@ export interface BlocksGaleria extends Struct.ComponentSchema {
     icon: 'layout';
   };
   attributes: {
-    itens: Schema.Attribute.Component<'blocks.galeria-item', true>;
+    imagens: Schema.Attribute.Media<'images', true>;
   };
 }
 
@@ -146,7 +146,6 @@ export interface NavigationLink extends Struct.ComponentSchema {
     icon: 'link';
   };
   attributes: {
-    imagem_hover: Schema.Attribute.Media<'images' | 'videos'>;
     label: Schema.Attribute.String & Schema.Attribute.Required;
     sublinks: Schema.Attribute.Component<'navigation.sublink', true>;
     url: Schema.Attribute.String;
@@ -164,7 +163,6 @@ export interface NavigationSublink extends Struct.ComponentSchema {
       'oneToOne',
       'api::especialidade.especialidade'
     >;
-    imagem_hover: Schema.Attribute.Media<'images' | 'videos'>;
     label: Schema.Attribute.String & Schema.Attribute.Required;
     url: Schema.Attribute.String;
   };

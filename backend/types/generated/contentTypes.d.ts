@@ -451,15 +451,22 @@ export interface ApiAgenciaAgencia extends Struct.CollectionTypeSchema {
       'api::agencia.agencia'
     > &
       Schema.Attribute.Private;
-    logo: Schema.Attribute.Media<'images'>;
-    nome: Schema.Attribute.String & Schema.Attribute.Required;
-    ordem: Schema.Attribute.Integer & Schema.Attribute.DefaultTo<0>;
+    Logo: Schema.Attribute.Media<'images'>;
+    Nome: Schema.Attribute.String & Schema.Attribute.Required;
+    posicao: Schema.Attribute.Integer &
+      Schema.Attribute.SetMinMax<
+        {
+          min: 1;
+        },
+        number
+      > &
+      Schema.Attribute.DefaultTo<1>;
     publishedAt: Schema.Attribute.DateTime;
-    slug: Schema.Attribute.UID<'nome'> & Schema.Attribute.Required;
+    Slug: Schema.Attribute.UID & Schema.Attribute.Required;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-    url_externo: Schema.Attribute.String;
+    url_externa: Schema.Attribute.String;
   };
 }
 
@@ -532,6 +539,7 @@ export interface ApiClienteCliente extends Struct.CollectionTypeSchema {
       'api::cliente.cliente'
     > &
       Schema.Attribute.Private;
+    logo: Schema.Attribute.Media<'images'>;
     nome: Schema.Attribute.String & Schema.Attribute.Required;
     publishedAt: Schema.Attribute.DateTime;
     slug: Schema.Attribute.UID<'nome'> & Schema.Attribute.Required;
@@ -618,7 +626,7 @@ export interface ApiNavigationNavigation extends Struct.SingleTypeSchema {
       Schema.Attribute.Required &
       Schema.Attribute.SetMinMax<
         {
-          max: 4;
+          max: 6;
         },
         number
       >;
@@ -764,37 +772,6 @@ export interface ApiTrabalheConoscoTrabalheConosco
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
     vagas: Schema.Attribute.Component<'trabalhe-conosco.vaga', true>;
-  };
-}
-
-export interface ApiVagaVaga extends Struct.CollectionTypeSchema {
-  collectionName: 'vagas';
-  info: {
-    displayName: 'Vaga';
-    pluralName: 'vagas';
-    singularName: 'vaga';
-  };
-  options: {
-    draftAndPublish: true;
-  };
-  attributes: {
-    createdAt: Schema.Attribute.DateTime;
-    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
-      Schema.Attribute.Private;
-    descricao: Schema.Attribute.Text & Schema.Attribute.Required;
-    link_aplicacao: Schema.Attribute.String;
-    locale: Schema.Attribute.String & Schema.Attribute.Private;
-    localizations: Schema.Attribute.Relation<'oneToMany', 'api::vaga.vaga'> &
-      Schema.Attribute.Private;
-    publishedAt: Schema.Attribute.DateTime;
-    titulo: Schema.Attribute.String & Schema.Attribute.Required;
-    trabalhe_conosco: Schema.Attribute.Relation<
-      'manyToOne',
-      'api::trabalhe-conosco.trabalhe-conosco'
-    >;
-    updatedAt: Schema.Attribute.DateTime;
-    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
-      Schema.Attribute.Private;
   };
 }
 
@@ -1319,7 +1296,6 @@ declare module '@strapi/strapi' {
       'api::quarenta-anos.quarenta-anos': ApiQuarentaAnosQuarentaAnos;
       'api::redes-sociais.redes-sociais': ApiRedesSociaisRedesSociais;
       'api::trabalhe-conosco.trabalhe-conosco': ApiTrabalheConoscoTrabalheConosco;
-      'api::vaga.vaga': ApiVagaVaga;
       'plugin::content-releases.release': PluginContentReleasesRelease;
       'plugin::content-releases.release-action': PluginContentReleasesReleaseAction;
       'plugin::i18n.locale': PluginI18NLocale;

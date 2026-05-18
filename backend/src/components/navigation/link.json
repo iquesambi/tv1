@@ -12,11 +12,6 @@
     "url": {
       "type": "string"
     },
-    "imagem_hover": {
-      "type": "media",
-      "multiple": false,
-      "allowedTypes": ["images", "videos"]
-    },
     "sublinks": {
       "type": "component",
       "component": "navigation.sublink",
