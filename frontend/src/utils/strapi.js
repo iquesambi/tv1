@@ -28,8 +28,9 @@ export const apiWithCache = (path, ttlMinutes = 120) => {
 
 export const mediaUrl = (obj) => {
   if (!obj?.url) return null
-  // Em produção, as imagens vêm do CMS remoto (Render)
-  // Em desenvolvimento, vêm do STRAPI local
+  // URLs absolutas (Cloudinary) retornam direto
+  if (obj.url.startsWith('http')) return obj.url
+  // URLs relativas: prepende o host do Strapi
   if (import.meta.env.MODE === 'production') {
     return `https://tv1-53ev.onrender.com${obj.url}`
   }

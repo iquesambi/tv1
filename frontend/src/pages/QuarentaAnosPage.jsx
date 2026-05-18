@@ -7,7 +7,7 @@ import './QuarentaAnosPage.css'
 
 const STRAPI = 'https://tv1-53ev.onrender.com'
 const api = (path) => axios.get(`${STRAPI}/api/${path}`).then(r => r.data.data).catch(() => null)
-const mediaUrl = (obj) => obj?.url ? `${STRAPI}${obj.url}` : null
+const mediaUrl = (obj) => !obj?.url ? null : obj.url.startsWith("http") ? obj.url : `${STRAPI}${obj.url}`
 
 const FOTOS_FIGMA = [
   'https://www.figma.com/api/mcp/asset/733afda4-e15a-47bf-9b8d-0813f88e200d',

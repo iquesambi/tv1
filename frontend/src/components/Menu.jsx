@@ -7,7 +7,7 @@ import './Menu.css'
 
 const STRAPI = 'https://tv1-53ev.onrender.com'
 const api = (path) => axios.get(`${STRAPI}/api/${path}`).then(r => r.data.data).catch(() => null)
-const mediaUrl = (obj) => obj?.url ? `${STRAPI}${obj.url}` : null
+const mediaUrl = (obj) => !obj?.url ? null : obj.url.startsWith("http") ? obj.url : `${STRAPI}${obj.url}`
 const externalUrl = (url) => {
   if (!url) return '#'
   return /^https?:\/\//i.test(url) ? url : `https://${url}`
@@ -318,8 +318,9 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
     if (isHome && contatoAberto) return null
 
     const link = links[aberto]
+    const isClientes = link && (link.url?.includes('clientes') || link.label?.toLowerCase().includes('clientes') || link.label?.toLowerCase().includes('cases'))
     const sublinks = link ? getSublinks(link) : []
-    if (sublinks.length === 0) return null
+    if (!isClientes && sublinks.length === 0) return null
 
     const mobile   = window.innerWidth <= 768
     const itemH    = mobile ? ITEM_H_M : ITEM_H_D
@@ -340,6 +341,30 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
     const N           = links.length
     const itemCenterY = vh * 0.5 + (aberto - (N - 1) / 2) * navItemH - vh * 0.35
     const itemBottomY = itemCenterY + navItemH / 2
+
+    // Grid de logos para Clientes
+    if (isClientes && clientes?.length) {
+      const gridTop = Math.max(itemBottomY + 20, vh * 0.18)
+      return (
+        <div className="home__submenu" onClick={e => e.stopPropagation()}>
+          <div className="home__submenu-logos" style={{ top: gridTop }}>
+            {clientes.map((c, j) => (
+              <a
+                key={j}
+                href={`/${c.slug}`}
+                className="home__submenu-logo-item"
+                onClick={handleSubClick({ url: `/${c.slug}` })}
+              >
+                {c.logo
+                  ? <img src={mediaUrl(c.logo)} alt={c.nome} />
+                  : <span className="home__submenu-logo-fallback">{c.nome}</span>
+                }
+              </a>
+            ))}
+          </div>
+        </div>
+      )
+    }
 
     if (isRoleta) {
       const offset     = Math.max(0, Math.min(activeSubIdx, sublinks.length - 1))

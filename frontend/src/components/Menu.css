@@ -193,6 +193,53 @@
 
 .footer-branco__redes a:hover img { opacity: 0.45; }
 
+/* ── GRID DE LOGOS (submenu Clientes) ── */
+
+.home__submenu-logos {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 32px 48px;
+  background: #fff;
+  padding: 40px 48px;
+  border-radius: 4px;
+  max-width: 860px;
+  width: max-content;
+  z-index: 10;
+}
+
+.home__submenu-logo-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 56px;
+  transition: opacity 0.2s ease;
+}
+
+.home__submenu-logo-item:hover {
+  opacity: 0.5;
+}
+
+.home__submenu-logo-item img {
+  max-height: 48px;
+  max-width: 100px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  display: block;
+}
+
+.home__submenu-logo-fallback {
+  font-family: 'Gilroy', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #000001;
+  text-align: center;
+}
+
 /* ── VARIANTE ESCURA ──────────────────── */
 
 .footer-branco--escuro {

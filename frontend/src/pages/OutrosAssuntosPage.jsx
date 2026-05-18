@@ -6,7 +6,7 @@ import './OutrosAssuntosPage.css'
 
 const STRAPI = 'https://tv1-53ev.onrender.com'
 const api = (path) => axios.get(`${STRAPI}/api/${path}`).then(r => r.data.data).catch(() => null)
-const mediaUrl = (obj) => obj?.url ? `${STRAPI}${obj.url}` : null
+const mediaUrl = (obj) => !obj?.url ? null : obj.url.startsWith("http") ? obj.url : `${STRAPI}${obj.url}`
 
 export default function OutrosAssuntosPage() {
   const [logo, setLogo] = useState(null)

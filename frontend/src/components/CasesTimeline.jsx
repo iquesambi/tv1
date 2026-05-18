@@ -7,7 +7,7 @@ import './CasesTimeline.css'
 
 const STRAPI = 'https://tv1-53ev.onrender.com'
 const apiGet = (path) => axios.get(`${STRAPI}/api/${path}`).then(r => r.data.data).catch(() => null)
-const mediaUrl = (obj) => obj?.url ? `${STRAPI}${obj.url}` : null
+const mediaUrl = (obj) => !obj?.url ? null : obj.url.startsWith("http") ? obj.url : `${STRAPI}${obj.url}`
 
 const ALTURAS = [460, 340, 400, 310, 380]
 const alturaParaIdx = (idx) => ALTURAS[idx % ALTURAS.length]

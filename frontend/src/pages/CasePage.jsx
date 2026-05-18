@@ -35,7 +35,7 @@ function textoParaHtml(texto) {
     .map(p => `<p>${p.replace(/\n/g, '<br>')}</p>`)
     .join('')
 }
-const mediaUrl = (obj) => obj?.url ? `${STRAPI}${obj.url}` : null
+const mediaUrl = (obj) => !obj?.url ? null : obj.url.startsWith("http") ? obj.url : `${STRAPI}${obj.url}`
 
 function isYoutube(url) {
   return url?.includes('youtube.com') || url?.includes('youtu.be')
