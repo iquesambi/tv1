@@ -104,9 +104,11 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
 
   // Fetch de dados
   useEffect(() => {
-    api('navigation?populate[links][populate][imagem_hover]=true&populate[links][populate][sublinks][populate][imagem_hover]=true').then(setNav)
+    api('navigation?populate[links][populate]=*').then(setNav)
     api('logo-site?populate=logo').then(setLogo)
-    api('agencias?populate=logo&sort=ordem:asc').then(setAgencias)
+    api('agencias?populate=*&sort=posicao:asc').then(data =>
+      setAgencias(Array.isArray(data) ? data.map(a => ({ ...a, logo: a.Logo ?? a.logo, nome: a.Nome ?? a.nome, slug: a.Slug ?? a.slug })) : [])
+    )
     api('redes-sociais?populate[redes][populate]=icone').then(setRedes)
     api('quarenta-anos?populate=imagem').then(r => { if (isHome) setQA(r); else setQA(r) })
     api('pessoas?filters[ativo][$eq]=true&populate=foto&sort=ordem').then(setEquipe)
@@ -119,6 +121,13 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
         saved.forEach(url => { const i = new Image(); i.src = url })
       } catch {}
     }
+  }, [])
+
+  // Fallback: garante que o preloader nunca trava se alguma API falhar
+  useEffect(() => {
+    if (!isHome) return
+    const t = setTimeout(() => setPronto(true), 7000)
+    return () => clearTimeout(t)
   }, [])
 
   // Preloader (home only)
