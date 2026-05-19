@@ -25,6 +25,13 @@
 .outros-logo img {
   height: 100%;
   width: auto;
+  display: block;
+  filter: brightness(0);
+  transition: opacity 0.25s ease;
+}
+
+.outros-logo:hover img {
+  opacity: 0.4;
 }
 
 /* ── MAIN ────────────────────────────── */
@@ -75,46 +82,46 @@
 .outros-field {
   display: flex;
   flex-direction: column;
-  border: 1px solid #000001;
-  border-left: 4px solid #000001;
-  padding: 16px 24px;
-  gap: 4px;
+  gap: 16px;
 }
 
 .outros-field__label {
-  font-size: 16px;
+  font-size: 24px;
   font-weight: 900;
-  text-transform: uppercase;
   line-height: 1.4;
   color: #000001;
 }
 
 .outros-field__input {
   font-family: 'Gilroy', sans-serif;
-  font-size: 24px;
+  font-size: 18px;
   font-weight: 500;
-  line-height: 1.4;
   color: #000001;
-  background: transparent;
-  border: none;
+  background: #fff;
+  border: 1px solid #000001;
+  border-radius: 999px;
   outline: none;
-  padding: 0;
+  padding: 0 28px;
+  height: 58px;
   width: 100%;
+  box-sizing: border-box;
 }
 
 .outros-field__textarea {
   font-family: 'Gilroy', sans-serif;
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 500;
-  line-height: 1.4;
+  line-height: 1.5;
   color: #000001;
-  background: transparent;
-  border: none;
+  background: #fff;
+  border: 1px solid #000001;
+  border-radius: 40px;
   outline: none;
-  padding: 0;
+  padding: 24px 28px;
   width: 100%;
-  height: 131px;
+  height: 333px;
   resize: none;
+  box-sizing: border-box;
 }
 
 .outros-field__input::placeholder,
@@ -134,9 +141,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 12px 20px;
+  padding: 12px 32px;
   border: 1px solid #000001;
-  border-radius: 0 20px 0 20px;
+  border-radius: 999px;
   font-family: 'Gilroy', sans-serif;
   font-size: 16px;
   font-weight: 500;
@@ -169,6 +176,21 @@
 
 .outros-sucesso p {
   margin: 0;
+}
+
+/* ── LOADING ────────────────────────── */
+
+.outros-spinner {
+  width: 32px;
+  height: 32px;
+  border: 2px solid rgba(0, 0, 0, 0.12);
+  border-top-color: #000001;
+  border-radius: 50%;
+  animation: outros-spin 0.8s linear infinite;
+}
+
+@keyframes outros-spin {
+  to { transform: rotate(360deg); }
 }
 
 /* ── RESPONSIVO ─────────────────────── */

@@ -25,8 +25,8 @@ export default function MobileMenu({ logo, logoFiltro = 'brightness(0)' }) {
   const goTo = useGoTo()
 
   useEffect(() => {
-    api('navigation?populate[links][populate][0]=imagem_hover&populate[links][populate][sublinks][populate]=imagem_hover').then(setNav)
-    api('agencias?populate=logo&sort=ordem:asc').then(setAgencias)
+    api('navigation?populate[links][populate]=*').then(setNav)
+    api('agencias?populate=*&sort=posicao:asc').then(setAgencias)
     api('redes-sociais?populate[redes][populate]=icone').then(setRedes)
     api('pessoas?filters[ativo][$eq]=true&populate=foto&sort=ordem').then(setEquipe)
     api('clientes?sort=nome:asc').then(setClientes)

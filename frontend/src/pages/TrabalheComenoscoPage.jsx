@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import axios from 'axios'
 import { useGoTo } from '../transition.jsx'
 import Menu from '../components/Menu.jsx'
@@ -12,7 +12,10 @@ export default function TrabalheComenoscoPage() {
   const [conteudo, setConteudo] = useState(undefined)
   const [vagas, setVagas] = useState([])
   const [logo, setLogo] = useState(null)
+  const footerRef = useRef(null)
   const goTo = useGoTo()
+
+  const pronto = conteudo !== undefined && logo !== null
 
   useEffect(() => {
     api('logo-site?populate=logo').then(setLogo)
@@ -32,12 +35,18 @@ export default function TrabalheComenoscoPage() {
       })
   }, [])
 
+  if (!pronto) return (
+    <div className="trabalhe-page" style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div className="trabalhe-spinner" />
+    </div>
+  )
+
   return (
     <div className="trabalhe-page">
 
       {/* Header */}
       <header className="trabalhe-header">
-        <button className="trabalhe-logo" onClick={() => goTo('/')} aria-label="Home">
+        <button className="trabalhe-logo" onClick={() => footerRef.current?.scrollIntoView({ behavior: 'smooth' })} aria-label="Home">
           {logo?.logo && <img src={mediaUrl(logo.logo)} alt="TV1" />}
         </button>
       </header>
@@ -46,14 +55,16 @@ export default function TrabalheComenoscoPage() {
       <main className="trabalhe-main">
 
         {/* Título + descrição */}
-        <section className="trabalhe-intro">
-          <h1 className="trabalhe-intro__title">
-            {conteudo?.titulo || 'Porquê trabalhar aqui?'}
-          </h1>
-          {conteudo?.descricao && (
-            <p className="trabalhe-intro__text">{conteudo.descricao}</p>
-          )}
-        </section>
+        {conteudo !== undefined && (
+          <section className="trabalhe-intro">
+            <h1 className="trabalhe-intro__title">
+              {conteudo?.titulo || 'Porquê trabalhar aqui?'}
+            </h1>
+            {conteudo?.descricao && (
+              <p className="trabalhe-intro__text">{conteudo.descricao}</p>
+            )}
+          </section>
+        )}
 
         {/* Oportunidades — sempre aparece */}
         <section className="trabalhe-oportunidades">
@@ -85,7 +96,7 @@ export default function TrabalheComenoscoPage() {
 
       </main>
 
-      <Menu />
+      <div ref={footerRef}><Menu /></div>
 
     </div>
   )

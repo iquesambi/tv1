@@ -327,13 +327,8 @@ export default function CasePage() {
         `?filters[slug][$eq]=${caseSlug}` +
         (clienteSlug ? `&filters[cliente][slug][$eq]=${clienteSlug}` : '') +
         `&populate[cliente]=true` +
-        `&populate[agencia][populate]=logo` +
         `&populate[imagem_capa]=true` +
-        `&populate[blocos][on][blocks.galeria][populate][itens][populate]=imagem` +
-        `&populate[blocos][on][blocks.video][populate]=capa` +
-        `&populate[blocos][on][blocks.imagem-trio][populate]=*` +
-        `&populate[blocos][on][blocks.imagem-simples][populate]=imagem` +
-        `&populate[blocos][on][blocks.subcase][populate]=imagem`
+        `&populate[blocos][populate]=*`
       )
       .then(r => setData(r.data.data?.[0] ?? null))
       .catch(() => {})

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import axios from 'axios'
 import { useGoTo } from '../transition.jsx'
 import Menu from '../components/Menu.jsx'
@@ -13,7 +13,10 @@ export default function OutrosAssuntosPage() {
   const [form, setForm] = useState({ nome: '', email: '', assunto: '', mensagem: '' })
   const [enviado, setEnviado] = useState(false)
   const [enviando, setEnviando] = useState(false)
+  const footerRef = useRef(null)
   const goTo = useGoTo()
+
+  const pronto = logo !== null
 
   useEffect(() => {
     api('logo-site?populate=logo').then(setLogo)
@@ -34,12 +37,18 @@ export default function OutrosAssuntosPage() {
     setEnviando(false)
   }
 
+  if (!pronto) return (
+    <div className="outros-page" style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div className="outros-spinner" />
+    </div>
+  )
+
   return (
     <div className="outros-page">
 
       {/* Header */}
       <header className="outros-header">
-        <button className="outros-logo" onClick={() => goTo('/')} aria-label="Home">
+        <button className="outros-logo" onClick={() => footerRef.current?.scrollIntoView({ behavior: 'smooth' })} aria-label="Home">
           {logo?.logo && <img src={mediaUrl(logo.logo)} alt="TV1" />}
         </button>
       </header>
@@ -99,13 +108,12 @@ export default function OutrosAssuntosPage() {
               </div>
 
               <div className="outros-field">
-                <label className="outros-field__label">Mensagem</label>
+                <label className="outros-field__label">Digite aqui</label>
                 <textarea
                   className="outros-field__textarea"
                   name="mensagem"
                   value={form.mensagem}
                   onChange={handleChange}
-                  placeholder="Digite aqui"
                   required
                 />
               </div>
@@ -126,7 +134,7 @@ export default function OutrosAssuntosPage() {
 
       </main>
 
-      <Menu />
+      <div ref={footerRef}><Menu /></div>
 
     </div>
   )

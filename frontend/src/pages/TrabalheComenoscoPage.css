@@ -25,6 +25,13 @@
 .trabalhe-logo img {
   height: 100%;
   width: auto;
+  display: block;
+  filter: brightness(0);
+  transition: opacity 0.25s ease;
+}
+
+.trabalhe-logo:hover img {
+  opacity: 0.4;
 }
 
 /* ── MAIN ────────────────────────────── */
@@ -124,9 +131,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 12px 20px;
+  padding: 12px 32px;
   border: 1px solid #000001;
-  border-radius: 0 20px 0 20px;
+  border-radius: 999px;
   font-size: 16px;
   font-weight: 500;
   text-transform: uppercase;
@@ -140,6 +147,21 @@
 .trabalhe-vaga__btn:hover {
   background: #000001;
   color: #fff;
+}
+
+/* ── LOADING ────────────────────────── */
+
+.trabalhe-spinner {
+  width: 32px;
+  height: 32px;
+  border: 2px solid rgba(0, 0, 0, 0.12);
+  border-top-color: #000001;
+  border-radius: 50%;
+  animation: trabalhe-spin 0.8s linear infinite;
+}
+
+@keyframes trabalhe-spin {
+  to { transform: rotate(360deg); }
 }
 
 /* ── RESPONSIVO ─────────────────────── */
