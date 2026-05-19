@@ -158,13 +158,13 @@
 
 .home__nav-link {
   display: block;
-  font-size: min(clamp(42px, 12.6vw, 173px), calc(54.4vh / var(--nav-count, 3) / 0.75));
+  font-size: min(clamp(52px, 15.8vw, 216px), calc(68vh / var(--nav-count, 3) / 0.75));
   font-weight: 900;
   font-style: italic;
   text-transform: uppercase;
   color: #000001;
   text-decoration: none;
-  line-height: 0.9;
+  line-height: 0.75;
   white-space: nowrap;
   cursor: pointer;
   transition: opacity 0.3s ease;
