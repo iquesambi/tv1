@@ -9,12 +9,6 @@ const STRAPI = 'https://tv1-53ev.onrender.com'
 const api = (path) => axios.get(`${STRAPI}/api/${path}`).then(r => r.data.data).catch(() => null)
 const mediaUrl = (obj) => !obj?.url ? null : obj.url.startsWith("http") ? obj.url : `${STRAPI}${obj.url}`
 
-const FOTOS_FIGMA = [
-  'https://www.figma.com/api/mcp/asset/733afda4-e15a-47bf-9b8d-0813f88e200d',
-  'https://www.figma.com/api/mcp/asset/98fc439c-fd5a-47c3-bf03-652b6baee46b',
-  'https://www.figma.com/api/mcp/asset/89f1cd8e-8edb-4974-9840-b80c9662f75f',
-  'https://www.figma.com/api/mcp/asset/00a10eeb-94dd-4f84-80f6-c646c4319ba4',
-]
 
 
 export default function QuarentaAnosPage() {
@@ -37,9 +31,7 @@ export default function QuarentaAnosPage() {
     document.body.classList.remove('scroll-locked')
   }, [])
 
-  const fotos = data?.fotos?.length
-    ? data.fotos.map(f => mediaUrl(f))
-    : FOTOS_FIGMA
+  const fotos = (data?.fotos ?? []).map(f => mediaUrl(f)).filter(Boolean)
 
   return (
     <div className="qa-page">
@@ -86,7 +78,6 @@ export default function QuarentaAnosPage() {
               <div xmlns="http://www.w3.org/1999/xhtml" className="qa-lorem-fo">
                 <p style={{fontWeight: 700, margin: '0 0 1em'}}>Nós não apenas vivemos 40 anos de história.<br/>O que importa é como usamos esses 40 anos<br/>para construir o depois.</p>
                 <p style={{margin: '0 0 1em'}}>Quatro décadas atravessando mudanças de tecnologia,<br/>mídia, comportamento e cultura nos ensinaram algo<br/>essencial: futuro não é previsão, é construção diária.<br/>Cada experiência que criamos para ajudar a transformar<br/>pessoas, marcas e negócios nos abre novos caminhos<br/>de evolução.</p>
-                <p style={{margin: 0}}>Assim, nasce uma nova perspectiva: conhecimento e<br/>experiência materializados em uma plataforma que cura<br/>tendências e as aplica em cada um dos próximos desafios.</p>
               </div>
             </foreignObject>
 
