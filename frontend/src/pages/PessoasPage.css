@@ -14,19 +14,23 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 32px 80px;
-  border-bottom: 0.75px solid rgba(0, 0, 1, 0.15);
+  padding: 40px 80px;
 }
 
 .pessoas-header__logo img {
-  height: 28px;
+  height: 40px;
   width: auto;
   display: block;
   filter: brightness(0);
+  transition: opacity 0.25s ease;
+}
+
+.pessoas-header__logo img:hover {
+  opacity: 0.4;
 }
 
 .pessoas-header__titulo {
-  font-size: 18px;
+  font-size: 32px;
   font-weight: 900;
   text-transform: uppercase;
   letter-spacing: 0.04em;
