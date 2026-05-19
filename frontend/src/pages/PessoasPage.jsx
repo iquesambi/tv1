@@ -81,24 +81,29 @@ export default function PessoasPage() {
       </header>
 
       <main className="pessoas-main">
-        {membros.map((m, i) => (
-          <section
-            key={i}
-            id={m.slug}
-            className={`pessoa-bloco${i % 2 !== 0 ? ' pessoa-bloco--invertido' : ''}`}
-          >
-            {m.foto && (
-              <div className="pessoa-foto">
-                <img src={mediaUrl(m.foto)} alt={m.nome} />
+        {membros.map((m, i) => {
+          const primeiro = membros[0]
+          const foto = m.foto || primeiro?.foto
+          const bio  = m.bio  || primeiro?.bio
+          return (
+            <section
+              key={i}
+              id={m.slug}
+              className={`pessoa-bloco${i % 2 !== 0 ? ' pessoa-bloco--invertido' : ''}`}
+            >
+              {foto && (
+                <div className="pessoa-foto">
+                  <img src={mediaUrl(foto)} alt={m.nome} />
+                </div>
+              )}
+              <div className="pessoa-texto">
+                <h2 className="pessoa-nome">{m.nome}</h2>
+                {m.cargo && <p className="pessoa-cargo">{m.cargo}</p>}
+                {bio     && <p className="pessoa-bio">{bio}</p>}
               </div>
-            )}
-            <div className="pessoa-texto">
-              <h2 className="pessoa-nome">{m.nome}</h2>
-              {m.cargo && <p className="pessoa-cargo">{m.cargo}</p>}
-              {m.bio   && <p className="pessoa-bio">{m.bio}</p>}
-            </div>
-          </section>
-        ))}
+            </section>
+          )
+        })}
       </main>
 
       <Menu />
