@@ -31,15 +31,7 @@ export default function QuarentaAnosPage() {
     document.body.classList.remove('scroll-locked')
   }, [])
 
-  // Fotos estáticas (exportadas do Figma). Se o Strapi tiver fotos cadastradas, usa as do Strapi.
-  const FOTOS_STATIC = [
-    '/quarenta-anos/foto-sergio.png', // stacked esquerda topo
-    '/quarenta-anos/foto-selma.png',  // stacked esquerda meio
-    null,                              // stacked esquerda base (ainda sem foto)
-    '/quarenta-anos/foto-tv1.png',    // typewriter canto superior direito
-  ]
-  const fotosStrapi = (data?.fotos ?? []).map(f => mediaUrl(f)).filter(Boolean)
-  const fotos = fotosStrapi.length >= 3 ? fotosStrapi : FOTOS_STATIC
+  const fotos = (data?.fotos ?? []).map(f => mediaUrl(f)).filter(Boolean)
 
   return (
     <div className="qa-page">
