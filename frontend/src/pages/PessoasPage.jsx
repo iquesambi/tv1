@@ -119,7 +119,7 @@ export default function PessoasPage() {
         })}
       </main>
 
-      <div ref={footerRef}><Menu /></div>
+      <div ref={footerRef}><Menu isHome={true} footerHome={true} /></div>
 
     </div>
   )

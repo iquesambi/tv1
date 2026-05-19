@@ -44,7 +44,7 @@ function AgenciaLogos({ agencias, className }) {
   )
 }
 
-export default function Menu({ isHome = false, variant = 'claro', semMarcas = false }) {
+export default function Menu({ isHome = false, variant = 'claro', semMarcas = false, footerHome = false }) {
   const escuro = !isHome && variant === 'escuro'
   const p = isHome ? 'home' : 'footer-branco'
 
@@ -62,8 +62,8 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
   // Estado exclusivo da home
   const [quarentaAnos, setQA]   = useState(isHome ? (_pf.quarentaAnos ?? null) : null)
   const [menuMobile, setMenuMobile] = useState(false)
-  // pronto: footer sempre pronto; home espera preloader
-  const [pronto, setPronto] = useState(!isHome)
+  // pronto: footer sempre pronto; home espera preloader; footerHome também pronto de imediato
+  const [pronto, setPronto] = useState(!isHome || footerHome)
 
   // useLocation só funciona se houver Router acima — na home há, no footer também (dentro do Router)
   const location = useLocation()
@@ -157,9 +157,9 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
     return () => clearTimeout(timeout)
   }, [logo, agencias, redes, quarentaAnos, nav])
 
-  // Bloqueia scroll do body na home
+  // Bloqueia scroll do body na home (não quando usado como footer)
   useEffect(() => {
-    if (!isHome) return
+    if (!isHome || footerHome) return
     document.body.classList.add('scroll-locked')
     return () => document.body.classList.remove('scroll-locked')
   }, [])
@@ -441,10 +441,12 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
   if (isHome) {
     return (
       <>
-        {/* Loading screen */}
-        <div className={`home-loading${pronto ? ' home-loading--saiu' : ''}`}>
-          <div className="home-loading__spinner" />
-        </div>
+        {/* Loading screen — omitido quando usado como footer */}
+        {!footerHome && (
+          <div className={`home-loading${pronto ? ' home-loading--saiu' : ''}`}>
+            <div className="home-loading__spinner" />
+          </div>
+        )}
 
         <div
           className={`home${pronto ? ' home--pronto' : ''}`}
