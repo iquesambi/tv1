@@ -350,8 +350,8 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
     const vw = window.innerWidth
     const vh = window.innerHeight
     const N           = links.length
-    const navFontSize = Math.min(Math.min(Math.max(52, 0.158 * vw), 216), (0.68 * vh) / (N * 0.75))
-    const navItemH    = navFontSize * 0.75
+    const navFontSize = Math.min(Math.min(Math.max(42, 0.126 * vw), 173), (0.544 * vh) / (N * 0.75))
+    const navItemH    = navFontSize * 0.9
     const itemCenterY = vh * 0.47 + (aberto - (N - 1) / 2) * navItemH
     const itemBottomY = itemCenterY + navItemH / 2
 
