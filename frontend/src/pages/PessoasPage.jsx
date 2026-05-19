@@ -98,7 +98,19 @@ export default function PessoasPage() {
                 </div>
               )}
               <div className="pessoa-texto">
-                <h2 className="pessoa-nome">{m.nome}</h2>
+                <h2 className="pessoa-nome">
+                  {(() => {
+                    const partes = m.nome.split(' ')
+                    const primeiro = partes[0]
+                    const resto = partes.slice(1).join(' ')
+                    // Se o resto é curto o suficiente para caber numa linha, força quebra
+                    // após o primeiro nome. Se for longo (causaria 3ª linha), flui normal.
+                    if (resto && resto.length <= 20) {
+                      return <>{primeiro}<br />{resto}</>
+                    }
+                    return m.nome
+                  })()}
+                </h2>
                 {m.cargo && <p className="pessoa-cargo">{m.cargo}</p>}
                 {bio     && <p className="pessoa-bio">{bio}</p>}
               </div>
