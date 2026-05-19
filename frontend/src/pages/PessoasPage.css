@@ -87,6 +87,7 @@
 
 .pessoa-texto {
   flex: 1;
+  min-width: 0;
   padding-top: 4px;
 }
 
@@ -100,6 +101,7 @@
   line-height: 0.9;
   color: #000001;
   margin: 0 0 24px;
+  white-space: nowrap;
 }
 
 .pessoa-cargo {
