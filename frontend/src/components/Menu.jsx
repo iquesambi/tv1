@@ -311,12 +311,13 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
     e.preventDefault()
     e.stopPropagation()
     const sublinks = getSublinks(link)
-    if (isHome && isMobile()) {
+
+    if (isMobile()) {
       if (sublinks.length > 0) { setAberto(aberto === i ? null : i); setHoveredSub(null) }
       else if (link.url) goTo(link.url)
       return
     }
-    // Desktop: sem sublinks → navega direto; com sublinks → toggle submenu
+    // Desktop home: sem sublinks → navega direto; com sublinks → toggle submenu
     if (sublinks.length === 0) {
       if (link.url) goTo(link.url)
       return
@@ -412,10 +413,9 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
       )
     }
 
-    const blockTop = Math.max(itemBottomY + 30, vh * 0.26)
     return (
       <div className="home__submenu" onClick={e => e.stopPropagation()}>
-        <div className="home__submenu-center" style={{ top: blockTop, transform: 'none', justifyContent: 'flex-start' }}>
+        <div className="home__submenu-center">
           {sublinks.map((sub, j) => {
             const isAtivo = hoveredSub ? hoveredSub === sub : j === 0
             return (
@@ -627,7 +627,7 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
       </div>
 
       {/* Nav central */}
-      <nav className="footer-branco__nav">
+      <nav className="footer-branco__nav" style={{ '--nav-count': links.length }}>
         {links.map((link, i) => {
           const esteAberto = aberto === i
           const acima  = aberto !== null && !esteAberto && i < aberto

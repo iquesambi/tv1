@@ -256,7 +256,6 @@ export default function CasesTimeline({
     axios.get(
       `${STRAPI}/api/cases?${filtro}` +
       `&populate[cliente]=true` +
-      `&populate[agencia][populate]=logo` +
       `&populate[especialidade]=true` +
       `&populate[imagem_capa]=true` +
       `&populate[blocos][populate]=*` +
