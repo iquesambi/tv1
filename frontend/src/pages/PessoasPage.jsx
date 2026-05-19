@@ -16,13 +16,12 @@ export const slugify = (str) => str.toLowerCase()
 
 export default function PessoasPage() {
   const [equipe, setEquipe] = useState(null)
+  const [logo, setLogo]     = useState(null)
 
-  // Se já esteve aqui antes, mostra imediatamente (sem spinner)
   const [pronto, setPronto] = useState(() => {
     try { return JSON.parse(localStorage.getItem(LS_KEY) ?? '[]').length > 0 } catch { return false }
   })
 
-  // Mount: precarrega do cache para aquecer HTTP
   useEffect(() => {
     try {
       const saved = JSON.parse(localStorage.getItem(LS_KEY) ?? '[]')
@@ -32,15 +31,15 @@ export default function PessoasPage() {
 
   useEffect(() => {
     api('pessoas?filters[ativo][$eq]=true&populate=foto&sort=ordem').then(setEquipe)
+    api('logo-site?populate=logo').then(setLogo)
     document.body.classList.remove('scroll-locked')
   }, [])
 
-  // Quando equipe carrega: salva URLs + aguarda imagens (1ª visita)
   useEffect(() => {
     if (!equipe) return
     const urls = equipe.map(m => mediaUrl(m.foto)).filter(Boolean)
     try { localStorage.setItem(LS_KEY, JSON.stringify(urls)) } catch {}
-    if (pronto) return   // já estava em cache
+    if (pronto) return
     if (!urls.length) { setPronto(true); return }
     const timeout = setTimeout(() => setPronto(true), 6000)
     let count = 0
@@ -49,9 +48,6 @@ export default function PessoasPage() {
     return () => clearTimeout(timeout)
   }, [equipe])
 
-  const membros = equipe ?? []
-
-  // âncora via hash após carregar
   useEffect(() => {
     if (!equipe || !pronto) return
     const hash = window.location.hash.slice(1)
@@ -72,34 +68,37 @@ export default function PessoasPage() {
     </div>
   )
 
+  const membros = equipe ?? []
+
   return (
     <div className="pessoas-page">
 
-      <main className="pessoas-main">
-        {membros.map((m, i) => {
-          const primeiro = membros[0]
-          const foto = m.foto || primeiro.foto
-          const bio  = m.bio  || primeiro.bio
-          return (
-            <section
-              key={i}
-              id={m.slug}
-              className="pessoa-bloco"
-            >
-              {foto && (
-                <div className="pessoa-foto">
-                  <img src={mediaUrl(foto)} alt={m.nome} />
-                </div>
-              )}
+      <header className="pessoas-header">
+        <div className="pessoas-header__logo">
+          {logo?.logo && <img src={mediaUrl(logo.logo)} alt="TV1" />}
+        </div>
+        <span className="pessoas-header__titulo">Pessoas</span>
+      </header>
 
-              <div className="pessoa-texto">
-                <h2 className="pessoa-nome">{m.nome}</h2>
-                {m.cargo && <p className="pessoa-cargo">{m.cargo}</p>}
-                {bio     && <p className="pessoa-bio">{bio}</p>}
+      <main className="pessoas-main">
+        {membros.map((m, i) => (
+          <section
+            key={i}
+            id={m.slug}
+            className={`pessoa-bloco${i % 2 !== 0 ? ' pessoa-bloco--invertido' : ''}`}
+          >
+            {m.foto && (
+              <div className="pessoa-foto">
+                <img src={mediaUrl(m.foto)} alt={m.nome} />
               </div>
-            </section>
-          )
-        })}
+            )}
+            <div className="pessoa-texto">
+              <h2 className="pessoa-nome">{m.nome}</h2>
+              {m.cargo && <p className="pessoa-cargo">{m.cargo}</p>}
+              {m.bio   && <p className="pessoa-bio">{m.bio}</p>}
+            </div>
+          </section>
+        ))}
       </main>
 
       <Menu />

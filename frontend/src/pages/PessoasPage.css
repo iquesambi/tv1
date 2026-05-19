@@ -8,84 +8,107 @@
   overflow-x: hidden;
 }
 
+/* ── HEADER ───────────────────────────── */
+
+.pessoas-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 32px 80px;
+  border-bottom: 0.75px solid rgba(0, 0, 1, 0.15);
+}
+
+.pessoas-header__logo img {
+  height: 28px;
+  width: auto;
+  display: block;
+  filter: brightness(0);
+}
+
+.pessoas-header__titulo {
+  font-size: 18px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
 /* ── MAIN ────────────────────────────── */
 
 .pessoas-main {
-  padding: 120px 80px 120px;
+  padding: 120px 80px 160px;
   display: flex;
   flex-direction: column;
-  gap: 120px;
+  gap: 160px;
 }
 
 /* ── BLOCO DE PESSOA ─────────────────── */
-
-/*
-  Grid de 12 colunas:
-  - Foto começa na coluna 6 (margin-left: 50% do container de conteúdo).
-  - O container da foto ocupa as colunas 6–12 (50% do width restante).
-  - A imagem dentro do container se adapta naturalmente ao formato:
-      → Landscape (horizontal): preenche os 6 colunas (max-width: 100%)
-      → Portrait (vertical): é mais estreita (~4 colunas), centrada no container
-  - O texto fica na mesma célula de grid, por cima da foto (z-index maior).
-*/
 
 .pessoa-bloco {
   display: flex;
   flex-direction: row;
   align-items: flex-start;
-  gap: 60px;
+  gap: 80px;
 }
+
+/* padrão: texto esquerda, foto direita */
+.pessoa-bloco .pessoa-foto  { order: 2; }
+.pessoa-bloco .pessoa-texto { order: 1; }
+
+/* invertido: foto esquerda, texto direita */
+.pessoa-bloco--invertido .pessoa-foto  { order: 1; }
+.pessoa-bloco--invertido .pessoa-texto { order: 2; }
+
+/* ── FOTO ─────────────────────────────── */
 
 .pessoa-foto {
   flex-shrink: 0;
-  order: 2;
-}
-
-.pessoa-texto {
-  order: 1;
+  width: 320px;
 }
 
 .pessoa-foto img {
   display: block;
-  width: 500px;
-  height: 80vh;
+  width: 100%;
+  height: 420px;
   object-fit: cover;
+  object-position: top center;
 }
+
+/* ── TEXTO ────────────────────────────── */
 
 .pessoa-texto {
   flex: 1;
-  padding-top: 8px;
+  padding-top: 4px;
 }
 
 /* ── TIPOGRAFIA ───────────────────────── */
 
 .pessoa-nome {
-  font-size: 64px;
+  font-size: 72px;
   font-weight: 900;
-  font-style: italic;
+  font-style: normal;
   text-transform: uppercase;
-  line-height: 0.92;
+  line-height: 0.9;
   color: #000001;
-  margin: 0 0 16px;
+  margin: 0 0 24px;
 }
 
 .pessoa-cargo {
-  font-size: 20px;
+  font-size: 15px;
   font-weight: 700;
   font-style: normal;
   text-transform: uppercase;
-  line-height: 1.3;
+  line-height: 1.4;
   color: #000001;
-  margin: 20px 0 48px;
-  letter-spacing: 0.3px;
+  margin: 0 0 40px;
+  letter-spacing: 0.04em;
 }
 
 .pessoa-bio {
   font-size: 14px;
-  font-weight: 500;
-  line-height: 1.65;
+  font-weight: 400;
+  line-height: 1.75;
   color: #000001;
-  max-width: 600px;
+  max-width: 480px;
   margin: 0;
 }
 
@@ -98,7 +121,6 @@
   min-height: 100vh;
 }
 
-/* spinner reutiliza .cliente-loading / .cliente-loading__spinner de ClientePage.css */
 .pessoas-page--loading .cliente-loading {
   display: flex;
   align-items: center;
@@ -118,53 +140,49 @@
   to { transform: rotate(360deg); }
 }
 
-/* ── RESPONSIVO ───────────────────────── */
-
-@media (min-width: 1650px) {
-  .pessoa-nome {
-    font-size: 100px;
-  }
-}
+/* ── MOBILE ───────────────────────────── */
 
 @media (max-width: 768px) {
+
+  .pessoas-header {
+    padding: 20px 24px;
+  }
+
   .pessoas-main {
-    padding: 0 24px 80px;
+    padding: 60px 24px 80px;
     gap: 80px;
   }
 
-  .pessoa-bloco {
-    display: flex;
+  .pessoa-bloco,
+  .pessoa-bloco--invertido {
     flex-direction: column;
-    gap: 24px;
+    gap: 28px;
   }
 
-  .pessoa-foto {
+  .pessoa-bloco .pessoa-foto,
+  .pessoa-bloco--invertido .pessoa-foto {
+    order: 1;
     width: 100%;
-    margin-left: 0;
-    align-self: auto;
-    justify-content: center;
+  }
+
+  .pessoa-bloco .pessoa-texto,
+  .pessoa-bloco--invertido .pessoa-texto {
+    order: 2;
   }
 
   .pessoa-foto img {
-    max-width: 100%;
-    max-height: none;
-  }
-
-  .pessoa-texto {
+    height: auto;
+    max-height: 380px;
     width: 100%;
-    max-width: 100%;
-    margin-top: 0;
   }
 
   .pessoa-nome {
-    font-size: clamp(28px, 9vw, 40px);
-    white-space: normal;
-    line-height: 0.95;
+    font-size: clamp(40px, 11vw, 60px);
+    line-height: 0.9;
   }
 
   .pessoa-cargo {
-    font-size: clamp(28px, 9vw, 40px);
-    max-width: 100%;
-    line-height: 0.95;
+    font-size: 13px;
+    margin-bottom: 24px;
   }
 }
