@@ -62,13 +62,13 @@
 
 .pessoa-foto {
   flex-shrink: 0;
-  width: 320px;
+  width: 38%;
 }
 
 .pessoa-foto img {
   display: block;
   width: 100%;
-  height: 420px;
+  aspect-ratio: 4 / 5;
   object-fit: cover;
   object-position: top center;
 }
