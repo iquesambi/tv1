@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import axios from 'axios'
 import Menu from '../components/Menu.jsx'
 import './PessoasPage.css'
@@ -17,6 +17,7 @@ export const slugify = (str) => str.toLowerCase()
 export default function PessoasPage() {
   const [equipe, setEquipe] = useState(null)
   const [logo, setLogo]     = useState(null)
+  const footerRef           = useRef(null)
 
   const [pronto, setPronto] = useState(() => {
     try { return JSON.parse(localStorage.getItem(LS_KEY) ?? '[]').length > 0 } catch { return false }
@@ -74,9 +75,9 @@ export default function PessoasPage() {
     <div className="pessoas-page">
 
       <header className="pessoas-header">
-        <div className="pessoas-header__logo">
+        <button className="pessoas-header__logo" onClick={() => footerRef.current?.scrollIntoView({ behavior: 'smooth' })}>
           {logo?.logo && <img src={mediaUrl(logo.logo)} alt="TV1" />}
-        </div>
+        </button>
         <span className="pessoas-header__titulo">Pessoas</span>
       </header>
 
@@ -106,7 +107,7 @@ export default function PessoasPage() {
         })}
       </main>
 
-      <Menu />
+      <div ref={footerRef}><Menu /></div>
 
     </div>
   )

@@ -17,6 +17,13 @@
   padding: 40px 80px;
 }
 
+.pessoas-header__logo {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
 .pessoas-header__logo img {
   height: 40px;
   width: auto;
@@ -86,7 +93,7 @@
 /* ── TIPOGRAFIA ───────────────────────── */
 
 .pessoa-nome {
-  font-size: 72px;
+  font-size: 94px;
   font-weight: 900;
   font-style: normal;
   text-transform: uppercase;
@@ -96,7 +103,7 @@
 }
 
 .pessoa-cargo {
-  font-size: 15px;
+  font-size: 20px;
   font-weight: 700;
   font-style: normal;
   text-transform: uppercase;
@@ -180,12 +187,12 @@
   }
 
   .pessoa-nome {
-    font-size: clamp(40px, 11vw, 60px);
+    font-size: clamp(52px, 14vw, 78px);
     line-height: 0.9;
   }
 
   .pessoa-cargo {
-    font-size: 13px;
+    font-size: 17px;
     margin-bottom: 24px;
   }
 }
