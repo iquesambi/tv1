@@ -399,7 +399,9 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
       const offset     = Math.max(0, Math.min(activeSubIdx, sublinks.length - 1))
       const winPad     = mobile ? 28 : WIN_PAD
       const windowH    = SUBMENU_VISIBLE * itemH + winPad * 2
-      const windowTop  = itemBottomY + 30
+      // Desconta o translateY(-35vh) do CSS no item ativo
+      const actualItemBottomY = itemBottomY - vh * 0.35
+      const windowTop = Math.max(actualItemBottomY + 60, vh * 0.27)
       const listOffset = winPad - offset * itemH
 
       return (
