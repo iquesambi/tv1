@@ -8,12 +8,11 @@ const STRAPI = 'https://tv1-53ev.onrender.com'
 const api = (path) => axios.get(`${STRAPI}/api/${path}`).then(r => r.data.data).catch(() => null)
 const mediaUrl = (obj) => !obj?.url ? null : obj.url.startsWith("http") ? obj.url : `${STRAPI}${obj.url}`
 
-// Suporta Strapi v4 (HTML string) e v5 (blocks JSON)
+// Suporta Markdown (Strapi richtext), HTML string, e blocks JSON (Strapi v5)
 function renderRichText(value) {
   if (!value) return ''
-  // v4: string HTML
-  if (typeof value === 'string') return value
-  // v5: blocks array
+
+  // blocks JSON array (Strapi v5 blocks type)
   if (Array.isArray(value)) {
     return value.map(block => {
       if (block.type === 'paragraph') {
@@ -35,6 +34,25 @@ function renderRichText(value) {
       return ''
     }).join('')
   }
+
+  // string: pode ser Markdown ou HTML
+  if (typeof value === 'string') {
+    // Se já tem tags HTML, usa directamente
+    if (/<[a-z][\s\S]*>/i.test(value)) return value
+    // Caso contrário, converte Markdown básico
+    return value
+      .split(/\n\n+/)
+      .map(para => {
+        const html = para
+          .replace(/\n/g, '<br>')
+          .replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>')
+          .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+          .replace(/\*(.+?)\*/g, '<em>$1</em>')
+        return `<p>${html}</p>`
+      })
+      .join('')
+  }
+
   return ''
 }
 
