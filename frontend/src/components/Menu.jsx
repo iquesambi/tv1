@@ -112,7 +112,16 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
     api('redes-sociais?populate[redes][populate]=icone').then(setRedes)
     api('quarenta-anos?populate=imagem').then(r => { if (isHome) setQA(r); else setQA(r) })
     api('pessoas?filters[ativo][$eq]=true&populate=foto&sort=ordem').then(setEquipe)
-    api('clientes?sort=nome:asc&populate[logo]=true').then(setClientes)
+    api('clientes?sort=nome:asc&populate[logo]=true').then(data => {
+      setClientes(data)
+      // Pré-carrega logos para evitar flash na abertura do submenu
+      if (Array.isArray(data)) {
+        data.forEach(c => {
+          const url = mediaUrl(c.logo)
+          if (url) { const img = new Image(); img.src = url }
+        })
+      }
+    })
 
     if (isHome) {
       // Pré-carrega imagens salvas da visita anterior
@@ -358,7 +367,13 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
 
     // Grid de logos para Clientes
     if (isClientes && clientes?.length) {
-      const gridTop = Math.max(itemBottomY + 20, vh * 0.18)
+      const rows = Math.ceil(clientes.length / 6)
+      const estimatedGridH = rows * 56 + (rows - 1) * 32 + 80 // itens + gaps + padding
+      // Centraliza verticalmente no viewport
+      const gridTop = Math.min(
+        Math.max((vh - estimatedGridH) / 2, vh * 0.25),
+        vh - estimatedGridH - 48
+      )
       return (
         <div className="home__submenu" onClick={e => e.stopPropagation()}>
           <div className="home__submenu-logos" style={{ top: gridTop }}>
