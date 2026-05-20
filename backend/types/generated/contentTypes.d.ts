@@ -714,6 +714,43 @@ export interface ApiQuarentaAnosQuarentaAnos extends Struct.SingleTypeSchema {
   };
 }
 
+export interface ApiQuemSomosQuemSomos extends Struct.SingleTypeSchema {
+  collectionName: 'quem_somos';
+  info: {
+    displayName: 'Quem Somos';
+    pluralName: 'quem-somos-pages';
+    singularName: 'quem-somos';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    imagem: Schema.Attribute.Media<'images'>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::quem-somos.quem-somos'
+    > &
+      Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
+    tagline: Schema.Attribute.Text;
+    texto_era: Schema.Attribute.Text;
+    texto_intro: Schema.Attribute.Text;
+    titulo_era: Schema.Attribute.String &
+      Schema.Attribute.DefaultTo<'Da era da comunica\u00E7\u00E3o \u00E0 era da'>;
+    titulo_era_italico: Schema.Attribute.String &
+      Schema.Attribute.DefaultTo<'experi\u00EAncia.'>;
+    titulo_intro: Schema.Attribute.String &
+      Schema.Attribute.DefaultTo<'Quem somos'>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiRedesSociaisRedesSociais extends Struct.SingleTypeSchema {
   collectionName: 'redes_sociais';
   info: {
@@ -1294,6 +1331,7 @@ declare module '@strapi/strapi' {
       'api::navigation.navigation': ApiNavigationNavigation;
       'api::pessoa.pessoa': ApiPessoaPessoa;
       'api::quarenta-anos.quarenta-anos': ApiQuarentaAnosQuarentaAnos;
+      'api::quem-somos.quem-somos': ApiQuemSomosQuemSomos;
       'api::redes-sociais.redes-sociais': ApiRedesSociaisRedesSociais;
       'api::trabalhe-conosco.trabalhe-conosco': ApiTrabalheConoscoTrabalheConosco;
       'plugin::content-releases.release': PluginContentReleasesRelease;
