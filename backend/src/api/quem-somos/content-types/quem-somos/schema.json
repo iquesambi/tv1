@@ -35,8 +35,7 @@
       "type": "text"
     },
     "tagline": {
-      "type": "string",
-      "default": "Content driven.\nTech inspired."
+      "type": "text"
     }
   }
 }
