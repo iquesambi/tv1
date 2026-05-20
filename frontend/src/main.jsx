@@ -11,6 +11,7 @@ import PessoasPage from './pages/PessoasPage.jsx'
 import QuarentaAnosPage from './pages/QuarentaAnosPage.jsx'
 import TrabalheComenoscoPage from './pages/TrabalheComenoscoPage.jsx'
 import OutrosAssuntosPage from './pages/OutrosAssuntosPage.jsx'
+import QuemSomosPage from './pages/QuemSomosPage.jsx'
 import { TransitionProvider } from './transition.jsx'
 
 createRoot(document.getElementById('root')).render(
@@ -22,6 +23,7 @@ createRoot(document.getElementById('root')).render(
           <Route path="/contato" element={<App />} />
           <Route path="/contato/trabalhe-conosco" element={<TrabalheComenoscoPage />} />
           <Route path="/contato/outros-assuntos" element={<OutrosAssuntosPage />} />
+          <Route path="/quem-somos" element={<QuemSomosPage />} />
           <Route path="/pessoas" element={<PessoasPage />} />
           <Route path="/quarenta-anos" element={<QuarentaAnosPage />} />
           <Route path="/cases/:especialidade" element={<EspecialidadePage />} />

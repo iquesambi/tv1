@@ -1,0 +1,42 @@
+{
+  "kind": "singleType",
+  "collectionName": "quem_somos",
+  "info": {
+    "singularName": "quem-somos",
+    "pluralName": "quem-somos",
+    "displayName": "Quem Somos"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "titulo_intro": {
+      "type": "string",
+      "default": "Quem somos"
+    },
+    "texto_intro": {
+      "type": "text"
+    },
+    "imagem": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": ["images"]
+    },
+    "titulo_era": {
+      "type": "string",
+      "default": "Da era da comunicação à era da"
+    },
+    "titulo_era_italico": {
+      "type": "string",
+      "default": "experiência."
+    },
+    "texto_era": {
+      "type": "text"
+    },
+    "tagline": {
+      "type": "string",
+      "default": "Content driven.\nTech inspired."
+    }
+  }
+}
