@@ -338,11 +338,20 @@ export default function CasesTimeline({
     }
 
     const onWheel = (e) => {
-      // Sempre: só scroll horizontal move o carrossel (vertical é livre em ambos os contextos)
-      if (Math.abs(e.deltaX) > Math.abs(e.deltaY) && usaCarrossel) {
+      if (!usaCarrossel) return
+      if (contexto === 'pagina') {
+        // Página 100vh: scroll vertical E horizontal movem a timeline
         e.preventDefault()
-        xRef.current.x -= e.deltaX
-        tiltDeltaRef.current = -e.deltaX * 4
+        const delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY
+        xRef.current.x -= delta
+        tiltDeltaRef.current = -delta * 4
+      } else {
+        // Embutido numa case page: só scroll horizontal move a timeline
+        if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
+          e.preventDefault()
+          xRef.current.x -= e.deltaX
+          tiltDeltaRef.current = -e.deltaX * 4
+        }
       }
     }
 
@@ -408,6 +417,18 @@ export default function CasesTimeline({
       )}
       {contexto === 'pagina' && tipoResolvido !== 'quarentaAnos' && (
         <div className="cases-timeline__header cases-timeline__header--pagina">
+          {logo?.logo && (
+            <button
+              onClick={() => goTo('/')}
+              style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}
+            >
+              <img
+                src={mediaUrl(logo.logo)}
+                alt="TV1"
+                className="cases-timeline__logo"
+              />
+            </button>
+          )}
           <MobileMenu logo={logo?.logo} logoFiltro="brightness(0)" />
         </div>
       )}
