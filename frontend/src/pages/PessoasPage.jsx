@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import axios from 'axios'
 import Menu from '../components/Menu.jsx'
+import PageHeader from '../components/PageHeader.jsx'
 import './PessoasPage.css'
 
 const STRAPI = 'https://tv1-53ev.onrender.com'
@@ -74,12 +75,11 @@ export default function PessoasPage() {
   return (
     <div className="pessoas-page">
 
-      <header className="pessoas-header">
-        <button className="pessoas-header__logo" onClick={() => footerRef.current?.scrollIntoView({ behavior: 'smooth' })}>
-          {logo?.logo && <img src={mediaUrl(logo.logo)} alt="TV1" />}
-        </button>
-        <span className="pessoas-header__titulo">Pessoas</span>
-      </header>
+      <PageHeader
+        logoUrl={mediaUrl(logo?.logo)}
+        label="Pessoas"
+        onLogoClick={() => footerRef.current?.scrollIntoView({ behavior: 'smooth' })}
+      />
 
       <main className="pessoas-main">
         {membros.map((m, i) => {

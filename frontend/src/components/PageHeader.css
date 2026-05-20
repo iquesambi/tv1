@@ -1,0 +1,45 @@
+/* PAGE HEADER - TV1 */
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 40px 80px;
+}
+
+.page-header__logo {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.page-header__logo img {
+  height: 40px;
+  width: auto;
+  display: block;
+  filter: brightness(0);
+  transition: opacity 0.25s ease;
+}
+
+.page-header__logo img:hover {
+  opacity: 0.4;
+}
+
+.page-header__titulo {
+  font-size: 32px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-family: 'Gilroy', sans-serif;
+}
+
+@media (max-width: 768px) {
+  .page-header {
+    padding: 20px 24px;
+  }
+
+  .page-header__titulo {
+    display: none;
+  }
+}

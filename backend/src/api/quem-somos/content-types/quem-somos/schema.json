@@ -11,11 +11,10 @@
   },
   "attributes": {
     "titulo_intro": {
-      "type": "string",
-      "default": "Quem somos"
+      "type": "string"
     },
     "texto_intro": {
-      "type": "text"
+      "type": "richtext"
     },
     "imagem": {
       "type": "media",
@@ -24,15 +23,13 @@
       "allowedTypes": ["images"]
     },
     "titulo_era": {
-      "type": "string",
-      "default": "Da era da comunicação à era da"
+      "type": "string"
     },
     "titulo_era_italico": {
-      "type": "string",
-      "default": "experiência."
+      "type": "string"
     },
     "texto_era": {
-      "type": "text"
+      "type": "richtext"
     },
     "tagline": {
       "type": "text"

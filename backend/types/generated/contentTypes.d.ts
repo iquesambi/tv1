@@ -738,13 +738,10 @@ export interface ApiQuemSomosQuemSomos extends Struct.SingleTypeSchema {
     publishedAt: Schema.Attribute.DateTime;
     tagline: Schema.Attribute.Text;
     texto_era: Schema.Attribute.Text;
-    texto_intro: Schema.Attribute.Text;
-    titulo_era: Schema.Attribute.String &
-      Schema.Attribute.DefaultTo<'Da era da comunica\u00E7\u00E3o \u00E0 era da'>;
-    titulo_era_italico: Schema.Attribute.String &
-      Schema.Attribute.DefaultTo<'experi\u00EAncia.'>;
-    titulo_intro: Schema.Attribute.String &
-      Schema.Attribute.DefaultTo<'Quem somos'>;
+    texto_intro: Schema.Attribute.RichText;
+    titulo_era: Schema.Attribute.String;
+    titulo_era_italico: Schema.Attribute.String;
+    titulo_intro: Schema.Attribute.String;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
