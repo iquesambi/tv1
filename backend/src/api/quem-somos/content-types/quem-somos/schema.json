@@ -14,7 +14,7 @@
       "type": "string"
     },
     "texto_intro": {
-      "type": "blocks"
+      "type": "richtext"
     },
     "imagem": {
       "type": "media",
@@ -29,7 +29,7 @@
       "type": "string"
     },
     "texto_era": {
-      "type": "blocks"
+      "type": "richtext"
     },
     "tagline": {
       "type": "text"
