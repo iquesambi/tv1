@@ -408,7 +408,15 @@ export default function CasesTimeline({
         track.style.transform = `translateX(${xRef.current.x}px)`
         if (timelineTrackRef.current) timelineTrackRef.current.style.transform = `translateX(${xRef.current.x}px)`
       }
-      cards.forEach(card => { card.style.transform = `perspective(700px) rotateY(${tilt}deg)` })
+      const vw = container.clientWidth
+      cards.forEach(card => {
+        card.style.transform = `perspective(700px) rotateY(${tilt}deg)`
+        // Marca cards 100% visíveis no viewport
+        const left  = card.offsetLeft + xRef.current.x
+        const right = left + card.offsetWidth
+        const visivel = left >= -1 && right <= vw + 1
+        card.classList.toggle('cliente-card--visivel', visivel)
+      })
       raf = requestAnimationFrame(tick)
     }
 
