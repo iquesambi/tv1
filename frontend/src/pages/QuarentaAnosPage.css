@@ -348,6 +348,11 @@
 /* ── MOBILE ───────────────────────────── */
 
 @media (max-width: 768px) {
+  /* Esconde o header fixo do Menu nesta página */
+  .qa-page .footer-branco__top {
+    display: none;
+  }
+
   .qa-hero {
     height: 100dvh;
   }
