@@ -480,29 +480,23 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
                 <button className="home__menu-mobile__fechar" onClick={() => setMenuMobile(false)}>✕</button>
               </div>
               <nav className="home__menu-mobile__nav">
-                {links.map((link, i) => {
-                  const sublinks = getSublinks(link)
-                  return (
-                    <button
-                      key={i}
-                      className="home__menu-mobile__nav-link"
-                      onClick={(e) => {
-                        e.preventDefault()
-                        if (sublinks.length === 0 && link.url) {
-                          goTo(link.url)
-                          setMenuMobile(false)
-                        }
-                      }}
-                    >
-                      {link.label}
-                    </button>
-                  )
-                })}
                 <button
                   className="home__menu-mobile__nav-link"
                   onClick={(e) => { e.preventDefault(); goTo('/contato'); setMenuMobile(false) }}
                 >
-                  Contato
+                  Seja cliente
+                </button>
+                <button
+                  className="home__menu-mobile__nav-link"
+                  onClick={(e) => { e.preventDefault(); goTo('/contato/trabalhe-conosco'); setMenuMobile(false) }}
+                >
+                  Trabalhe conosco
+                </button>
+                <button
+                  className="home__menu-mobile__nav-link"
+                  onClick={(e) => { e.preventDefault(); goTo('/contato/outros-assuntos'); setMenuMobile(false) }}
+                >
+                  Outros assuntos
                 </button>
               </nav>
               <div className="home__menu-mobile__marcas">
