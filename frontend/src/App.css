@@ -593,7 +593,7 @@
   .home__camera--mobile {
     display: block;
     position: absolute;
-    top: 33%;
+    top: 26%;
     left: 50%;
     transform: translate(-50%, -50%);
     z-index: 3;
@@ -655,13 +655,14 @@
   }
 
   .home__nav-link {
-    font-size: clamp(64px, 23vw, 101px);
+    font-size: clamp(36px, 13vw, 64px);
     line-height: 1;
     font-weight: 900;
     font-style: italic;
     text-transform: uppercase;
     color: #000001;
-    white-space: nowrap;
+    white-space: normal;
+    text-align: center;
   }
 
   .home__nav-link--dimmed {
