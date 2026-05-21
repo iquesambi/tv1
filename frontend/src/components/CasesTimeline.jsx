@@ -338,7 +338,8 @@ export default function CasesTimeline({
       if (!touchDir && (Math.abs(dx) > 4 || Math.abs(dy) > 4)) {
         touchDir = Math.abs(dx) > Math.abs(dy) ? 'h' : 'v'
       }
-      if (touchDir !== 'h') return // gesto vertical → deixa a página scrollar
+      if (touchDir === 'v') return // gesto vertical → deixa a página scrollar
+      if (touchDir === null) return // ainda a determinar direcção
       e.preventDefault()
       touchMoved = true
       touchStartX = e.touches[0].clientX
