@@ -482,7 +482,7 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
               <nav className="home__menu-mobile__nav">
                 <button
                   className="home__menu-mobile__nav-link"
-                  onClick={(e) => { e.preventDefault(); goTo('/contato'); setMenuMobile(false) }}
+                  onClick={(e) => { e.preventDefault(); goTo('/contato/seja-cliente'); setMenuMobile(false) }}
                 >
                   Seja cliente
                 </button>
@@ -595,7 +595,7 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
           <footer className="home__bottom" onClick={e => e.stopPropagation()}>
             <button
               className={`home__contato${contatoAberto ? ' home__contato--inativo' : ''}`}
-              onClick={(e) => { e.stopPropagation(); if (!contatoAberto) goTo('/contato') }}
+              onClick={(e) => { e.stopPropagation(); if (!contatoAberto) goTo('/contato/seja-cliente') }}
             >Contato</button>
             <AgenciaLogos agencias={agencias} className={`home__marcas ${aberto !== null ? 'home__marcas--oculto' : ''}`} />
             <div className="home__redes">
@@ -668,7 +668,7 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
       <div className="footer-branco__bottom" onClick={e => e.stopPropagation()}>
         <button
           className="footer-branco__contato"
-          onClick={(e) => { e.stopPropagation(); goTo('/contato') }}
+          onClick={(e) => { e.stopPropagation(); goTo('/contato/seja-cliente') }}
         >Contato</button>
         {!semMarcas && <AgenciaLogos agencias={agencias} className={`footer-branco__marcas ${aberto !== null ? 'footer-branco__marcas--oculto' : ''}`} />}
         <div className="footer-branco__redes">
