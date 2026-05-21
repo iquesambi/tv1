@@ -322,8 +322,8 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
     const sublinks = getSublinks(link)
 
     if (isMobile()) {
+      if (link.url && link.url !== '#') { goTo(link.url); return }
       if (sublinks.length > 0) { setAberto(aberto === i ? null : i); setHoveredSub(null) }
-      else if (link.url) goTo(link.url)
       return
     }
     // Desktop home: sem sublinks → navega direto; com sublinks → toggle submenu
@@ -546,7 +546,7 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
 
           {/* câmera mobile — centralizada abaixo do header */}
           <button
-            className="home__camera home__camera--mobile"
+            className={`home__camera home__camera--mobile${(menuMobile || aberto !== null) ? ' home__camera--oculta' : ''}`}
             onClick={(e) => { e.stopPropagation(); if (quarentaAnos?.ativo) startCamera(e.currentTarget.getBoundingClientRect()) }}
             aria-label="40 Anos TV1"
           >
@@ -690,7 +690,7 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
 
       {/* Câmera mobile — centro da tela */}
       {quarentaAnos?.ativo && (
-        <div className="footer-branco__camera-mobile" onClick={(e) => { e.stopPropagation(); startCamera(e.currentTarget.getBoundingClientRect()) }}>
+        <div className={`footer-branco__camera-mobile${(menuMobile || aberto !== null) ? ' home__camera--oculta' : ''}`} onClick={(e) => { e.stopPropagation(); startCamera(e.currentTarget.getBoundingClientRect()) }}>
           <video muted playsInline preload="metadata" onLoadedMetadata={e => { e.target.currentTime = 3 }}>
             <source src="/camera-rotation-alpha.webm" type="video/webm" />
             <source src="/camera-rotation-alpha.mov" type="video/mp4; codecs=hvc1" />

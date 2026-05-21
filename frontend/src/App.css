@@ -410,6 +410,11 @@
   display: none;
 }
 
+.home__camera--oculta {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
 /* ── MENU MOBILE OVERLAY ──────────────── */
 
 .home__menu-mobile {
@@ -546,6 +551,25 @@
   object-fit: contain;
   display: block;
   filter: brightness(0);
+}
+
+.home__menu-mobile__camera {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-shrink: 0;
+  padding: 24px 0;
+}
+
+.home__menu-mobile__camera video {
+  height: 120px;
+  width: auto;
+  object-fit: contain;
+  display: block;
 }
 
 /* ── MOBILE ───────────────────────────── */
