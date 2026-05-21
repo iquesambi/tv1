@@ -319,6 +319,31 @@ export default function CasesTimeline({
     window.addEventListener('mousemove', onMouseMove)
     window.addEventListener('mouseup', onMouseUp)
 
+    // Drag com touch (mobile)
+    let touchStartX = 0
+    let touchMoved  = false
+    const onTouchStart = (e) => {
+      touchStartX = e.touches[0].clientX
+      touchMoved = false
+    }
+    const onTouchMove = (e) => {
+      if (!usaCarrossel) return
+      const delta = e.touches[0].clientX - touchStartX
+      if (Math.abs(delta) > 3) touchMoved = true
+      touchStartX = e.touches[0].clientX
+      xRef.current.x += delta
+      tiltDeltaRef.current = -delta * 4
+      e.preventDefault()
+    }
+    const onTouchEnd = (e) => {
+      if (touchMoved) e.stopPropagation()
+      touchMoved = false
+    }
+
+    container.addEventListener('touchstart', onTouchStart, { passive: true })
+    container.addEventListener('touchmove',  onTouchMove,  { passive: false })
+    container.addEventListener('touchend',   onTouchEnd,   { passive: true })
+
     const cards = Array.from(track.querySelectorAll('.cliente-card'))
     if (usaCarrossel) { firstSetCardsRef.current = cards.slice(0, n); oneSetRef.current = oneSet }
 
@@ -383,6 +408,9 @@ export default function CasesTimeline({
       container.removeEventListener('click', onClickCapture, true)
       window.removeEventListener('mousemove', onMouseMove)
       window.removeEventListener('mouseup', onMouseUp)
+      container.removeEventListener('touchstart', onTouchStart)
+      container.removeEventListener('touchmove',  onTouchMove)
+      container.removeEventListener('touchend',   onTouchEnd)
       cancelAnimationFrame(raf)
     }
   }, [n, usaCarrossel, contexto])
