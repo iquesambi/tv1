@@ -267,7 +267,9 @@
 
 @media (max-width: 768px) {
   .footer-branco {
-    height: 100dvh;
+    height: auto;
+    min-height: auto;
+    padding: 80px 0 40px;
   }
 
   .footer-branco__top {
@@ -292,11 +294,12 @@
   }
 
   .footer-branco__nav {
-    padding-top: 80px;
+    padding-top: 0;
+    gap: 4px;
   }
 
   .footer-branco__nav-link {
-    font-size: min(clamp(52px, 23vw, 101px), calc(68vh / var(--nav-count, 3) / 0.75));
+    font-size: clamp(28px, 8vw, 42px);
   }
 
   .footer-branco__submenu {
@@ -304,7 +307,10 @@
   }
 
   .footer-branco__bottom {
-    display: none;
+    display: flex;
+    padding: 24px 20px 0;
+    flex-wrap: wrap;
+    gap: 12px;
   }
 
   .footer-branco--escuro .footer-branco__top {
