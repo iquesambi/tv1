@@ -17,38 +17,14 @@ const slugify = (str) => str.toLowerCase()
 
 export default function MobileMenu({ logo, logoFiltro = 'brightness(0)' }) {
   const [aberto, setAberto] = useState(false)
-  const [nav, setNav]       = useState(null)
   const [agencias, setAgencias] = useState(null)
   const [redes, setRedes]   = useState(null)
-  const [equipe, setEquipe] = useState(null)
-  const [clientes, setClientes] = useState(null)
   const goTo = useGoTo()
 
   useEffect(() => {
-    api('navigation?populate[links][populate]=*').then(setNav)
     api('agencias?populate=*&sort=posicao:asc').then(setAgencias)
     api('redes-sociais?populate[redes][populate]=icone').then(setRedes)
-    api('pessoas?filters[ativo][$eq]=true&populate=foto&sort=ordem').then(setEquipe)
-    api('clientes?sort=nome:asc').then(setClientes)
   }, [])
-
-  const links = nav?.links ?? []
-
-  const getSublinks = (link) => {
-    if (link.url === '/pessoas') {
-      return (link.sublinks ?? []).map(sub => ({
-        label: sub.label,
-        url: `/pessoas#${sub.url.replace(/^\//, '')}`,
-      }))
-    }
-    if (link.url === '/clientes') {
-      return (clientes ?? []).map(c => ({
-        label: c.nome,
-        url: `/${c.slug}`,
-      }))
-    }
-    return link.sublinks ?? []
-  }
 
   return (
     <>
@@ -80,28 +56,14 @@ export default function MobileMenu({ logo, logoFiltro = 'brightness(0)' }) {
 
           {/* Nav */}
           <nav className="mobile-menu__nav">
-            {links.map((link, i) => {
-              const sublinks = getSublinks(link)
-              return (
-                <button
-                  key={i}
-                  className="mobile-menu__nav-link"
-                  onClick={() => {
-                    if (sublinks.length === 0 && link.url) {
-                      goTo(link.url)
-                      setAberto(false)
-                    }
-                  }}
-                >
-                  {link.label}
-                </button>
-              )
-            })}
-            <button
-              className="mobile-menu__nav-link"
-              onClick={() => { goTo('/contato'); setAberto(false) }}
-            >
-              Contato
+            <button className="mobile-menu__nav-link" onClick={() => { goTo('/contato'); setAberto(false) }}>
+              Seja cliente
+            </button>
+            <button className="mobile-menu__nav-link" onClick={() => { goTo('/contato/trabalhe-conosco'); setAberto(false) }}>
+              Trabalhe conosco
+            </button>
+            <button className="mobile-menu__nav-link" onClick={() => { goTo('/contato/outros-assuntos'); setAberto(false) }}>
+              Outros assuntos
             </button>
           </nav>
 
