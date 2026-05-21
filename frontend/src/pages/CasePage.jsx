@@ -1,8 +1,7 @@
 import { useEffect, useState, useCallback, useRef } from 'react'
-import { useParams, useNavigate, useLocation } from 'react-router-dom'
+import { useParams, useLocation } from 'react-router-dom'
 import axios from 'axios'
 import Menu from '../components/Menu.jsx'
-import MobileMenu from '../components/MobileMenu.jsx'
 import CasesTimeline from '../components/CasesTimeline.jsx'
 import './CasePage.css'
 
@@ -291,14 +290,12 @@ export default function CasePage() {
   // Se veio por /:slug sem case → é um case histórico sem cliente
   const clienteSlug = params.case ? (params.cliente ?? params.slug) : null
   const caseSlug    = params.case ?? params.slug
-  const navigate = useNavigate()
 
   // Origem da navegação: 'cliente' ou 'especialidade'
   const navFrom  = location.state?.from ?? 'cliente'
   const navSlug  = location.state?.slug ?? clienteSlug
   const [data, setData] = useState(null)
   const [logo, setLogo] = useState(null)
-  const [quarentaAnos, setQA] = useState(null)
   const footerRef = useRef(null)
 
   const lsKey = `tv1-case-${caseSlug}`
@@ -316,7 +313,6 @@ export default function CasePage() {
 
   useEffect(() => {
     axios.get(`${STRAPI}/api/logo-site?populate=logo`).then(r => setLogo(r.data.data)).catch(() => {})
-    axios.get(`${STRAPI}/api/quarenta-anos?populate=imagem`).then(r => setQA(r.data.data)).catch(() => {})
     document.body.classList.remove('scroll-locked')
   }, [])
 
@@ -417,29 +413,6 @@ export default function CasePage() {
       {navSlug && <CasesTimeline tipo={navFrom} slug={navSlug} />}
 
       <div ref={footerRef}><Menu /></div>
-
-      {/* Última dobra mobile: versão branca da home */}
-      <section className="case-home-fold">
-        <div className="case-home-fold__header">
-          <MobileMenu logoFiltro="brightness(0)" />
-        </div>
-        <div className="case-home-fold__center">
-          {quarentaAnos?.imagem && (
-            <button
-              className="case-home-fold__camera-btn"
-              onClick={() => quarentaAnos?.ativo && navigate('/quarenta-anos')}
-              style={{ background: 'none', border: 'none', padding: 0, cursor: quarentaAnos?.ativo ? 'pointer' : 'default' }}
-            >
-              <img className="case-home-fold__camera" src={mediaUrl(quarentaAnos.imagem)} alt="" />
-            </button>
-          )}
-          <nav className="case-home-fold__nav">
-            <a className="case-home-fold__nav-link" href="/clientes">Cases</a>
-            <a className="case-home-fold__nav-link" href="/clientes">Clientes</a>
-            <a className="case-home-fold__nav-link" href="/pessoas">Pessoas</a>
-          </nav>
-        </div>
-      </section>
 
     </div>
   )

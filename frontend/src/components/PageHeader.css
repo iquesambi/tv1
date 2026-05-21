@@ -36,10 +36,6 @@
 
 @media (max-width: 768px) {
   .page-header {
-    padding: 20px 24px;
-  }
-
-  .page-header__titulo {
     display: none;
   }
 }

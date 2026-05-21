@@ -65,6 +65,33 @@
   cursor: pointer;
 }
 
+.footer-branco__hamburger {
+  display: none;
+  flex-direction: column;
+  gap: 6px;
+  background: transparent;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+}
+
+.footer-branco__hamburger span {
+  display: block;
+  width: 28px;
+  height: 2px;
+  background: currentColor;
+  border-radius: 0;
+}
+
+.footer-branco__hamburger span:nth-child(2) {
+  width: 16px;
+  align-self: center;
+}
+
+.footer-branco__camera-mobile {
+  display: none;
+}
+
 .footer-branco__camera img,
 .footer-branco__camera video {
   height: 100px;
@@ -267,22 +294,17 @@
 
 @media (max-width: 768px) {
   .footer-branco {
-    height: auto;
-    min-height: auto;
-    padding: 80px 0 40px;
+    height: 100dvh;
   }
 
   .footer-branco__top {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
+    position: relative;
     padding: 16px 20px;
-    z-index: 10;
-    background: rgba(255, 255, 255, 0.98);
-    backdrop-filter: blur(4px);
+    z-index: 1;
+    background: transparent;
     justify-content: space-between;
     align-items: center;
+    flex-shrink: 0;
   }
 
   .footer-branco__logo img {
@@ -293,13 +315,37 @@
     display: none;
   }
 
+  .footer-branco__hamburger {
+    display: flex;
+    align-self: center;
+    margin: 0;
+  }
+
+  .footer-branco__camera-mobile {
+    display: block;
+    position: absolute;
+    top: 33%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 3;
+    pointer-events: auto;
+    cursor: pointer;
+  }
+
+  .footer-branco__camera-mobile video {
+    height: 135px;
+    width: auto;
+    object-fit: contain;
+    display: block;
+    margin: 0 auto;
+  }
+
   .footer-branco__nav {
-    padding-top: 0;
-    gap: 4px;
+    padding-top: 80px;
   }
 
   .footer-branco__nav-link {
-    font-size: clamp(28px, 8vw, 42px);
+    font-size: clamp(36px, 13vw, 64px);
   }
 
   .footer-branco__submenu {
@@ -307,10 +353,7 @@
   }
 
   .footer-branco__bottom {
-    display: flex;
-    padding: 24px 20px 0;
-    flex-wrap: wrap;
-    gap: 12px;
+    display: none;
   }
 
   .footer-branco--escuro .footer-branco__top {

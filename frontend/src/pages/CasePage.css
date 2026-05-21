@@ -459,20 +459,9 @@
   background: #fff;
 }
 
-/* DOBRA FINAL MOBILE (versão branca da home) */
-
-.case-home-fold {
-  display: none;
-}
-
 /* RESPONSIVO */
 
 @media (max-width: 768px) {
-
-  /* Esconde o FooterBranco no mobile — substituído pela dobra final */
-  .case-page .footer-branco {
-    display: none;
-  }
 
   /* ── Hero ── */
 
@@ -652,65 +641,4 @@
     height: 70vw;
   }
 
-  /* ── Dobra final: versão branca da home ── */
-  .case-home-fold {
-    display: flex;
-    flex-direction: column;
-    background: #fff;
-    height: 100vh;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .case-home-fold__header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 20px;
-    flex-shrink: 0;
-  }
-
-  .case-home-fold__logo img {
-    height: 32px;
-    width: auto;
-    object-fit: contain;
-    display: block;
-    filter: brightness(0);
-  }
-
-  /* Wrapper centralizado verticalmente no espaço abaixo do header */
-  .case-home-fold__center {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 34px;
-    padding-bottom: 40px;
-  }
-
-  .case-home-fold__camera {
-    height: 90px;
-    width: auto;
-    object-fit: contain;
-    display: block;
-  }
-
-  .case-home-fold__nav {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 16px;
-  }
-
-  .case-home-fold__nav-link {
-    font-family: 'Gilroy', sans-serif;
-    font-size: 70px;
-    font-weight: 900;
-    font-style: italic;
-    text-transform: uppercase;
-    color: #000001;
-    text-decoration: none;
-    line-height: 1;
-  }
 }

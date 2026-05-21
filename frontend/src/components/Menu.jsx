@@ -618,11 +618,58 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
       onClick={aberto !== null ? () => { setAberto(null); setHoveredSub(null) } : undefined}
     >
 
+      {/* Menu mobile overlay */}
+      <div className={`home__menu-mobile ${menuMobile ? 'home__menu-mobile--aberto' : ''}`} onClick={() => setMenuMobile(false)}>
+        <div className="home__menu-mobile__inner" onClick={e => e.stopPropagation()}>
+          <div className="home__menu-mobile__header">
+            <div className="home__menu-mobile__logo">
+              {logo?.logo && <img src={mediaUrl(logo.logo)} alt="TV1" />}
+            </div>
+            <button className="home__menu-mobile__fechar" onClick={() => setMenuMobile(false)}>✕</button>
+          </div>
+          <nav className="home__menu-mobile__nav">
+            <button
+              className="home__menu-mobile__nav-link"
+              onClick={(e) => { e.preventDefault(); goTo('/contato/seja-cliente'); setMenuMobile(false) }}
+            >
+              Seja cliente
+            </button>
+            <button
+              className="home__menu-mobile__nav-link"
+              onClick={(e) => { e.preventDefault(); goTo('/contato/trabalhe-conosco'); setMenuMobile(false) }}
+            >
+              Trabalhe conosco
+            </button>
+            <button
+              className="home__menu-mobile__nav-link"
+              onClick={(e) => { e.preventDefault(); goTo('/contato/outros-assuntos'); setMenuMobile(false) }}
+            >
+              Outros assuntos
+            </button>
+          </nav>
+          <div className="home__menu-mobile__marcas">
+            {agencias?.filter(a => a.logo).map((a, i) => (
+              <a key={i} href={externalUrl(a.url_externo)} target="_blank" rel="noreferrer">
+                <img src={mediaUrl(a.logo)} alt={a.nome} />
+              </a>
+            ))}
+          </div>
+          <div className="home__menu-mobile__redes">
+            {redes?.redes?.map((rede, i) => (
+              <a key={i} href={externalUrl(rede.url)} target="_blank" rel="noreferrer">
+                <img src={mediaUrl(rede.icone)} alt="" />
+              </a>
+            ))}
+          </div>
+        </div>
+      </div>
+
       {/* Topo */}
       <div className="footer-branco__top">
         <div className="footer-branco__logo" onClick={e => e.stopPropagation()}>
           {logo?.logo && <img src={mediaUrl(logo.logo)} alt="TV1" />}
         </div>
+        {/* câmera — só no desktop */}
         <button
           className="footer-branco__camera"
           onClick={(e) => { e.stopPropagation(); if (quarentaAnos?.ativo) startCamera(e.currentTarget.getBoundingClientRect()) }}
@@ -635,7 +682,21 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
             </video>
           )}
         </button>
+        {/* hamburguer — só no mobile */}
+        <button className="footer-branco__hamburger" onClick={(e) => { e.stopPropagation(); setMenuMobile(true) }} aria-label="Menu">
+          <span /><span /><span />
+        </button>
       </div>
+
+      {/* Câmera mobile — centro da tela */}
+      {quarentaAnos?.ativo && (
+        <div className="footer-branco__camera-mobile" onClick={(e) => { e.stopPropagation(); startCamera(e.currentTarget.getBoundingClientRect()) }}>
+          <video muted playsInline preload="metadata" onLoadedMetadata={e => { e.target.currentTime = 3 }}>
+            <source src="/camera-rotation-alpha.webm" type="video/webm" />
+            <source src="/camera-rotation-alpha.mov" type="video/mp4; codecs=hvc1" />
+          </video>
+        </div>
+      )}
 
       {/* Nav central */}
       <nav className="footer-branco__nav" style={{ '--nav-count': links.length }}>
