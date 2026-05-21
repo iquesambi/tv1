@@ -321,23 +321,35 @@ export default function CasesTimeline({
 
     // Drag com touch (mobile)
     let touchStartX = 0
+    let touchStartY = 0
+    let touchDir    = null // 'h' | 'v' | null
     let touchMoved  = false
     const onTouchStart = (e) => {
       touchStartX = e.touches[0].clientX
-      touchMoved = false
+      touchStartY = e.touches[0].clientY
+      touchDir    = null
+      touchMoved  = false
     }
     const onTouchMove = (e) => {
       if (!usaCarrossel) return
-      const delta = e.touches[0].clientX - touchStartX
-      if (Math.abs(delta) > 3) touchMoved = true
-      touchStartX = e.touches[0].clientX
-      xRef.current.x += delta
-      tiltDeltaRef.current = -delta * 4
+      const dx = e.touches[0].clientX - touchStartX
+      const dy = e.touches[0].clientY - touchStartY
+      // Determina direcção na primeira vez
+      if (!touchDir && (Math.abs(dx) > 4 || Math.abs(dy) > 4)) {
+        touchDir = Math.abs(dx) > Math.abs(dy) ? 'h' : 'v'
+      }
+      if (touchDir !== 'h') return // gesto vertical → deixa a página scrollar
       e.preventDefault()
+      touchMoved = true
+      touchStartX = e.touches[0].clientX
+      touchStartY = e.touches[0].clientY
+      xRef.current.x += dx
+      tiltDeltaRef.current = -dx * 4
     }
     const onTouchEnd = (e) => {
       if (touchMoved) e.stopPropagation()
       touchMoved = false
+      touchDir   = null
     }
 
     container.addEventListener('touchstart', onTouchStart, { passive: true })
