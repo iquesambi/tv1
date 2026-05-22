@@ -451,10 +451,10 @@
 
 .home__camera__label {
   position: absolute;
-  bottom: 2px;
+  top: 50%;
   left: 50%;
-  transform: translateX(calc(-50% - 15px));
-  width: 200px;
+  transform: translate(-50%, -50%);
+  width: 320px;
   height: auto;
   display: block;
   z-index: 0;
