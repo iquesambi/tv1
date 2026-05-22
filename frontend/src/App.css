@@ -415,6 +415,47 @@
   pointer-events: none !important;
 }
 
+/* ── câmera: wrapper interno (shake + label hover) ── */
+
+@keyframes camera-rattle {
+  0%, 6%, 100% { transform: rotate(0deg) translateX(0); }
+  1%  { transform: rotate(-3deg) translateX(-2px); }
+  2%  { transform: rotate(3deg)  translateX(2px); }
+  3%  { transform: rotate(-2deg) translateX(-1px); }
+  4%  { transform: rotate(2deg)  translateX(1px); }
+  5%  { transform: rotate(-0.5deg) translateX(0); }
+}
+
+.home__camera__inner {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: camera-rattle 10s ease-in-out infinite;
+}
+
+.home__camera__label {
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(calc(-50% - 15px));
+  font-family: 'Gilroy', sans-serif;
+  font-weight: 900;
+  font-size: 42px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  font-style: normal;
+  color: #000001;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.home__camera:hover .home__camera__label {
+  opacity: 1;
+}
+
 /* ── MENU MOBILE OVERLAY ──────────────── */
 
 .home__menu-mobile {

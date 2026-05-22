@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import axios from 'axios'
-import { useGoTo, useStartCamera } from '../transition.jsx'
+import { useGoTo, useStartCamera, useCameraAtiva } from '../transition.jsx'
 import '../App.css'
 import './Menu.css'
 
@@ -69,8 +69,9 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
   const location = useLocation()
   const contatoAberto = isHome ? location.pathname.startsWith('/contato') : false
 
-  const goTo       = useGoTo()
+  const goTo        = useGoTo()
   const startCamera = useStartCamera()
+  const cameraAtiva = useCameraAtiva()
 
   const lastScrollY     = useRef(0)
   const touchStartY     = useRef(null)
@@ -527,15 +528,18 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
             </div>
             {/* câmera — visível no desktop dentro do header */}
             <button
-              className="home__camera home__camera--desktop"
+              className={`home__camera home__camera--desktop${cameraAtiva ? ' home__camera--oculta' : ''}`}
               onClick={(e) => { e.stopPropagation(); if (quarentaAnos?.ativo) startCamera(e.currentTarget.getBoundingClientRect()) }}
               aria-label="40 Anos TV1"
             >
               {quarentaAnos?.ativo && (
-                <video muted playsInline preload="metadata" onLoadedMetadata={e => { e.target.currentTime = 3 }}>
-                  <source src="/camera-rotation-alpha.webm" type="video/webm" />
-                  <source src="/camera-rotation-alpha.mov" type="video/mp4; codecs=hvc1" />
-                </video>
+                <div className="home__camera__inner">
+                  <video muted playsInline preload="metadata" onLoadedMetadata={e => { e.target.currentTime = 3 }}>
+                    <source src="/camera-rotation-alpha.webm" type="video/webm" />
+                    <source src="/camera-rotation-alpha.mov" type="video/mp4; codecs=hvc1" />
+                  </video>
+                  <span className="home__camera__label">tv1 | 40</span>
+                </div>
               )}
             </button>
             {/* hamburguer — visível só no mobile */}
@@ -546,15 +550,18 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
 
           {/* câmera mobile — centralizada abaixo do header */}
           <button
-            className={`home__camera home__camera--mobile${(menuMobile || aberto !== null) ? ' home__camera--oculta' : ''}`}
+            className={`home__camera home__camera--mobile${(menuMobile || aberto !== null || cameraAtiva) ? ' home__camera--oculta' : ''}`}
             onClick={(e) => { e.stopPropagation(); if (quarentaAnos?.ativo) startCamera(e.currentTarget.getBoundingClientRect()) }}
             aria-label="40 Anos TV1"
           >
             {quarentaAnos?.ativo && (
-              <video muted playsInline preload="metadata" onLoadedMetadata={e => { e.target.currentTime = 3 }}>
-                <source src="/camera-rotation-alpha.webm" type="video/webm" />
-                <source src="/camera-rotation-alpha.mov" type="video/mp4; codecs=hvc1" />
-              </video>
+              <div className="home__camera__inner">
+                <video muted playsInline preload="metadata" onLoadedMetadata={e => { e.target.currentTime = 3 }}>
+                  <source src="/camera-rotation-alpha.webm" type="video/webm" />
+                  <source src="/camera-rotation-alpha.mov" type="video/mp4; codecs=hvc1" />
+                </video>
+                <span className="home__camera__label">tv1 | 40</span>
+              </div>
             )}
           </button>
 
@@ -676,10 +683,13 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
           aria-label="40 Anos TV1"
         >
           {quarentaAnos?.ativo && (
-            <video muted playsInline preload="metadata" onLoadedMetadata={e => { e.target.currentTime = 3 }}>
-              <source src="/camera-rotation-alpha.webm" type="video/webm" />
-              <source src="/camera-rotation-alpha.mov" type="video/mp4; codecs=hvc1" />
-            </video>
+            <div className="home__camera__inner">
+              <video muted playsInline preload="metadata" onLoadedMetadata={e => { e.target.currentTime = 3 }}>
+                <source src="/camera-rotation-alpha.webm" type="video/webm" />
+                <source src="/camera-rotation-alpha.mov" type="video/mp4; codecs=hvc1" />
+              </video>
+              <span className="home__camera__label">tv1 | 40</span>
+            </div>
           )}
         </button>
         {/* hamburguer — só no mobile */}
@@ -690,7 +700,7 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
 
       {/* Câmera mobile — centro da tela */}
       {quarentaAnos?.ativo && (
-        <div className={`footer-branco__camera-mobile${(menuMobile || aberto !== null) ? ' home__camera--oculta' : ''}`} onClick={(e) => { e.stopPropagation(); startCamera(e.currentTarget.getBoundingClientRect()) }}>
+        <div className={`footer-branco__camera-mobile${(menuMobile || aberto !== null || cameraAtiva) ? ' home__camera--oculta' : ''}`} onClick={(e) => { e.stopPropagation(); startCamera(e.currentTarget.getBoundingClientRect()) }}>
           <video muted playsInline preload="metadata" onLoadedMetadata={e => { e.target.currentTime = 3 }}>
             <source src="/camera-rotation-alpha.webm" type="video/webm" />
             <source src="/camera-rotation-alpha.mov" type="video/mp4; codecs=hvc1" />

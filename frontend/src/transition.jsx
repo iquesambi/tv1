@@ -11,6 +11,10 @@ export function useStartCamera() {
   return useContext(Ctx).startCamera
 }
 
+export function useCameraAtiva() {
+  return useContext(Ctx).cameraAtiva
+}
+
 export function TransitionProvider({ children }) {
   const navigate = useNavigate()
   const [ativa, setAtiva] = useState(false)
@@ -50,7 +54,7 @@ export function TransitionProvider({ children }) {
   }, [cameraAnim])
 
   return (
-    <Ctx.Provider value={{ goTo, startCamera }}>
+    <Ctx.Provider value={{ goTo, startCamera, cameraAtiva: !!cameraAnim }}>
       {children}
       <div className={`cartela ${ativa ? 'cartela--ativa' : ''}`} />
       {cameraAnim && (
