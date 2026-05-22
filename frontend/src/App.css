@@ -462,13 +462,23 @@
   top: 55%;
   left: 50%;
   transform: translateX(calc(-50% - 10px));
-  width: 160px;
+  width: 160px; /* default: home desktop 150px */
   height: auto;
   display: block;
   z-index: -1;
   opacity: 0;
   transition: opacity 0.2s ease;
   pointer-events: none;
+}
+
+/* Escala o label proporcional à câmera de cada contexto */
+.home__camera--mobile ~ .home__camera__label,
+.footer-branco__camera-mobile ~ .home__camera__label {
+  width: 144px; /* câmera 135px */
+}
+
+.footer-branco__camera ~ .home__camera__label {
+  width: 107px; /* câmera 100px */
 }
 
 .home__camera-wrap:hover .home__camera__label {
