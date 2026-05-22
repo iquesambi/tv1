@@ -114,7 +114,8 @@
   pointer-events: none !important;
 }
 
-.home__camera {
+.home__camera,
+.footer-branco__camera {
   background: none;
   border: none;
   padding: 0;
@@ -122,7 +123,8 @@
   transition: transform 0.35s ease-out;
 }
 
-.home__camera:hover {
+.home__camera:hover,
+.footer-branco__camera:hover {
   transform: scale(1.15) rotate(-12deg);
 }
 
@@ -447,7 +449,8 @@
   animation: camera-rattle 10s linear infinite;
 }
 
-.home__camera:hover .home__camera__inner {
+.home__camera:hover .home__camera__inner,
+.footer-branco__camera:hover .home__camera__inner {
   animation-play-state: paused;
 }
 
