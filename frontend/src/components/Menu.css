@@ -9,14 +9,6 @@
 }
 
 /* Nav: no footer usa fluxo flex em vez de posicionamento absoluto */
-.footer-branco .home__nav {
-  position: relative;
-  top: auto;
-  left: auto;
-  transform: none;
-  flex: 1;
-  justify-content: center;
-}
 
 /* Backgrounds das imagens de hover */
 .footer-branco__bg {
@@ -157,7 +149,7 @@
 }
 
 
-/* Barra inferior */
+/* Barra inferior — margin-top: auto empurra pro fundo com nav absoluto */
 .footer-branco__bottom {
   display: flex;
   align-items: center;
@@ -166,6 +158,7 @@
   gap: 24px;
   position: relative;
   z-index: 1;
+  margin-top: auto;
 }
 
 .footer-branco__contato {
