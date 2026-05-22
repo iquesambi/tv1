@@ -102,14 +102,6 @@
 }
 
 /* Nav central */
-.footer-branco .home__nav {
-  position: static;
-  top: auto;
-  left: auto;
-  transform: none;
-  flex: 1;
-  justify-content: center;
-}
 
 .footer-branco__nav-item {
   display: flex;
