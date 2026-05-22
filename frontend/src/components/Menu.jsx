@@ -726,7 +726,7 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
       )}
 
       {/* Nav central */}
-      <nav className="footer-branco__nav" style={{ '--nav-count': links.length }}>
+      <nav className="home__nav" style={{ '--nav-count': links.length }}>
         {links.map((link, i) => {
           const esteAberto = aberto === i
           const acima  = aberto !== null && !esteAberto && i < aberto
