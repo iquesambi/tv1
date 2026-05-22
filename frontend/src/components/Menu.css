@@ -8,6 +8,16 @@
   overflow: hidden;
 }
 
+/* Nav: no footer usa fluxo flex em vez de posicionamento absoluto */
+.footer-branco .home__nav {
+  position: static;
+  top: auto;
+  left: auto;
+  transform: none;
+  flex: 1;
+  justify-content: center;
+}
+
 /* Backgrounds das imagens de hover */
 .footer-branco__bg {
   position: absolute;
