@@ -712,11 +712,16 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
 
       {/* Câmera mobile — centro da tela */}
       {quarentaAnos?.ativo && (
-        <div className={`footer-branco__camera-mobile${(menuMobile || aberto !== null || cameraAtiva) ? ' home__camera--oculta' : ''}`} onClick={(e) => { e.stopPropagation(); startCamera(e.currentTarget.getBoundingClientRect()) }}>
-          <video muted playsInline preload="metadata" onLoadedMetadata={e => { e.target.currentTime = 3 }}>
-            <source src="/camera-rotation-alpha.webm" type="video/webm" />
-            <source src="/camera-rotation-alpha.mov" type="video/mp4; codecs=hvc1" />
-          </video>
+        <div className={`home__camera-wrap${(menuMobile || aberto !== null || cameraAtiva) ? ' home__camera-wrap--oculta' : ''}`}>
+          <div className="footer-branco__camera-mobile" onClick={(e) => { e.stopPropagation(); startCamera(e.currentTarget.getBoundingClientRect()) }}>
+            <div className="home__camera__inner">
+              <video muted playsInline preload="metadata" onLoadedMetadata={e => { e.target.currentTime = 3 }}>
+                <source src="/camera-rotation-alpha.webm" type="video/webm" />
+                <source src="/camera-rotation-alpha.mov" type="video/mp4; codecs=hvc1" />
+              </video>
+            </div>
+          </div>
+          <img src="/camera-label.svg" className="home__camera__label" alt="" />
         </div>
       )}
 
