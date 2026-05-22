@@ -95,7 +95,7 @@
 
 .footer-branco__camera img,
 .footer-branco__camera video {
-  height: 100px;
+  height: 150px;
   width: auto;
   object-fit: contain;
   display: block;

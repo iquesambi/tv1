@@ -477,9 +477,6 @@
   width: 144px; /* câmera 135px */
 }
 
-.footer-branco__camera ~ .home__camera__label {
-  width: 107px; /* câmera 100px */
-}
 
 .home__camera-wrap:hover .home__camera__label {
   opacity: 1;
