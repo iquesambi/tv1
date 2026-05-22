@@ -418,12 +418,9 @@
 /* ── câmera: wrapper interno (shake + label hover) ── */
 
 @keyframes camera-rattle {
-  0%, 6%, 100% { transform: rotate(0deg) translateX(0); }
-  1%  { transform: rotate(-3deg) translateX(-2px); }
-  2%  { transform: rotate(3deg)  translateX(2px); }
-  3%  { transform: rotate(-2deg) translateX(-1px); }
-  4%  { transform: rotate(2deg)  translateX(1px); }
-  5%  { transform: rotate(-0.5deg) translateX(0); }
+  0%, 100%  { transform: rotate(0deg) scale(1); }
+  4%        { transform: rotate(-12deg) scale(1.15); }
+  9%        { transform: rotate(0deg) scale(1); }
 }
 
 .home__camera__inner {
@@ -434,18 +431,35 @@
   animation: camera-rattle 10s ease-in-out infinite;
 }
 
+.home__camera:hover .home__camera__inner {
+  animation: none;
+}
+
+.home__camera__inner video,
+.home__camera__inner img {
+  position: relative;
+  z-index: 1;
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.home__camera:hover .home__camera__inner video,
+.home__camera:hover .home__camera__inner img {
+  transform: scale(1.15) rotate(-12deg);
+}
+
 .home__camera__label {
   position: absolute;
-  bottom: -8px;
+  bottom: 2px;
   left: 50%;
   transform: translateX(calc(-50% - 15px));
   font-family: 'Gilroy', sans-serif;
   font-weight: 900;
-  font-size: 42px;
+  font-size: 32px;
   text-transform: uppercase;
   letter-spacing: 0.03em;
   font-style: normal;
   color: #000001;
+  z-index: 0;
   opacity: 0;
   transition: opacity 0.2s ease;
   pointer-events: none;

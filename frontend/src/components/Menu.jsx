@@ -538,7 +538,7 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
                     <source src="/camera-rotation-alpha.webm" type="video/webm" />
                     <source src="/camera-rotation-alpha.mov" type="video/mp4; codecs=hvc1" />
                   </video>
-                  <span className="home__camera__label">tv1 | 40</span>
+                  <span className="home__camera__label">tv1 40 anos</span>
                 </div>
               )}
             </button>
@@ -560,7 +560,7 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
                   <source src="/camera-rotation-alpha.webm" type="video/webm" />
                   <source src="/camera-rotation-alpha.mov" type="video/mp4; codecs=hvc1" />
                 </video>
-                <span className="home__camera__label">tv1 | 40</span>
+                <span className="home__camera__label">tv1 40 anos</span>
               </div>
             )}
           </button>
@@ -688,7 +688,7 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
                 <source src="/camera-rotation-alpha.webm" type="video/webm" />
                 <source src="/camera-rotation-alpha.mov" type="video/mp4; codecs=hvc1" />
               </video>
-              <span className="home__camera__label">tv1 | 40</span>
+              <span className="home__camera__label">tv1 40 anos</span>
             </div>
           )}
         </button>
