@@ -459,9 +459,9 @@
 
 .home__camera__label {
   position: absolute;
-  top: 50%;
+  top: 100%;
   left: 50%;
-  transform: translate(-50%, -50%);
+  transform: translateX(-50%);
   width: 160px;
   height: auto;
   display: block;
