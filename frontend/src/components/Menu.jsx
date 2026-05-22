@@ -540,7 +540,7 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
                       <source src="/camera-rotation-alpha.mov" type="video/mp4; codecs=hvc1" />
                     </video>
                   </div>
-                  <span className="home__camera__label">tv1 40 anos</span>
+                  <img src="/camera-label.svg" className="home__camera__label" alt="" />
                 </>
               )}
             </button>
