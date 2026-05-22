@@ -533,13 +533,15 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
               aria-label="40 Anos TV1"
             >
               {quarentaAnos?.ativo && (
-                <div className="home__camera__inner">
-                  <video muted playsInline preload="metadata" onLoadedMetadata={e => { e.target.currentTime = 3 }}>
-                    <source src="/camera-rotation-alpha.webm" type="video/webm" />
-                    <source src="/camera-rotation-alpha.mov" type="video/mp4; codecs=hvc1" />
-                  </video>
+                <>
+                  <div className="home__camera__inner">
+                    <video muted playsInline preload="metadata" onLoadedMetadata={e => { e.target.currentTime = 3 }}>
+                      <source src="/camera-rotation-alpha.webm" type="video/webm" />
+                      <source src="/camera-rotation-alpha.mov" type="video/mp4; codecs=hvc1" />
+                    </video>
+                  </div>
                   <span className="home__camera__label">tv1 40 anos</span>
-                </div>
+                </>
               )}
             </button>
             {/* hamburguer — visível só no mobile */}
@@ -555,13 +557,15 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
             aria-label="40 Anos TV1"
           >
             {quarentaAnos?.ativo && (
-              <div className="home__camera__inner">
-                <video muted playsInline preload="metadata" onLoadedMetadata={e => { e.target.currentTime = 3 }}>
-                  <source src="/camera-rotation-alpha.webm" type="video/webm" />
-                  <source src="/camera-rotation-alpha.mov" type="video/mp4; codecs=hvc1" />
-                </video>
+              <>
+                <div className="home__camera__inner">
+                  <video muted playsInline preload="metadata" onLoadedMetadata={e => { e.target.currentTime = 3 }}>
+                    <source src="/camera-rotation-alpha.webm" type="video/webm" />
+                    <source src="/camera-rotation-alpha.mov" type="video/mp4; codecs=hvc1" />
+                  </video>
+                </div>
                 <span className="home__camera__label">tv1 40 anos</span>
-              </div>
+              </>
             )}
           </button>
 
@@ -683,13 +687,15 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
           aria-label="40 Anos TV1"
         >
           {quarentaAnos?.ativo && (
-            <div className="home__camera__inner">
-              <video muted playsInline preload="metadata" onLoadedMetadata={e => { e.target.currentTime = 3 }}>
-                <source src="/camera-rotation-alpha.webm" type="video/webm" />
-                <source src="/camera-rotation-alpha.mov" type="video/mp4; codecs=hvc1" />
-              </video>
+            <>
+              <div className="home__camera__inner">
+                <video muted playsInline preload="metadata" onLoadedMetadata={e => { e.target.currentTime = 3 }}>
+                  <source src="/camera-rotation-alpha.webm" type="video/webm" />
+                  <source src="/camera-rotation-alpha.mov" type="video/mp4; codecs=hvc1" />
+                </video>
+              </div>
               <span className="home__camera__label">tv1 40 anos</span>
-            </div>
+            </>
           )}
         </button>
         {/* hamburguer — só no mobile */}

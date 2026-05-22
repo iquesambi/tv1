@@ -59,6 +59,7 @@
 }
 
 .footer-branco__camera {
+  position: relative;
   background: none;
   border: none;
   padding: 0;
