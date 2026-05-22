@@ -734,16 +734,15 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
           return (
             <div
               key={i}
-              className={['footer-branco__nav-item', esteAberto ? 'footer-branco__nav-item--ativo' : '', acima ? 'footer-branco__nav-item--acima' : '', abaixo ? 'footer-branco__nav-item--abaixo' : ''].join(' ')}
+              className={['home__nav-item', esteAberto ? 'home__nav-item--ativo' : '', acima ? 'home__nav-item--acima' : '', abaixo ? 'home__nav-item--abaixo' : ''].join(' ')}
               onClick={e => e.stopPropagation()}
             >
               <a
                 href={link.url || '#'}
-                className={`footer-branco__nav-link ${(acima || abaixo) ? 'footer-branco__nav-link--dimmed' : ''}`}
+                className={`home__nav-link ${(acima || abaixo) ? 'home__nav-link--dimmed' : ''}`}
                 onClick={e => handleLink(e, i, link)}
-              >
-                {link.label}
-              </a>
+                dangerouslySetInnerHTML={{ __html: link.label.replace(/\|/g, '<span class="home__nav-sep">|</span>') }}
+              />
             </div>
           )
         })}
