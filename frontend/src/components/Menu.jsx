@@ -455,6 +455,38 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
   }
 
 
+  // ── NAV (compartilhado entre home e footer) ───────────────────────────────
+  const navBlock = (
+    <nav className={`home__nav ${aberto !== null ? 'home__nav--aberto' : ''} ${contatoAberto ? 'home__nav--contato' : ''}`} style={{ '--nav-count': links.length }}>
+      {contatoAberto && (
+        <div className="home__nav-contato">
+          <a href="#" className="home__nav-link home__nav-link--contato" onClick={(e) => { e.preventDefault(); e.stopPropagation() }}>SEJA CLIENTE</a>
+          <a href="/contato/trabalhe-conosco" className="home__nav-link home__nav-link--contato" onClick={(e) => { e.preventDefault(); e.stopPropagation(); goTo('/contato/trabalhe-conosco') }}>TRABALHE CONOSCO</a>
+          <a href="/contato/outros-assuntos" className="home__nav-link home__nav-link--contato" onClick={(e) => { e.preventDefault(); e.stopPropagation(); goTo('/contato/outros-assuntos') }}>OUTROS ASSUNTOS</a>
+        </div>
+      )}
+      {!contatoAberto && links.map((link, i) => {
+        const esteAberto = aberto === i
+        const acima  = aberto !== null && !esteAberto && i < aberto
+        const abaixo = aberto !== null && !esteAberto && i > aberto
+        return (
+          <div
+            key={i}
+            className={['home__nav-item', esteAberto ? 'home__nav-item--ativo' : '', acima ? 'home__nav-item--acima' : '', abaixo ? 'home__nav-item--abaixo' : ''].join(' ')}
+            onClick={e => e.stopPropagation()}
+          >
+            <a
+              href={link.url || '#'}
+              className={`home__nav-link ${(acima || abaixo) ? 'home__nav-link--dimmed' : ''}`}
+              onClick={e => handleLink(e, i, link)}
+              dangerouslySetInnerHTML={{ __html: link.label.replace(/\|/g, '<span class="home__nav-sep">|</span>') }}
+            />
+          </div>
+        )
+      })}
+    </nav>
+  )
+
   // ── HOME ──────────────────────────────────────────────────────────────────
   if (isHome) {
     return (
@@ -574,34 +606,7 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
           </div>
 
           {/* Nav central */}
-          <nav className={`home__nav ${aberto !== null ? 'home__nav--aberto' : ''} ${contatoAberto ? 'home__nav--contato' : ''}`} style={{ '--nav-count': links.length }}>
-            {contatoAberto && (
-              <div className="home__nav-contato">
-                <a href="#" className="home__nav-link home__nav-link--contato" onClick={(e) => { e.preventDefault(); e.stopPropagation() }}>SEJA CLIENTE</a>
-                <a href="/contato/trabalhe-conosco" className="home__nav-link home__nav-link--contato" onClick={(e) => { e.preventDefault(); e.stopPropagation(); goTo('/contato/trabalhe-conosco') }}>TRABALHE CONOSCO</a>
-                <a href="/contato/outros-assuntos" className="home__nav-link home__nav-link--contato" onClick={(e) => { e.preventDefault(); e.stopPropagation(); goTo('/contato/outros-assuntos') }}>OUTROS ASSUNTOS</a>
-              </div>
-            )}
-            {!contatoAberto && links.map((link, i) => {
-              const esteAberto = aberto === i
-              const acima  = aberto !== null && !esteAberto && i < aberto
-              const abaixo = aberto !== null && !esteAberto && i > aberto
-              return (
-                <div
-                  key={i}
-                  className={['home__nav-item', esteAberto ? 'home__nav-item--ativo' : '', acima ? 'home__nav-item--acima' : '', abaixo ? 'home__nav-item--abaixo' : ''].join(' ')}
-                  onClick={e => e.stopPropagation()}
-                >
-                  <a
-                    href={link.url || '#'}
-                    className={`home__nav-link ${(acima || abaixo) ? 'home__nav-link--dimmed' : ''}`}
-                    onClick={e => handleLink(e, i, link)}
-                    dangerouslySetInnerHTML={{ __html: link.label.replace(/\|/g, '<span class="home__nav-sep">|</span>') }}
-                  />
-                </div>
-              )
-            })}
-          </nav>
+          {navBlock}
 
           {/* Submenu */}
           {renderSubmenu()}
@@ -726,27 +731,7 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
       )}
 
       {/* Nav central */}
-      <nav className="home__nav" style={{ '--nav-count': links.length }}>
-        {links.map((link, i) => {
-          const esteAberto = aberto === i
-          const acima  = aberto !== null && !esteAberto && i < aberto
-          const abaixo = aberto !== null && !esteAberto && i > aberto
-          return (
-            <div
-              key={i}
-              className={['home__nav-item', esteAberto ? 'home__nav-item--ativo' : '', acima ? 'home__nav-item--acima' : '', abaixo ? 'home__nav-item--abaixo' : ''].join(' ')}
-              onClick={e => e.stopPropagation()}
-            >
-              <a
-                href={link.url || '#'}
-                className={`home__nav-link ${(acima || abaixo) ? 'home__nav-link--dimmed' : ''}`}
-                onClick={e => handleLink(e, i, link)}
-                dangerouslySetInnerHTML={{ __html: link.label.replace(/\|/g, '<span class="home__nav-sep">|</span>') }}
-              />
-            </div>
-          )
-        })}
-      </nav>
+      {navBlock}
 
       {/* Submenu */}
       {renderSubmenu()}
