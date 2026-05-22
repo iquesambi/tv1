@@ -527,23 +527,25 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
               {logo?.logo && <img src={mediaUrl(logo.logo)} alt="TV1" />}
             </div>
             {/* câmera — visível no desktop dentro do header */}
-            <button
-              className={`home__camera home__camera--desktop${cameraAtiva ? ' home__camera--oculta' : ''}`}
-              onClick={(e) => { e.stopPropagation(); if (quarentaAnos?.ativo) startCamera(e.currentTarget.getBoundingClientRect()) }}
-              aria-label="40 Anos TV1"
-            >
-              {quarentaAnos?.ativo && (
-                <>
+            <div className={`home__camera-wrap${cameraAtiva ? ' home__camera-wrap--oculta' : ''}`}>
+              <button
+                className="home__camera home__camera--desktop"
+                onClick={(e) => { e.stopPropagation(); if (quarentaAnos?.ativo) startCamera(e.currentTarget.getBoundingClientRect()) }}
+                aria-label="40 Anos TV1"
+              >
+                {quarentaAnos?.ativo && (
                   <div className="home__camera__inner">
                     <video muted playsInline preload="metadata" onLoadedMetadata={e => { e.target.currentTime = 3 }}>
                       <source src="/camera-rotation-alpha.webm" type="video/webm" />
                       <source src="/camera-rotation-alpha.mov" type="video/mp4; codecs=hvc1" />
                     </video>
                   </div>
-                  <img src="/camera-label.svg" className="home__camera__label" alt="" />
-                </>
+                )}
+              </button>
+              {quarentaAnos?.ativo && (
+                <img src="/camera-label.svg" className="home__camera__label" alt="" />
               )}
-            </button>
+            </div>
             {/* hamburguer — visível só no mobile */}
             <button className="home__hamburger" onClick={(e) => { e.stopPropagation(); setMenuMobile(true) }} aria-label="Menu">
               <span /><span /><span />
@@ -551,23 +553,25 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
           </header>
 
           {/* câmera mobile — centralizada abaixo do header */}
-          <button
-            className={`home__camera home__camera--mobile${(menuMobile || aberto !== null || cameraAtiva) ? ' home__camera--oculta' : ''}`}
-            onClick={(e) => { e.stopPropagation(); if (quarentaAnos?.ativo) startCamera(e.currentTarget.getBoundingClientRect()) }}
-            aria-label="40 Anos TV1"
-          >
-            {quarentaAnos?.ativo && (
-              <>
+          <div className={`home__camera-wrap${(menuMobile || aberto !== null || cameraAtiva) ? ' home__camera-wrap--oculta' : ''}`}>
+            <button
+              className="home__camera home__camera--mobile"
+              onClick={(e) => { e.stopPropagation(); if (quarentaAnos?.ativo) startCamera(e.currentTarget.getBoundingClientRect()) }}
+              aria-label="40 Anos TV1"
+            >
+              {quarentaAnos?.ativo && (
                 <div className="home__camera__inner">
                   <video muted playsInline preload="metadata" onLoadedMetadata={e => { e.target.currentTime = 3 }}>
                     <source src="/camera-rotation-alpha.webm" type="video/webm" />
                     <source src="/camera-rotation-alpha.mov" type="video/mp4; codecs=hvc1" />
                   </video>
                 </div>
-                <span className="home__camera__label">tv1 40 anos</span>
-              </>
+              )}
+            </button>
+            {quarentaAnos?.ativo && (
+              <img src="/camera-label.svg" className="home__camera__label" alt="" />
             )}
-          </button>
+          </div>
 
           {/* Nav central */}
           <nav className={`home__nav ${aberto !== null ? 'home__nav--aberto' : ''} ${contatoAberto ? 'home__nav--contato' : ''}`} style={{ '--nav-count': links.length }}>
@@ -681,23 +685,25 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
           {logo?.logo && <img src={mediaUrl(logo.logo)} alt="TV1" />}
         </div>
         {/* câmera — só no desktop */}
-        <button
-          className="footer-branco__camera"
-          onClick={(e) => { e.stopPropagation(); if (quarentaAnos?.ativo) startCamera(e.currentTarget.getBoundingClientRect()) }}
-          aria-label="40 Anos TV1"
-        >
-          {quarentaAnos?.ativo && (
-            <>
+        <div className="home__camera-wrap">
+          <button
+            className="footer-branco__camera"
+            onClick={(e) => { e.stopPropagation(); if (quarentaAnos?.ativo) startCamera(e.currentTarget.getBoundingClientRect()) }}
+            aria-label="40 Anos TV1"
+          >
+            {quarentaAnos?.ativo && (
               <div className="home__camera__inner">
                 <video muted playsInline preload="metadata" onLoadedMetadata={e => { e.target.currentTime = 3 }}>
                   <source src="/camera-rotation-alpha.webm" type="video/webm" />
                   <source src="/camera-rotation-alpha.mov" type="video/mp4; codecs=hvc1" />
                 </video>
               </div>
-              <span className="home__camera__label">tv1 40 anos</span>
-            </>
+            )}
+          </button>
+          {quarentaAnos?.ativo && (
+            <img src="/camera-label.svg" className="home__camera__label" alt="" />
           )}
-        </button>
+        </div>
         {/* hamburguer — só no mobile */}
         <button className="footer-branco__hamburger" onClick={(e) => { e.stopPropagation(); setMenuMobile(true) }} aria-label="Menu">
           <span /><span /><span />
