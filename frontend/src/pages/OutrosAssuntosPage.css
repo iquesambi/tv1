@@ -203,6 +203,7 @@
   .outros-main {
     padding: 60px 24px 80px;
     gap: 40px;
+    min-height: 100vh;
   }
 
   .outros-title {
