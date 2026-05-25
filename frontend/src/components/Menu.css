@@ -274,7 +274,7 @@
   filter: brightness(0) invert(1);
 }
 
-.footer-branco--escuro .footer-branco__nav-link {
+.footer-branco--escuro .home__nav-link {
   color: #fff;
 }
 
