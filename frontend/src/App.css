@@ -679,6 +679,14 @@
     align-self: center;
   }
 
+  /* Camera wrap se expande para preencher o container pai no mobile,
+     para que os filhos com position:absolute se ancorem corretamente */
+  .home__camera-wrap {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
   /* ── Câmera ── */
   .home__camera--desktop {
     display: none;
@@ -687,7 +695,7 @@
   .home__camera--mobile {
     display: block;
     position: absolute;
-    top: 26%;
+    top: 32%;
     left: 50%;
     transform: translate(-50%, -50%);
     z-index: 3;
@@ -699,7 +707,7 @@
 
   .home__camera--mobile img,
   .home__camera--mobile video {
-    height: 135px;
+    height: 162px;
     width: auto;
     object-fit: contain;
     display: block;
