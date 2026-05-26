@@ -150,14 +150,14 @@ function logoImgStyle(logo, escala = 1) {
 
   // Portrait (escudos, empilhados — WB, GWM): normaliza por largura-alvo
   if (aspect < 1) {
-    const targetW = Math.round(58 * scale)
-    const h = Math.min(Math.round(68 * scale), Math.round(targetW / aspect))
+    const targetW = Math.round(75 * scale)
+    const h = Math.min(Math.round(88 * scale), Math.round(targetW / aspect))
     return { height: h, width: targetW }
   }
 
-  // Landscape/quadrados: teto 34px, redução começa cedo (aspect > 1)
+  // Landscape/quadrados: teto 44px, redução começa cedo (aspect > 1)
   const t = Math.min(Math.max(aspect - 1, 0) / 2.5, 1)
-  let h = Math.max(Math.round((34 - t * 8) * scale), aspect > 2.8 ? 20 : 16)
+  let h = Math.max(Math.round((44 - t * 10) * scale), aspect > 2.8 ? 26 : 21)
   let w = Math.round(h * aspect)
   if (w > LOGO_MAX_W) { w = LOGO_MAX_W; h = Math.round(w / aspect) }
   return { height: h, width: w }
