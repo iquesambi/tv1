@@ -20,6 +20,7 @@ export function TransitionProvider({ children }) {
   const navigate = useNavigate()
   const [ativa, setAtiva] = useState(false)
   const [cameraAnim, setCameraAnim] = useState(null) // null | { rect, expanded }
+  const [cover, setCover] = useState(false)          // fundo preto separado do vídeo
   const timer = useRef(null)
   const overlayVideoRef = useRef(null)
   const cameraTriggered = useRef(false)
@@ -36,6 +37,7 @@ export function TransitionProvider({ children }) {
 
   const startCamera = useCallback((rect) => {
     cameraTriggered.current = false
+    setCover(true)           // cobre a tela IMEDIATAMENTE, sem transição
     setCameraAnim({ rect, expanded: false })
   }, [])
 
@@ -59,6 +61,15 @@ export function TransitionProvider({ children }) {
     <Ctx.Provider value={{ goTo, startCamera, cameraAtiva: !!cameraAnim }}>
       {children}
       <div className={`cartela ${ativa ? 'cartela--ativa' : ''}`} />
+
+      {/* Fundo preto separado — aparece antes do vídeo, some depois da nova rota montar */}
+      {cover && (
+        <div style={{
+          position: 'fixed', inset: 0, zIndex: 9997, background: '#000001',
+          pointerEvents: 'none',
+        }} />
+      )}
+
       {cameraAnim && (
         <video
           ref={overlayVideoRef}
@@ -77,9 +88,10 @@ export function TransitionProvider({ children }) {
           onTimeUpdate={e => {
             if (e.target.currentTime >= 4.2) {
               e.target.pause()
-              // Navega primeiro; só remove o overlay depois da nova rota montar
+              setCameraAnim(null)
               navigate('/quarenta-anos')
-              setTimeout(() => setCameraAnim(null), 300)
+              // Remove o fundo só depois da nova rota estar montada
+              setTimeout(() => setCover(false), 400)
             }
           }}
         >
