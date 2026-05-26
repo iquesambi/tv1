@@ -54,19 +54,25 @@ export function TransitionProvider({ children }) {
     video.playbackRate = 1.3
     video.play().catch(() => {})
 
-    // RAF loop separado — não cancela quando cameraAnim muda para expanded:true
+    let done = false
+    const doNavigate = () => {
+      if (done) return
+      done = true
+      cancelAnimationFrame(rafLoopRef.current)
+      video.pause()
+      setCameraAnim(null)
+      navigateRef.current('/quarenta-anos')
+    }
+
+    // Evento ended — dispara quando o vídeo termina naturalmente
+    video.addEventListener('ended', doNavigate, { once: true })
+
+    // RAF loop — dispara antecipadamente em ~4.7s (antes do fim)
     cancelAnimationFrame(rafLoopRef.current)
     const loop = () => {
-      const t = video.currentTime
-      // Pula frames congelados 3.08–3.24s
-      if (t >= 3.08 && t < 3.24) {
-        video.currentTime = 3.24
-      }
-      if (t >= 4.7 || video.ended) {
-        video.pause()
-        setCameraAnim(null)
-        navigateRef.current('/quarenta-anos')
-        return // não agenda próximo frame
+      if (video.currentTime >= 4.7 || video.ended) {
+        doNavigate()
+        return
       }
       rafLoopRef.current = requestAnimationFrame(loop)
     }
