@@ -74,9 +74,13 @@ export function TransitionProvider({ children }) {
             width:  cameraAnim.expanded ? '100vw' : `${cameraAnim.rect.width}px`,
             height: cameraAnim.expanded ? '100vh' : `${cameraAnim.rect.height}px`,
           }}
-          onEnded={() => {
-            setCameraAnim(null)
-            navigate('/quarenta-anos')
+          onTimeUpdate={e => {
+            // Dispara ~0.5s antes do fim (0.5 * playbackRate 1.3 ≈ 0.65s de vídeo)
+            if (e.target.currentTime >= 4.2) {
+              e.target.pause()
+              setCameraAnim(null)
+              navigate('/quarenta-anos')
+            }
           }}
         >
           <source src="/camera-rotation-alpha.webm" type="video/webm" />
