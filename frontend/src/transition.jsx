@@ -75,7 +75,7 @@ export function TransitionProvider({ children }) {
             height: cameraAnim.expanded ? '100vh' : `${cameraAnim.rect.height}px`,
           }}
           onTimeUpdate={e => {
-            if (e.target.currentTime >= 4.9) {
+            if (e.target.currentTime >= 4.8) {
               e.target.pause()
               setCameraAnim(null)
               navigate('/quarenta-anos')
