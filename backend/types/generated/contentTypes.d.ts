@@ -737,7 +737,7 @@ export interface ApiQuemSomosQuemSomos extends Struct.SingleTypeSchema {
       Schema.Attribute.Private;
     publishedAt: Schema.Attribute.DateTime;
     tagline: Schema.Attribute.Text;
-    texto_era: Schema.Attribute.Text;
+    texto_era: Schema.Attribute.Blocks;
     texto_intro: Schema.Attribute.RichText;
     titulo_era: Schema.Attribute.String;
     titulo_era_italico: Schema.Attribute.String;

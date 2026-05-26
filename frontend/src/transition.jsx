@@ -23,6 +23,9 @@ export function TransitionProvider({ children }) {
   const timer = useRef(null)
   const overlayVideoRef = useRef(null)
   const cameraTriggered = useRef(false)
+  const rafLoopRef = useRef(null)
+  const navigateRef = useRef(navigate)
+  useEffect(() => { navigateRef.current = navigate }, [navigate])
 
   const goTo = useCallback((path, onNavigated, state) => {
     clearTimeout(timer.current)
@@ -39,21 +42,41 @@ export function TransitionProvider({ children }) {
     setCameraAnim({ rect, expanded: false })
   }, [])
 
-  // Play + expand juntos logo após o overlay montar
+  // Play + expand logo após o overlay montar
   useEffect(() => {
     if (!cameraAnim || cameraTriggered.current) return
     cameraTriggered.current = true
 
     const video = overlayVideoRef.current
-    if (video) {
-      video.currentTime = CAMERA_START_TIME
-      video.playbackRate = 1.3
-      video.play().catch(() => {})
+    if (!video) return
+
+    video.currentTime = CAMERA_START_TIME
+    video.playbackRate = 1.3
+    video.play().catch(() => {})
+
+    // RAF loop separado — não cancela quando cameraAnim muda para expanded:true
+    cancelAnimationFrame(rafLoopRef.current)
+    const loop = () => {
+      const t = video.currentTime
+      // Pula frames congelados 3.08–3.24s
+      if (t >= 3.08 && t < 3.24) {
+        video.currentTime = 3.24
+      }
+      if (t >= 4.9) {
+        video.pause()
+        setCameraAnim(null)
+        navigateRef.current('/quarenta-anos')
+        return // não agenda próximo frame
+      }
+      rafLoopRef.current = requestAnimationFrame(loop)
     }
+    rafLoopRef.current = requestAnimationFrame(loop)
+
+    // Expande o overlay (muda só expanded, não recria o effect)
     requestAnimationFrame(() => requestAnimationFrame(() => {
       setCameraAnim(p => p ? { ...p, expanded: true } : null)
     }))
-  }, [cameraAnim])
+  }, [cameraAnim?.rect]) // depende só de rect — não dispara de novo ao mudar expanded
 
   return (
     <Ctx.Provider value={{ goTo, startCamera, cameraAtiva: !!cameraAnim }}>
@@ -73,13 +96,6 @@ export function TransitionProvider({ children }) {
             left:   cameraAnim.expanded ? 0 : `${cameraAnim.rect.left}px`,
             width:  cameraAnim.expanded ? '100vw' : `${cameraAnim.rect.width}px`,
             height: cameraAnim.expanded ? '100vh' : `${cameraAnim.rect.height}px`,
-          }}
-          onTimeUpdate={e => {
-            if (e.target.currentTime >= 4.8) {
-              e.target.pause()
-              setCameraAnim(null)
-              navigate('/quarenta-anos')
-            }
           }}
         >
           <source src="/camera-rotation-alpha.webm" type="video/webm" />
