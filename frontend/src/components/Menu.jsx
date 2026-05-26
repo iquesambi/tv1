@@ -2,8 +2,124 @@ import { useEffect, useRef, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import axios from 'axios'
 import { useGoTo, useStartCamera, useCameraAtiva } from '../transition.jsx'
+import { CAMERA_START_TIME } from '../cameraConfig.js'
 import '../App.css'
 import './Menu.css'
+
+// Câmera: vai 0→END (1s+1frame), segura 1s, volta→0, espera 7s, repete
+// No hover: vai até END e segura enquanto mouse estiver sobre a câmera
+const PINGPONG_START = 10 / 30       // frame 10 — posição de repouso
+const PINGPONG_END   = CAMERA_START_TIME
+const PINGPONG_HOLD  = 1000          // ms no pico
+const PINGPONG_WAIT  = 7000          // ms após ciclo
+
+function CameraVideo() {
+  const videoRef   = useRef(null)
+  const dirRef     = useRef(1)
+  const waitRef    = useRef(false)
+  const hoveredRef = useRef(false)
+  const timerRef   = useRef(null)
+  const rafRef     = useRef(null)
+
+  useEffect(() => {
+    const video = videoRef.current
+    if (!video) return
+
+    let prev = null
+
+    const startCycle = () => {
+      if (hoveredRef.current) return
+      waitRef.current   = false
+      dirRef.current    = 1
+      video.currentTime = PINGPONG_START
+      prev = null
+      rafRef.current = requestAnimationFrame(step)
+    }
+
+    const holdAtPeak = () => {
+      video.currentTime = PINGPONG_END
+      waitRef.current   = true
+      cancelAnimationFrame(rafRef.current)
+      clearTimeout(timerRef.current)
+    }
+
+    const step = (ts) => {
+      if (waitRef.current) return
+      if (prev !== null) {
+        const delta = (ts - prev) / 1000
+        let next = video.currentTime + dirRef.current * delta
+
+        if (next >= PINGPONG_END) {
+          holdAtPeak()
+          if (!hoveredRef.current) {
+            timerRef.current = setTimeout(() => {
+              waitRef.current = false
+              dirRef.current  = -1
+              prev = null
+              rafRef.current  = requestAnimationFrame(step)
+            }, PINGPONG_HOLD)
+          }
+          return
+        } else if (next <= PINGPONG_START && dirRef.current === -1) {
+          video.currentTime = PINGPONG_START
+          waitRef.current   = true
+          timerRef.current  = setTimeout(startCycle, PINGPONG_WAIT)
+          return
+        }
+        video.currentTime = next
+      }
+      prev = ts
+      rafRef.current = requestAnimationFrame(step)
+    }
+
+    const onEnter = () => {
+      hoveredRef.current = true
+      clearTimeout(timerRef.current)
+      cancelAnimationFrame(rafRef.current)
+      if (video.currentTime < PINGPONG_END) {
+        waitRef.current = false
+        dirRef.current  = 1
+        prev = null
+        rafRef.current  = requestAnimationFrame(step)
+      } else {
+        holdAtPeak()
+      }
+    }
+
+    const onLeave = () => {
+      hoveredRef.current = false
+      clearTimeout(timerRef.current)
+      waitRef.current = false
+      dirRef.current  = -1
+      prev = null
+      rafRef.current  = requestAnimationFrame(step)
+    }
+
+    video.addEventListener('mouseenter', onEnter)
+    video.addEventListener('mouseleave', onLeave)
+
+    if (video.readyState >= 2) {
+      startCycle()
+    } else {
+      video.addEventListener('loadeddata', startCycle, { once: true })
+    }
+
+    return () => {
+      cancelAnimationFrame(rafRef.current)
+      clearTimeout(timerRef.current)
+      video.removeEventListener('loadeddata', startCycle)
+      video.removeEventListener('mouseenter', onEnter)
+      video.removeEventListener('mouseleave', onLeave)
+    }
+  }, [])
+
+  return (
+    <video ref={videoRef} muted playsInline preload="auto">
+      <source src="/camera-rotation-alpha.webm" type="video/webm" />
+      <source src="/camera-rotation-alpha.mov" type="video/mp4; codecs=hvc1" />
+    </video>
+  )
+}
 
 const STRAPI = 'https://tv1-53ev.onrender.com'
 const api = (path) => axios.get(`${STRAPI}/api/${path}`).then(r => r.data.data).catch(() => null)
@@ -566,12 +682,7 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
                 aria-label="40 Anos TV1"
               >
                 {quarentaAnos?.ativo && (
-                  <div className="home__camera__inner">
-                    <video muted playsInline preload="metadata" onLoadedMetadata={e => { e.target.currentTime = 3 }}>
-                      <source src="/camera-rotation-alpha.webm" type="video/webm" />
-                      <source src="/camera-rotation-alpha.mov" type="video/mp4; codecs=hvc1" />
-                    </video>
-                  </div>
+                  <CameraVideo />
                 )}
               </button>
               {quarentaAnos?.ativo && (
@@ -592,12 +703,7 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
               aria-label="40 Anos TV1"
             >
               {quarentaAnos?.ativo && (
-                <div className="home__camera__inner">
-                  <video muted playsInline preload="metadata" onLoadedMetadata={e => { e.target.currentTime = 3 }}>
-                    <source src="/camera-rotation-alpha.webm" type="video/webm" />
-                    <source src="/camera-rotation-alpha.mov" type="video/mp4; codecs=hvc1" />
-                  </video>
-                </div>
+                <CameraVideo />
               )}
             </button>
             {quarentaAnos?.ativo && (
@@ -697,12 +803,7 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
             aria-label="40 Anos TV1"
           >
             {quarentaAnos?.ativo && (
-              <div className="home__camera__inner">
-                <video muted playsInline preload="metadata" onLoadedMetadata={e => { e.target.currentTime = 3 }}>
-                  <source src="/camera-rotation-alpha.webm" type="video/webm" />
-                  <source src="/camera-rotation-alpha.mov" type="video/mp4; codecs=hvc1" />
-                </video>
-              </div>
+              <CameraVideo />
             )}
           </button>
           {quarentaAnos?.ativo && (
@@ -719,12 +820,7 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
       {quarentaAnos?.ativo && (
         <div className={`home__camera-wrap${(menuMobile || aberto !== null || cameraAtiva) ? ' home__camera-wrap--oculta' : ''}`}>
           <div className="footer-branco__camera-mobile" onClick={(e) => { e.stopPropagation(); startCamera(e.currentTarget.getBoundingClientRect()) }}>
-            <div className="home__camera__inner">
-              <video muted playsInline preload="metadata" onLoadedMetadata={e => { e.target.currentTime = 3 }}>
-                <source src="/camera-rotation-alpha.webm" type="video/webm" />
-                <source src="/camera-rotation-alpha.mov" type="video/mp4; codecs=hvc1" />
-              </video>
-            </div>
+            <CameraVideo />
           </div>
           <img src="/camera-label.svg" className="home__camera__label" alt="" />
         </div>

@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { CAMERA_START_TIME } from './cameraConfig.js'
 
 const Ctx = createContext(null)
 
@@ -45,7 +46,7 @@ export function TransitionProvider({ children }) {
 
     const video = overlayVideoRef.current
     if (video) {
-      video.currentTime = 3
+      video.currentTime = CAMERA_START_TIME
       video.play().catch(() => {})
     }
     requestAnimationFrame(() => requestAnimationFrame(() => {
@@ -73,7 +74,7 @@ export function TransitionProvider({ children }) {
             height: cameraAnim.expanded ? '100vh' : `${cameraAnim.rect.height}px`,
           }}
           onTimeUpdate={e => {
-            if (e.target.currentTime >= 12) {
+            if (e.target.currentTime >= 4.9) {
               e.target.pause()
               setCameraAnim(null)
               navigate('/quarenta-anos')

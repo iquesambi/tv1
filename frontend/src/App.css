@@ -107,6 +107,7 @@
 
 .home__camera-wrap {
   position: relative;
+  margin-top: -35px;
 }
 
 .home__camera-wrap--oculta {
@@ -123,10 +124,6 @@
   transition: transform 0.35s ease-out;
 }
 
-.home__camera:hover,
-.footer-branco__camera:hover {
-  transform: scale(1.15) rotate(-12deg);
-}
 
 .home__camera img,
 .home__camera video {
@@ -433,25 +430,12 @@
 
 /* ── câmera: wrapper interno (shake + label hover) ── */
 
-@keyframes camera-rattle {
-  0%   { transform: rotate(0deg) scale(1); animation-timing-function: ease-in; }
-  4%   { transform: rotate(-12deg) scale(1.15); animation-timing-function: ease-out; }
-  9%   { transform: rotate(0deg) scale(1); }
-  100% { transform: rotate(0deg) scale(1); }
-}
-
 .home__camera__inner {
   position: relative;
   z-index: 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  animation: camera-rattle 10s linear infinite;
-}
-
-.home__camera:hover .home__camera__inner,
-.footer-branco__camera:hover .home__camera__inner {
-  animation-play-state: paused;
 }
 
 .home__camera__inner video,
@@ -481,9 +465,7 @@
 }
 
 
-.home__camera-wrap:hover .home__camera__label {
-  opacity: 1;
-}
+/* .home__camera-wrap:hover .home__camera__label { opacity: 1; } */
 
 /* ── MENU MOBILE OVERLAY ──────────────── */
 
