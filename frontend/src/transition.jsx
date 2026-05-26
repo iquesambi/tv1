@@ -75,11 +75,11 @@ export function TransitionProvider({ children }) {
             height: cameraAnim.expanded ? '100vh' : `${cameraAnim.rect.height}px`,
           }}
           onTimeUpdate={e => {
-            // Dispara ~0.5s antes do fim (0.5 * playbackRate 1.3 ≈ 0.65s de vídeo)
             if (e.target.currentTime >= 4.2) {
               e.target.pause()
-              setCameraAnim(null)
+              // Navega primeiro; só remove o overlay depois da nova rota montar
               navigate('/quarenta-anos')
+              setTimeout(() => setCameraAnim(null), 300)
             }
           }}
         >
