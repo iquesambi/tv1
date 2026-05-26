@@ -134,6 +134,34 @@ const externalUrl = (url) => {
 const _pf = window.__TV1_DATA__ ?? {}
 
 const SUBMENU_VISIBLE = 7
+
+// Normalização óptica de logos:
+// - height explícito (não max-height) para SVGs serem corretamente constrangidos
+// - logos quadrados/circulares recebem MAIS altura (círculo de 50px ≈ texto de 38px em peso visual)
+// - logos horizontais muito largos recebem menos altura para não dominar
+// aspect ≤ 1  → 50px   (VW, Bayer, Shell)
+// aspect = 2  → 44px   (McDonald's, NU)
+// aspect ≥ 3  → 38px, mas capped pelo max-width 130px
+const LOGO_MAX_W = 130
+
+function logoImgStyle(logo, escala = 1) {
+  const aspect = (logo?.width && logo?.height) ? logo.width / logo.height : 1.8
+  const scale  = Math.max(0.3, Math.min(3, escala || 1))   // clamp seguro
+
+  // Portrait (escudos, empilhados — WB, GWM): normaliza por largura-alvo
+  if (aspect < 1) {
+    const targetW = Math.round(58 * scale)
+    const h = Math.min(Math.round(68 * scale), Math.round(targetW / aspect))
+    return { height: h, width: targetW }
+  }
+
+  // Landscape/quadrados: teto 34px, redução começa cedo (aspect > 1)
+  const t = Math.min(Math.max(aspect - 1, 0) / 2.5, 1)
+  let h = Math.max(Math.round((34 - t * 8) * scale), aspect > 2.8 ? 20 : 16)
+  let w = Math.round(h * aspect)
+  if (w > LOGO_MAX_W) { w = LOGO_MAX_W; h = Math.round(w / aspect) }
+  return { height: h, width: w }
+}
 const ITEM_H_D = 70
 const ITEM_H_M = 46
 const WIN_PAD  = 48
@@ -482,10 +510,20 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
     const itemCenterY = vh * 0.47 + (aberto - (N - 1) / 2) * navItemH
     const itemBottomY = itemCenterY + navItemH / 2
 
-    // Grid de logos para Clientes
+    // Grid de logos para Clientes — layout intercalado (7, 6, 7, 6...)
     if (isClientes && clientes?.length) {
-      const rows = Math.ceil(clientes.length / 6)
-      const estimatedGridH = rows * 56 + (rows - 1) * 32 + 80 // itens + gaps + padding
+      // Divide em linhas alternando 7 e 6 itens
+      const logoRows = []
+      let idx = 0, rowIdx = 0
+      while (idx < clientes.length) {
+        const size = rowIdx % 2 === 0 ? 7 : 6
+        logoRows.push(clientes.slice(idx, idx + size))
+        idx += size
+        rowIdx++
+      }
+
+      const numRows = logoRows.length
+      const estimatedGridH = numRows * 56 + (numRows - 1) * 32 + 80 // itens + gaps + padding
       // Centraliza verticalmente no viewport
       const gridTop = Math.min(
         Math.max((vh - estimatedGridH) / 2, vh * 0.25),
@@ -494,18 +532,22 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
       return (
         <div className="home__submenu" onClick={e => e.stopPropagation()}>
           <div className="home__submenu-logos" style={{ top: gridTop }}>
-            {clientes.map((c, j) => (
-              <a
-                key={j}
-                href={`/${c.slug}`}
-                className="home__submenu-logo-item"
-                onClick={handleSubClick({ url: `/${c.slug}` })}
-              >
-                {c.logo
-                  ? <img src={mediaUrl(c.logo)} alt={c.nome} />
-                  : <span className="home__submenu-logo-fallback">{c.nome}</span>
-                }
-              </a>
+            {logoRows.map((row, r) => (
+              <div key={r} className="home__submenu-logos__row">
+                {row.map((c, j) => (
+                  <a
+                    key={j}
+                    href={`/${c.slug}`}
+                    className="home__submenu-logo-item"
+                    onClick={handleSubClick({ url: `/${c.slug}` })}
+                  >
+                    {c.logo
+                      ? <img src={mediaUrl(c.logo)} alt={c.nome} style={logoImgStyle(c.logo, c.escala_logo)} />
+                      : <span className="home__submenu-logo-fallback">{c.nome}</span>
+                    }
+                  </a>
+                ))}
+              </div>
             ))}
           </div>
         </div>

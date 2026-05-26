@@ -221,15 +221,23 @@
   right: 0;
   margin-left: auto;
   margin-right: auto;
-  display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  gap: 32px 48px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 44px;
   background: #fff;
   padding: 40px 48px;
   border-radius: 4px;
-  width: fit-content;
+  /* largura exata para 7 items: 7 × 130px + 6 gaps × 40px + 2 × 48px padding */
+  width: calc(7 * 130px + 6 * 40px + 2 * 48px);
   pointer-events: auto;
   z-index: 10;
+}
+
+.home__submenu-logos__row {
+  display: flex;
+  justify-content: center;
+  gap: 56px;
 }
 
 .home__submenu-logo-item {
@@ -237,6 +245,7 @@
   align-items: center;
   justify-content: center;
   height: 56px;
+  flex: 0 0 130px;
   text-decoration: none;
   transition: opacity 0.2s ease;
 }
@@ -246,10 +255,6 @@
 }
 
 .home__submenu-logo-item img {
-  max-height: 48px;
-  max-width: 100px;
-  width: auto;
-  height: auto;
   object-fit: contain;
   display: block;
 }
