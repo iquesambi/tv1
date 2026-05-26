@@ -55,28 +55,23 @@ export function TransitionProvider({ children }) {
     video.play().catch(() => {})
 
     let done = false
+    let safeTimer = null
     const doNavigate = () => {
       if (done) return
       done = true
-      cancelAnimationFrame(rafLoopRef.current)
+      clearTimeout(safeTimer)
+      // Navega antes de remover o overlay para não piscar o menu
+      navigateRef.current('/quarenta-anos')
       video.pause()
       setCameraAnim(null)
-      navigateRef.current('/quarenta-anos')
     }
 
-    // Evento ended — dispara quando o vídeo termina naturalmente
+    // Evento ended — dispara quando o vídeo termina naturalmente (sem cortar frames)
     video.addEventListener('ended', doNavigate, { once: true })
 
-    // RAF loop — dispara antecipadamente em ~4.7s (antes do fim)
-    cancelAnimationFrame(rafLoopRef.current)
-    const loop = () => {
-      if (video.currentTime >= 4.7 || video.ended) {
-        doNavigate()
-        return
-      }
-      rafLoopRef.current = requestAnimationFrame(loop)
-    }
-    rafLoopRef.current = requestAnimationFrame(loop)
+    // Timeout de segurança caso o ended não dispare
+    const safeDuration = ((video.duration || 4.87) - CAMERA_START_TIME) / video.playbackRate
+    safeTimer = setTimeout(doNavigate, (safeDuration + 0.3) * 1000)
 
     // Expande o overlay (muda só expanded, não recria o effect)
     requestAnimationFrame(() => requestAnimationFrame(() => {
