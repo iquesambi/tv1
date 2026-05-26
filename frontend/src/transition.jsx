@@ -62,7 +62,7 @@ export function TransitionProvider({ children }) {
       if (t >= 3.08 && t < 3.24) {
         video.currentTime = 3.24
       }
-      if (t >= 4.9) {
+      if (t >= 4.7 || video.ended) {
         video.pause()
         setCameraAnim(null)
         navigateRef.current('/quarenta-anos')
