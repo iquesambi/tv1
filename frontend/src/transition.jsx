@@ -47,6 +47,7 @@ export function TransitionProvider({ children }) {
     const video = overlayVideoRef.current
     if (video) {
       video.currentTime = CAMERA_START_TIME
+      video.playbackRate = 1.3
       video.play().catch(() => {})
     }
     requestAnimationFrame(() => requestAnimationFrame(() => {
