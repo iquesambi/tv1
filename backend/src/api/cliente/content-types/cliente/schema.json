@@ -30,6 +30,12 @@
       "multiple": false,
       "required": false,
       "allowedTypes": ["images"]
+    },
+    "escala_logo": {
+      "type": "decimal",
+      "default": 1,
+      "min": 0.3,
+      "max": 3
     }
   }
 }
