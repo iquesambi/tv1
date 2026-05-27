@@ -85,15 +85,13 @@ export function TransitionProvider({ children }) {
             height: cameraAnim.expanded ? '100vh' : `${cameraAnim.rect.height}px`,
           }}
           onTimeUpdate={e => {
-            // Congela 3 frames antes do fim (30fps → 0.1s antes da duração)
-            const freezeAt = (e.target.duration || 4.866) - 3 / 30
-            if (e.target.currentTime >= freezeAt) {
+            // Vídeo original tem 5.033s; threshold 4.9 = quase no fim
+            if (e.target.currentTime >= 4.9) {
               e.target.pause()
               navigate('/quarenta-anos')
               const remove = () => {
                 window.removeEventListener('qa-page-ready', remove)
                 clearTimeout(fallback)
-                // 2 frames extras para garantir que a nova rota foi pintada
                 requestAnimationFrame(() => requestAnimationFrame(() => setCameraAnim(null)))
               }
               const fallback = setTimeout(remove, 3000)
