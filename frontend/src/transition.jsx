@@ -74,11 +74,14 @@ export function TransitionProvider({ children }) {
             width:  cameraAnim.expanded ? '100vw' : `${cameraAnim.rect.width}px`,
             height: cameraAnim.expanded ? '100vh' : `${cameraAnim.rect.height}px`,
           }}
-          onEnded={() => {
-            // Vídeo terminou — congela naturalmente no último frame (preto opaco).
-            // Navega POR BAIXO do frame congelado, depois remove ele.
-            navigate('/quarenta-anos')
-            setTimeout(() => setCameraAnim(null), 400)
+          onTimeUpdate={e => {
+            // Congela 3 frames antes do fim (30fps → 0.1s antes da duração)
+            const freezeAt = (e.target.duration || 4.866) - 3 / 30
+            if (e.target.currentTime >= freezeAt) {
+              e.target.pause()
+              navigate('/quarenta-anos')
+              setTimeout(() => setCameraAnim(null), 400)
+            }
           }}
         >
           <source src="/camera-rotation-alpha.webm" type="video/webm" />
