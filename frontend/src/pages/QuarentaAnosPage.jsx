@@ -6,10 +6,17 @@ import CasesTimeline from '../components/CasesTimeline.jsx'
 import './QuarentaAnosPage.css'
 
 const STRAPI = 'https://tv1-53ev.onrender.com'
+const QA_PATH = 'quarenta-anos?populate[imagem]=true&populate[video_capa]=true&populate[fotos]=true'
 const api = (path) => axios.get(`${STRAPI}/api/${path}`).then(r => r.data.data).catch(() => null)
 const mediaUrl = (obj) => !obj?.url ? null : obj.url.startsWith("http") ? obj.url : `${STRAPI}${obj.url}`
 
-
+// Pré-busca usada pela transição da câmera para que os dados já estejam prontos
+// antes do overlay sair
+let qaPrefetch = null
+export function prefetchQuarentaAnos() {
+  if (!qaPrefetch) qaPrefetch = api(QA_PATH)
+  return qaPrefetch
+}
 
 export default function QuarentaAnosPage() {
 
@@ -27,9 +34,21 @@ export default function QuarentaAnosPage() {
   const heroBgY = useTransform(heroProgress, [0, 1], ['0%', '30%'])
 
   useEffect(() => {
-    api('quarenta-anos?populate[imagem]=true&populate[video_capa]=true&populate[fotos]=true').then(setData)
+    (qaPrefetch || api(QA_PATH)).then(setData)
     document.body.classList.remove('scroll-locked')
   }, [])
+
+  // Sinaliza pronto quando dados chegam E a imagem do hero termina de carregar
+  useEffect(() => {
+    if (!data) return
+    const capaUrl = data?.video_capa ? mediaUrl(data.video_capa) : null
+    const fire = () => window.dispatchEvent(new Event('qa-page-ready'))
+    if (!capaUrl) { fire(); return }
+    const img = new Image()
+    img.onload = fire
+    img.onerror = fire
+    img.src = capaUrl
+  }, [data])
 
   const fotos = (data?.fotos ?? []).map(f => mediaUrl(f)).filter(Boolean)
 

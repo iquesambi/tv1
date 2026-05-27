@@ -48,8 +48,15 @@
   opacity: 1;
 }
 
-/* Quando a câmera está ativa, esconde o conteúdo do menu (mantém só o fundo
-   branco) para que o alpha do vídeo não mostre os textos por trás */
+/* Quando a câmera está ativa, esconde o conteúdo do menu e pinta o fundo de
+   preto. O vídeo termina em preto opaco e a /quarenta-anos também é preta,
+   então a transição fica contínua sem nenhum flash */
+body.camera-ativa {
+  background: #000001;
+}
+body.camera-ativa .home {
+  background: transparent;
+}
 body.camera-ativa .home > *:not(.home__menu-mobile) {
   opacity: 0;
   transition: opacity 0.2s ease;

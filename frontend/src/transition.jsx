@@ -1,6 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { CAMERA_START_TIME } from './cameraConfig.js'
+import { prefetchQuarentaAnos } from './pages/QuarentaAnosPage.jsx'
 
 const Ctx = createContext(null)
 
@@ -36,6 +37,8 @@ export function TransitionProvider({ children }) {
 
   const startCamera = useCallback((rect) => {
     cameraTriggered.current = false
+    // Pré-busca a página de destino em paralelo com a animação do vídeo (~3s)
+    prefetchQuarentaAnos()
     setCameraAnim({ rect, expanded: false })
   }, [])
 
@@ -87,7 +90,14 @@ export function TransitionProvider({ children }) {
             if (e.target.currentTime >= freezeAt) {
               e.target.pause()
               navigate('/quarenta-anos')
-              setTimeout(() => setCameraAnim(null), 400)
+              const remove = () => {
+                window.removeEventListener('qa-page-ready', remove)
+                clearTimeout(fallback)
+                // 2 frames extras para garantir que a nova rota foi pintada
+                requestAnimationFrame(() => requestAnimationFrame(() => setCameraAnim(null)))
+              }
+              const fallback = setTimeout(remove, 3000)
+              window.addEventListener('qa-page-ready', remove, { once: true })
             }
           }}
         >
