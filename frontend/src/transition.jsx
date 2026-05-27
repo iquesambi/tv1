@@ -39,6 +39,13 @@ export function TransitionProvider({ children }) {
     setCameraAnim({ rect, expanded: false })
   }, [])
 
+  // Esconde o conteúdo do menu enquanto a câmera está ativa para que o alpha
+  // do vídeo não mostre o texto do menu por trás durante a animação
+  useEffect(() => {
+    if (cameraAnim) document.body.classList.add('camera-ativa')
+    else document.body.classList.remove('camera-ativa')
+  }, [!!cameraAnim])
+
   // Play + expand logo após o overlay montar
   useEffect(() => {
     if (!cameraAnim || cameraTriggered.current) return

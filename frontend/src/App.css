@@ -48,6 +48,13 @@
   opacity: 1;
 }
 
+/* Quando a câmera está ativa, esconde o conteúdo do menu (mantém só o fundo
+   branco) para que o alpha do vídeo não mostre os textos por trás */
+body.camera-ativa .home > *:not(.home__menu-mobile) {
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
 /* ── BACKGROUND POR LINK ──────────────── */
 
 .home__bg {
