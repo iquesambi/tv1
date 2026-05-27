@@ -74,15 +74,11 @@ export function TransitionProvider({ children }) {
             width:  cameraAnim.expanded ? '100vw' : `${cameraAnim.rect.width}px`,
             height: cameraAnim.expanded ? '100vh' : `${cameraAnim.rect.height}px`,
           }}
-          onTimeUpdate={e => {
-            if (e.target.currentTime >= 4.7) {
-              // Pausa no frame preto opaco (já confirmado: t>=4s é preto sólido).
-              // O próprio vídeo pausado faz o "backdrop" — navega primeiro, só
-              // remove o overlay depois da nova rota ter renderizado.
-              e.target.pause()
-              navigate('/quarenta-anos')
-              setTimeout(() => setCameraAnim(null), 400)
-            }
+          onEnded={() => {
+            // Vídeo terminou — congela naturalmente no último frame (preto opaco).
+            // Navega POR BAIXO do frame congelado, depois remove ele.
+            navigate('/quarenta-anos')
+            setTimeout(() => setCameraAnim(null), 400)
           }}
         >
           <source src="/camera-rotation-alpha.webm" type="video/webm" />
