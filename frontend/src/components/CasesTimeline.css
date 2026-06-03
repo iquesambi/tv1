@@ -1,3 +1,25 @@
+/* ── PROPORÇÃO NATURAL ─────────────────── */
+
+.cliente-card--proporcao-natural {
+  align-self: center;
+  width: fit-content !important;
+  height: fit-content !important;
+  background: transparent;
+  position: relative;
+  z-index: 2;
+}
+
+.cliente-card--proporcao-natural .cliente-card__img {
+  display: block !important;
+  width: auto !important;
+  height: auto !important;
+  max-height: 65vh !important;
+  max-width: clamp(220px, 26vw, 380px) !important;
+  object-fit: unset !important;
+  position: relative;
+  z-index: 2;
+}
+
 /* ── WRAPPER BASE ─────────────────────── */
 
 .cases-timeline {

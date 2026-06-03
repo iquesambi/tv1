@@ -104,16 +104,32 @@ function gruposDeLabels(entradas) {
 }
 
 /* ── Card ── */
-function CaseCard({ entrada, idx, carousel, navState = null }) {
+function CaseCard({ entrada, idx, carousel, proporcaoNatural = false, maxImageHeight = null, navState = null }) {
   const goTo = useGoTo()
+
+  const cardStyle = proporcaoNatural
+    ? { alignSelf: 'center', width: 'fit-content', height: 'fit-content', background: 'transparent' }
+    : carousel ? { height: alturaParaIdx(idx) } : undefined
+
+  const imgStyle = proporcaoNatural
+    ? {
+        display: 'block',
+        width: 'auto',
+        height: 'auto',
+        maxHeight: maxImageHeight ? `${maxImageHeight}px` : '60vh',
+        maxWidth: 'clamp(220px, 26vw, 380px)',
+        objectFit: 'unset',
+      }
+    : undefined
+
   return (
     <div
       className={['cliente-card', 'cliente-card--ativo', carousel ? 'cliente-card--carousel' : ''].join(' ')}
-      style={carousel ? { height: alturaParaIdx(idx) } : undefined}
+      style={cardStyle}
       onClick={() => goTo(entrada.href, null, navState)}
     >
       {entrada.capa && (
-        <img src={mediaUrl(entrada.capa)} alt={entrada.nome} className="cliente-card__img" />
+        <img src={mediaUrl(entrada.capa)} alt={entrada.nome} className="cliente-card__img" style={imgStyle} />
       )}
       <div className="cliente-card__overlay">
         <h3 className="cliente-card__titulo">{entrada.nome}</h3>
@@ -199,6 +215,7 @@ export default function CasesTimeline({
   slug,
   contexto = 'case',      // 'pagina' | 'case'
   tema     = 'claro',     // 'claro'  | 'escuro'
+  proporcaoNatural = false,
   navState = null,
 }) {
   // Resolve tipo/conteudo
@@ -215,7 +232,8 @@ export default function CasesTimeline({
   const firstSetCardsRef = useRef([])
   const oneSetRef        = useRef(0)
   const tiltDeltaRef     = useRef(0)
-  const [labels, setLabels] = useState([])
+  const [labels, setLabels]   = useState([])
+  const [vpHeight, setVpHeight] = useState(null)
 
   // Logo para contexto 'pagina' (não quarentaAnos)
   useEffect(() => {
@@ -223,6 +241,19 @@ export default function CasesTimeline({
       apiGet('logo-site?populate=logo').then(setLogo)
     }
   }, [contexto, tipoResolvido])
+
+  // Mede a altura real do viewport para limitar imagens em proporcaoNatural
+  useEffect(() => {
+    if (!proporcaoNatural || !viewportRef.current) return
+    const el = viewportRef.current
+    setVpHeight(el.clientHeight)
+    const ro = new ResizeObserver(entries => {
+      setVpHeight(entries[0].contentRect.height)
+    })
+    ro.observe(el)
+    return () => ro.disconnect()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [proporcaoNatural, entradas.length])
 
   // Aquece cache HTTP
   useEffect(() => {
@@ -486,7 +517,7 @@ export default function CasesTimeline({
       {usaCarrossel ? (
         <div className="cliente-viewport" ref={viewportRef}>
           <div className="cliente-track" ref={trackRef}>
-            {triplicadas.map(e => <CaseCard key={e._key} entrada={e} idx={e._idx} carousel navState={navState} />)}
+            {triplicadas.map(e => <CaseCard key={e._key} entrada={e} idx={e._idx} carousel proporcaoNatural={proporcaoNatural} maxImageHeight={vpHeight} navState={navState} />)}
           </div>
         </div>
       ) : (

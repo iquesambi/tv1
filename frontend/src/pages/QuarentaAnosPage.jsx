@@ -67,7 +67,7 @@ export default function QuarentaAnosPage() {
         </motion.div>
         <div className="qa-hero__overlay" />
         <div className="qa-hero__ui">
-          {!playing && (
+          {!playing && data?.video_url && (
             <button className="qa-hero__play" aria-label="Assistir vídeo">
               <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
                 <circle cx="32" cy="32" r="30" fill="none" stroke="#fff" strokeWidth="1.5" />
@@ -166,7 +166,7 @@ export default function QuarentaAnosPage() {
       </section>
 
       {/* CASES */}
-      <CasesTimeline conteudo="quarentaAnos" contexto="pagina" tema="escuro" />
+      <CasesTimeline conteudo="quarentaAnos" contexto="pagina" tema="escuro" proporcaoNatural />
 
       <Menu variant="escuro" semMarcas />
 

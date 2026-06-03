@@ -14,13 +14,13 @@
   position: relative;
   width: 100vw;
   height: 100vh;
-  overflow: hidden;
+  overflow: clip;
   cursor: pointer;
 }
 
 .qa-hero__bg-wrap {
   position: absolute;
-  inset: -20%;
+  inset: -15vh -15vw;
   will-change: transform;
 }
 
@@ -29,6 +29,7 @@
   height: 100%;
   object-fit: cover;
   display: block;
+  transform: translateX(10%);
 }
 
 .qa-hero__overlay {
