@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import axios from 'axios'
+import { useGoTo } from '../transition.jsx'
 import Menu from '../components/Menu.jsx'
 import PageHeader from '../components/PageHeader.jsx'
 import './PessoasPage.css'
@@ -19,6 +20,7 @@ export default function PessoasPage() {
   const [equipe, setEquipe] = useState(null)
   const [logo, setLogo]     = useState(null)
   const footerRef           = useRef(null)
+  const goTo                = useGoTo()
 
   const [pronto, setPronto] = useState(() => {
     try { return JSON.parse(localStorage.getItem(LS_KEY) ?? '[]').length > 0 } catch { return false }
@@ -78,7 +80,7 @@ export default function PessoasPage() {
       <PageHeader
         logoUrl={mediaUrl(logo?.logo)}
         label="Pessoas"
-        onLogoClick={() => footerRef.current?.scrollIntoView({ behavior: 'smooth' })}
+        onLogoClick={() => goTo('/')}
       />
 
       <main className="pessoas-main">

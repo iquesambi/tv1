@@ -215,11 +215,13 @@ export default function CasesTimeline({
   slug,
   contexto = 'case',      // 'pagina' | 'case'
   tema     = 'claro',     // 'claro'  | 'escuro'
-  proporcaoNatural = false,
+  proporcaoNatural = true,
   navState = null,
 }) {
   // Resolve tipo/conteudo
   const tipoResolvido = conteudo ?? (tipo === 'cliente' ? 'marca' : (tipo ?? 'marca'))
+
+  const goTo = useGoTo()
 
   const [entradas, setEntradas] = useState([])
   const [logo, setLogo]         = useState(null)
