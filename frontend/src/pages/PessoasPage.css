@@ -26,26 +26,28 @@
   gap: 80px;
 }
 
-/* padrão: texto esquerda, foto direita */
-.pessoa-bloco .pessoa-foto  { order: 2; }
+/* Texto sempre à esquerda, foto sempre à direita */
 .pessoa-bloco .pessoa-texto { order: 1; }
-
-/* invertido: foto esquerda, texto direita */
-.pessoa-bloco--invertido .pessoa-foto  { order: 1; }
-.pessoa-bloco--invertido .pessoa-texto { order: 2; }
+.pessoa-bloco .pessoa-foto  { order: 2; flex-shrink: 0; }
 
 /* ── FOTO ─────────────────────────────── */
 
-.pessoa-foto {
-  flex-shrink: 0;
-}
-
 .pessoa-foto img {
   display: block;
-  height: 80vh;
-  aspect-ratio: 4 / 5;
   object-fit: cover;
   object-position: top center;
+}
+
+/* 9:16 — retrato: alto e estreito */
+.pessoa-foto--portrait img {
+  height: 70vh;
+  aspect-ratio: 9 / 16;
+}
+
+/* 16:9 — paisagem: largo e baixo */
+.pessoa-foto--landscape img {
+  height: 45vh;
+  aspect-ratio: 16 / 9;
 }
 
 /* ── TEXTO ────────────────────────────── */
@@ -125,27 +127,31 @@
     gap: 80px;
   }
 
-  .pessoa-bloco,
-  .pessoa-bloco--invertido {
+  .pessoa-bloco {
     flex-direction: column;
     gap: 28px;
   }
 
-  .pessoa-bloco .pessoa-foto,
-  .pessoa-bloco--invertido .pessoa-foto {
+  .pessoa-bloco .pessoa-foto {
     order: 1;
     width: 100%;
   }
 
-  .pessoa-bloco .pessoa-texto,
-  .pessoa-bloco--invertido .pessoa-texto {
+  .pessoa-bloco .pessoa-texto {
     order: 2;
   }
 
-  .pessoa-foto img {
+  .pessoa-foto--portrait img {
     height: auto;
-    max-height: 380px;
     width: 100%;
+    max-height: 420px;
+    aspect-ratio: 9 / 16;
+  }
+
+  .pessoa-foto--landscape img {
+    height: auto;
+    width: 100%;
+    aspect-ratio: 16 / 9;
   }
 
   .pessoa-nome {

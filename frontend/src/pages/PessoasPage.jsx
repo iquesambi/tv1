@@ -90,10 +90,10 @@ export default function PessoasPage() {
             <section
               key={i}
               id={m.slug}
-              className={`pessoa-bloco${i % 2 !== 0 ? ' pessoa-bloco--invertido' : ''}`}
+              className="pessoa-bloco"
             >
               {foto && (
-                <div className="pessoa-foto">
+                <div className={`pessoa-foto ${i % 2 === 0 ? 'pessoa-foto--portrait' : 'pessoa-foto--landscape'}`}>
                   <img src={mediaUrl(foto)} alt={m.nome} />
                 </div>
               )}
