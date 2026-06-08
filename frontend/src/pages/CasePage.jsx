@@ -391,7 +391,7 @@ export default function CasePage() {
             </button>
           )}
           <span className="case-hero__breadcrumb">
-            cases / {data.cliente?.nome} / {data.titulo}
+            cases / {data.cliente?.nome} / {data.breadcrumb || data.titulo}
           </span>
           <h1 className="case-hero__title">{data.titulo}</h1>
           {data.descricao && (

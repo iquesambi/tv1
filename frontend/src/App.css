@@ -40,13 +40,13 @@
   position: relative;
   font-family: 'Gilroy', sans-serif;
   color: #000001;
-  opacity: 0;
-  transition: opacity 0.5s ease;
+  /* opacity e transition removidos: o home-loading (z-index:9999) cobre o
+     carregamento. opacity/transition no .home criavam um compositing layer
+     permanente no Safari que impede o HEVC alpha de funcionar. */
 }
 
-.home--pronto {
-  opacity: 1;
-}
+/* mantido para compatibilidade com JS que ainda adiciona a classe */
+.home--pronto {}
 
 /* Quando a câmera está ativa, esconde o conteúdo do menu e pinta o fundo de
    preto. O vídeo termina em preto opaco e a /quarenta-anos também é preta,
@@ -140,9 +140,7 @@ body.camera-ativa .home > *:not(.home__menu-mobile) {
   border: none;
   padding: 0;
   cursor: pointer;
-  transition: transform 0.35s ease-out;
 }
-
 
 .home__camera img,
 .home__camera video {
@@ -150,6 +148,7 @@ body.camera-ativa .home > *:not(.home__menu-mobile) {
   width: auto;
   object-fit: contain;
   display: block;
+  background: transparent;
 }
 
 /* ── NAV CENTRAL ──────────────────────── */
@@ -731,6 +730,7 @@ body.camera-ativa .home > *:not(.home__menu-mobile) {
     object-fit: contain;
     display: block;
     margin: 0 auto;
+    background: transparent;
   }
 
   .home__camera--desktop img,

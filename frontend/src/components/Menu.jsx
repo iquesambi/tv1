@@ -98,16 +98,27 @@ function CameraVideo() {
     video.addEventListener('mouseenter', onEnter)
     video.addEventListener('mouseleave', onLeave)
 
+    const primeAndStart = () => {
+      const p = video.play()
+      if (p && typeof p.then === 'function') {
+        p.then(() => { video.pause(); startCycle() }).catch(() => startCycle())
+      } else {
+        video.pause()
+        startCycle()
+      }
+    }
+
     if (video.readyState >= 2) {
-      startCycle()
+      primeAndStart()
     } else {
-      video.addEventListener('loadeddata', startCycle, { once: true })
+      video.addEventListener('loadeddata', primeAndStart, { once: true })
+      video.load()
     }
 
     return () => {
       cancelAnimationFrame(rafRef.current)
       clearTimeout(timerRef.current)
-      video.removeEventListener('loadeddata', startCycle)
+      video.removeEventListener('loadeddata', primeAndStart)
       video.removeEventListener('mouseenter', onEnter)
       video.removeEventListener('mouseleave', onLeave)
     }
@@ -115,8 +126,10 @@ function CameraVideo() {
 
   return (
     <video ref={videoRef} muted playsInline preload="auto">
-      <source src="/camera-rotation-alpha.webm" type="video/webm" />
+      {/* .mov primeiro: Safari usa HEVC alpha (formato correto). Chrome/Firefox não
+          suportam hvc1 e pulam para o .webm automaticamente. */}
       <source src="/camera-rotation-alpha.mov" type="video/mp4; codecs=hvc1" />
+      <source src="/camera-rotation-alpha.webm" type="video/webm" />
     </video>
   )
 }

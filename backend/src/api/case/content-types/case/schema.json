@@ -23,6 +23,9 @@
     "Data": {
       "type": "date"
     },
+    "breadcrumb": {
+      "type": "string"
+    },
     "descricao": {
       "type": "text"
     },
