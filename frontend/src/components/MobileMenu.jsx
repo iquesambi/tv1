@@ -48,7 +48,11 @@ export default function MobileMenu({ logo, logoFiltro = 'brightness(0)' }) {
 
           {/* Header */}
           <div className="mobile-menu__header">
-            <div className="mobile-menu__logo">
+            <div
+              className="mobile-menu__logo"
+              onClick={() => { goTo('/'); setAberto(false) }}
+              style={{ cursor: 'pointer' }}
+            >
               {logo && <img src={mediaUrl(logo)} alt="TV1" style={{ filter: logoFiltro }} />}
             </div>
             <button className="mobile-menu__fechar" onClick={() => setAberto(false)}>✕</button>

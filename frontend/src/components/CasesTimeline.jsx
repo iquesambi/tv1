@@ -138,7 +138,7 @@ function CaseCard({ entrada, idx, carousel, proporcaoNatural = false, maxImageHe
 }
 
 /* ── Timeline bar ── */
-function TimelineBar({ labels, xRef, tiltDeltaRef, timelineTrackRef, usaCarrossel, onLabelClick }) {
+function TimelineBar({ labels, xRef, tiltDeltaRef, timelineTrackRef, usaCarrossel, onLabelClick, arrowRef, onArrowClick }) {
   const isDragging = useRef(false)
   const dragStart  = useRef(0)
 
@@ -187,6 +187,13 @@ function TimelineBar({ labels, xRef, tiltDeltaRef, timelineTrackRef, usaCarrosse
             </div>
           </div>
         </div>
+        {/* Seta "mais à direita" — visibilidade controlada pelo tick via ref */}
+        <button
+          ref={arrowRef}
+          className="timeline__next-arrow"
+          onClick={onArrowClick}
+          style={{ opacity: 0, pointerEvents: 'none' }}
+        >&gt;</button>
       </div>
     )
   }
@@ -223,6 +230,7 @@ export default function CasesTimeline({
   const goTo = useGoTo()
 
   const [entradas, setEntradas] = useState([])
+  const [carregando, setCarregando] = useState(true)
   const [logo, setLogo]         = useState(null)
 
   const viewportRef      = useRef(null)
@@ -233,6 +241,9 @@ export default function CasesTimeline({
   const firstSetCardsRef = useRef([])
   const oneSetRef        = useRef(0)
   const tiltDeltaRef     = useRef(0)
+  const arrowRef         = useRef(null)
+  const seenLabelsRef    = useRef(new Set())
+  const labelsRef        = useRef([])
   const [labels, setLabels]   = useState([])
   const [vpHeight, setVpHeight] = useState(null)
 
@@ -275,11 +286,12 @@ export default function CasesTimeline({
         '&populate[cases_destaque][populate][blocos][populate]=*'
       ).then(data => {
         setEntradas(montarEntradas(data?.cases_destaque ?? [], 'quarentaAnos'))
+        setCarregando(false)
       })
       return
     }
 
-    if (!slug) return
+    if (!slug) { setCarregando(false); return }
 
     const filtro = tipoResolvido === 'especialidade'
       ? `filters[especialidade][slug][$eq]=${slug}`
@@ -300,10 +312,34 @@ export default function CasesTimeline({
         try { localStorage.setItem(`tv1-cases-${tipoResolvido}-${slug}`, JSON.stringify(urls)) } catch {}
       })
       .catch(() => {})
+      .finally(() => setCarregando(false))
   }, [tipoResolvido, slug])
+
+  // Mantém labelsRef em sincronia para o tick poder ler sem fechar sobre o state
+  useEffect(() => {
+    labelsRef.current = labels
+    seenLabelsRef.current = new Set()
+  }, [labels])
 
   const n            = entradas.length
   const usaCarrossel = n >= 4
+
+  const handleNextArrow = () => {
+    const container = viewportRef.current
+    if (!container) return
+    const fsc    = firstSetCardsRef.current
+    const oneSet = oneSetRef.current
+    const vw     = container.clientWidth
+    // Encontra o primeiro card cujo lado direito ultrapassa o viewport
+    for (let i = 0; i < fsc.length; i++) {
+      const card  = fsc[i]
+      const right = card.offsetLeft + oneSet + xRef.current.x + card.offsetWidth
+      if (right > vw + 10) {
+        handleLabelClick(i)   // handleLabelClick funciona com qualquer índice do set 0
+        return
+      }
+    }
+  }
 
   const handleLabelClick = (cardIdx) => {
     const cards     = firstSetCardsRef.current
@@ -392,31 +428,44 @@ export default function CasesTimeline({
     const cards = Array.from(track.querySelectorAll('.cliente-card'))
     if (usaCarrossel) { firstSetCardsRef.current = cards.slice(0, n); oneSetRef.current = oneSet }
 
-    if (usaCarrossel && timelineTrackRef.current) {
-      const sets = timelineTrackRef.current.querySelectorAll('.timeline__labels-set')
-      sets.forEach(s => { s.style.width = `${oneSet}px` })
-      const firstSetCards = cards.slice(0, n)
-      const grupos = gruposDeLabels(entradas)
-      setLabels(grupos.map(g => {
-        const card   = firstSetCards[g.indices[0]]
-        const center = card ? card.offsetLeft + card.offsetWidth / 2 : 0
-        return { label: g.label, pos: (center / oneSet) * 100, cardIdx: g.indices[0] }
-      }))
-    } else if (!usaCarrossel) {
-      const grupos = gruposDeLabels(entradas)
-      const timelineInner = container.closest('.cases-timeline')?.querySelector('.timeline__inner')
-      const innerRect = timelineInner?.getBoundingClientRect()
-      const allCards  = Array.from(container.querySelectorAll('.cliente-card'))
-      setLabels(grupos.map(g => {
-        const card = allCards[g.indices[0]]
-        if (card && innerRect) {
-          const cardRect = card.getBoundingClientRect()
-          const center   = cardRect.left + cardRect.width / 2 - innerRect.left
-          return { label: g.label, pos: Math.max(0, Math.min(100, (center / innerRect.width) * 100)) }
-        }
-        return { label: g.label, pos: ((g.indices[0] + 0.5) / n) * 100 }
-      }))
+    const calcLabels = () => {
+      if (usaCarrossel && timelineTrackRef.current) {
+        const sets = timelineTrackRef.current.querySelectorAll('.timeline__labels-set')
+        sets.forEach(s => { s.style.width = `${oneSet}px` })
+        const firstSetCards = cards.slice(0, n)
+        const grupos = gruposDeLabels(entradas)
+        setLabels(grupos.map(g => {
+          const card   = firstSetCards[g.indices[0]]
+          const center = card ? card.offsetLeft + card.offsetWidth / 2 : 0
+          return { label: g.label, pos: (center / oneSet) * 100, cardIdx: g.indices[0] }
+        }))
+      } else if (!usaCarrossel) {
+        const grupos = gruposDeLabels(entradas)
+        const timelineInner = container.closest('.cases-timeline')?.querySelector('.timeline__inner')
+        const innerRect = timelineInner?.getBoundingClientRect()
+        const allCards  = Array.from(container.querySelectorAll('.cliente-card'))
+        setLabels(grupos.map(g => {
+          const card = allCards[g.indices[0]]
+          if (card && innerRect) {
+            const cardRect = card.getBoundingClientRect()
+            const center   = cardRect.left + cardRect.width / 2 - innerRect.left
+            return { label: g.label, pos: Math.max(0, Math.min(100, (center / innerRect.width) * 100)) }
+          }
+          return { label: g.label, pos: ((g.indices[0] + 0.5) / n) * 100 }
+        }))
+      }
     }
+
+    // Calcula agora e recalcula quando as imagens terminarem de carregar
+    // (as imagens mudam as dimensões dos cards e deslocam os labels)
+    calcLabels()
+    const imgs = Array.from(track.querySelectorAll('img'))
+    let loaded = 0
+    const onImgLoad = () => { if (++loaded >= imgs.length) calcLabels() }
+    imgs.forEach(img => {
+      if (img.complete) { loaded++; if (loaded >= imgs.length) calcLabels() }
+      else { img.addEventListener('load', onImgLoad, { once: true }); img.addEventListener('error', onImgLoad, { once: true }) }
+    })
 
     const onWheel = (e) => {
       if (!usaCarrossel) return
@@ -460,6 +509,24 @@ export default function CasesTimeline({
         const visivel = left >= -1 && right <= vw + 1
         card.classList.toggle('cliente-card--visivel', visivel)
       })
+
+      // Seta ›: rastreia CARDS (não labels) — assim funciona mesmo com 1 único label.
+      // Mostra quando algum card transborda o viewport à direita e ainda não todos foram vistos.
+      if (arrowRef.current && usaCarrossel) {
+        const fsc    = firstSetCardsRef.current
+        const oneSet = oneSetRef.current
+        let hasRight = false
+        fsc.forEach((card, idx) => {
+          const left  = card.offsetLeft + oneSet + xRef.current.x
+          const right = left + card.offsetWidth
+          if (left >= -1 && right <= vw + 1) seenLabelsRef.current.add(idx)
+          if (right > vw + 10) hasRight = true
+        })
+        const allSeen = seenLabelsRef.current.size >= fsc.length
+        const show = hasRight && !allSeen
+        arrowRef.current.style.opacity       = show ? '1' : '0'
+        arrowRef.current.style.pointerEvents = show ? 'auto' : 'none'
+      }
       raf = requestAnimationFrame(tick)
     }
 
@@ -479,6 +546,11 @@ export default function CasesTimeline({
     }
   }, [n, usaCarrossel, contexto])
 
+  if (carregando) return (
+    <div className="cases-timeline cases-timeline--case" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div className="cliente-loading__spinner" />
+    </div>
+  )
   if (!n) return null
 
   const triplicadas = usaCarrossel
@@ -546,6 +618,8 @@ export default function CasesTimeline({
         timelineTrackRef={timelineTrackRef}
         usaCarrossel={usaCarrossel}
         onLabelClick={handleLabelClick}
+        arrowRef={arrowRef}
+        onArrowClick={handleNextArrow}
       />
 
     </div>

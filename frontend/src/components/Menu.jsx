@@ -730,8 +730,14 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
           <header className="home__top">
             <div
               className="home__logo"
-              onClick={e => { e.stopPropagation(); if (contatoAberto) goTo('/') }}
-              style={contatoAberto ? { cursor: 'pointer' } : undefined}
+              onClick={e => {
+                e.stopPropagation()
+                // Logo da home: fecha todos os menus abertos
+                setAberto(null)
+                setMenuMobile(false)
+                if (contatoAberto) goTo('/')
+              }}
+              style={{ cursor: 'pointer' }}
             >
               {logo?.logo && <img src={mediaUrl(logo.logo)} alt="TV1" />}
             </div>
@@ -820,7 +826,11 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
       <div className={`home__menu-mobile ${menuMobile ? 'home__menu-mobile--aberto' : ''}`} onClick={() => setMenuMobile(false)}>
         <div className="home__menu-mobile__inner" onClick={e => e.stopPropagation()}>
           <div className="home__menu-mobile__header">
-            <div className="home__menu-mobile__logo">
+            <div
+              className="home__menu-mobile__logo"
+              onClick={() => setMenuMobile(false)}
+              style={{ cursor: 'pointer' }}
+            >
               {logo?.logo && <img src={mediaUrl(logo.logo)} alt="TV1" />}
             </div>
             <button className="home__menu-mobile__fechar" onClick={() => setMenuMobile(false)}>✕</button>
@@ -864,7 +874,11 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
 
       {/* Topo */}
       <div className="footer-branco__top">
-        <div className="footer-branco__logo" onClick={e => e.stopPropagation()}>
+        <div
+          className="footer-branco__logo"
+          onClick={e => { e.stopPropagation(); goTo('/') }}
+          style={{ cursor: 'pointer' }}
+        >
           {logo?.logo && <img src={mediaUrl(logo.logo)} alt="TV1" />}
         </div>
         {/* câmera — só no desktop */}

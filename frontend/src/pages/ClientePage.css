@@ -211,10 +211,36 @@
 
 .timeline--carousel {
   cursor: grab;
+  position: relative;
 }
 
 .timeline--carousel:active {
   cursor: grabbing;
+}
+
+.timeline__next-arrow {
+  position: absolute;
+  right: calc(2% + 12px); /* alinha com o fim dos ticks: 100%-98% + padding-right do inner */
+  top: 38px; /* ticks (20px) + labels margin-top (18px) */
+  height: 28px;
+  display: flex;
+  align-items: center;
+  padding: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: 'Gilroy', sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  color: #000001;
+  transition: opacity 0.25s ease;
+  line-height: 1;
+  user-select: none;
+  z-index: 2;
+}
+
+.cases-timeline--escuro .timeline__next-arrow {
+  color: #fff;
 }
 
 /* Container interno com 98% da página (margens 1% de cada lado) */
