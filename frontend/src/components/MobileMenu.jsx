@@ -56,7 +56,7 @@ export default function MobileMenu({ logo, logoFiltro = 'brightness(0)' }) {
 
           {/* Nav */}
           <nav className="mobile-menu__nav">
-            <button className="mobile-menu__nav-link" onClick={() => { goTo('/contato/seja-cliente'); setAberto(false) }}>
+            <button className="mobile-menu__nav-link" onClick={() => { goTo('/contato'); setAberto(false) }}>
               Seja cliente
             </button>
             <button className="mobile-menu__nav-link" onClick={() => { goTo('/contato/trabalhe-conosco'); setAberto(false) }}>

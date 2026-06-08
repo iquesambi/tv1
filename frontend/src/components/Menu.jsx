@@ -257,7 +257,7 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
     api('redes-sociais?populate[redes][populate]=icone').then(setRedes)
     api('quarenta-anos?populate=imagem').then(r => { if (isHome) setQA(r); else setQA(r) })
     api('pessoas?filters[ativo][$eq]=true&populate=foto&sort=ordem').then(setEquipe)
-    api('clientes?sort=nome:asc&populate[logo]=true').then(data => {
+    api('clientes?sort=nome:asc&populate[logo]=true&populate[cases][fields][0]=id').then(data => {
       setClientes(data)
       // Pré-carrega logos para evitar flash na abertura do submenu
       if (Array.isArray(data)) {
@@ -534,19 +534,32 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
           <div className="home__submenu-logos" style={{ top: gridTop }}>
             {logoRows.map((row, r) => (
               <div key={r} className="home__submenu-logos__row">
-                {row.map((c, j) => (
-                  <a
-                    key={j}
-                    href={`/${c.slug}`}
-                    className="home__submenu-logo-item"
-                    onClick={handleSubClick({ url: `/${c.slug}` })}
-                  >
-                    {c.logo
-                      ? <img src={mediaUrl(c.logo)} alt={c.nome} style={logoImgStyle(c.logo, c.escala_logo)} />
-                      : <span className="home__submenu-logo-fallback">{c.nome}</span>
-                    }
-                  </a>
-                ))}
+                {row.map((c, j) => {
+                  const temCase = c.cases?.length > 0
+                  return temCase ? (
+                    <a
+                      key={j}
+                      href={`/${c.slug}`}
+                      className="home__submenu-logo-item"
+                      onClick={handleSubClick({ url: `/${c.slug}` })}
+                    >
+                      {c.logo
+                        ? <img src={mediaUrl(c.logo)} alt={c.nome} style={logoImgStyle(c.logo, c.escala_logo)} />
+                        : <span className="home__submenu-logo-fallback">{c.nome}</span>
+                      }
+                    </a>
+                  ) : (
+                    <div
+                      key={j}
+                      className="home__submenu-logo-item home__submenu-logo-item--sem-case"
+                    >
+                      {c.logo
+                        ? <img src={mediaUrl(c.logo)} alt={c.nome} style={logoImgStyle(c.logo, c.escala_logo)} />
+                        : <span className="home__submenu-logo-fallback">{c.nome}</span>
+                      }
+                    </div>
+                  )
+                })}
               </div>
             ))}
           </div>
@@ -673,7 +686,7 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
               <nav className="home__menu-mobile__nav">
                 <button
                   className="home__menu-mobile__nav-link"
-                  onClick={(e) => { e.preventDefault(); goTo('/contato/seja-cliente'); setMenuMobile(false) }}
+                  onClick={(e) => { e.preventDefault(); goTo('/contato'); setMenuMobile(false) }}
                 >
                   Seja cliente
                 </button>
@@ -690,13 +703,6 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
                   Outros assuntos
                 </button>
               </nav>
-              <div className="home__menu-mobile__marcas">
-                {agencias?.filter(a => a.logo).map((a, i) => (
-                  <a key={i} href={externalUrl(a.url_externo)} target="_blank" rel="noreferrer">
-                    <img src={mediaUrl(a.logo)} alt={a.nome} />
-                  </a>
-                ))}
-              </div>
               <div className="home__menu-mobile__redes">
                 {redes?.redes?.map((rede, i) => (
                   <a key={i} href={externalUrl(rede.url)} target="_blank" rel="noreferrer">
@@ -759,11 +765,22 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
           {/* Submenu */}
           {renderSubmenu()}
 
+          {/* Logos mobile — visível só no mobile */}
+          <div className="home__marcas-mobile" onClick={e => e.stopPropagation()}>
+            <div className="home__menu-mobile__marcas">
+              {agencias?.filter(a => a.logo).map((a, i) => (
+                <a key={i} href={externalUrl(a.url_externo)} target="_blank" rel="noreferrer">
+                  <img src={mediaUrl(a.logo)} alt={a.nome} />
+                </a>
+              ))}
+            </div>
+          </div>
+
           {/* Rodapé */}
           <footer className="home__bottom" onClick={e => e.stopPropagation()}>
             <button
               className={`home__contato${contatoAberto ? ' home__contato--inativo' : ''}`}
-              onClick={(e) => { e.stopPropagation(); if (!contatoAberto) goTo('/contato/seja-cliente') }}
+              onClick={(e) => { e.stopPropagation(); if (!contatoAberto) goTo('/contato') }}
             >Contato</button>
             <AgenciaLogos agencias={agencias} className={`home__marcas ${aberto !== null ? 'home__marcas--oculto' : ''}`} />
             <div className="home__redes">
@@ -798,7 +815,7 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
           <nav className="home__menu-mobile__nav">
             <button
               className="home__menu-mobile__nav-link"
-              onClick={(e) => { e.preventDefault(); goTo('/contato/seja-cliente'); setMenuMobile(false) }}
+              onClick={(e) => { e.preventDefault(); goTo('/contato'); setMenuMobile(false) }}
             >
               Seja cliente
             </button>
@@ -878,7 +895,7 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
       <div className="footer-branco__bottom" onClick={e => e.stopPropagation()}>
         <button
           className="footer-branco__contato"
-          onClick={(e) => { e.stopPropagation(); goTo('/contato/seja-cliente') }}
+          onClick={(e) => { e.stopPropagation(); goTo('/contato') }}
         >Contato</button>
         {!semMarcas && <AgenciaLogos agencias={agencias} className={`footer-branco__marcas ${aberto !== null ? 'footer-branco__marcas--oculto' : ''}`} />}
         <div className="footer-branco__redes">

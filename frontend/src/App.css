@@ -115,6 +115,11 @@ body.camera-ativa .home > *:not(.home__menu-mobile) {
   transition: opacity 0.25s ease;
 }
 
+.home__logo,
+.home__hamburger {
+  transition: opacity 0.35s ease;
+}
+
 .home__logo:hover img {
   opacity: 0.4;
 }
@@ -328,6 +333,10 @@ body.camera-ativa .home > *:not(.home__menu-mobile) {
 .home__contato:hover { opacity: 0.6; }
 .home__contato--inativo { opacity: 0.3; cursor: default; pointer-events: none; }
 
+.home__marcas-mobile {
+  display: none;
+}
+
 /* Marcas */
 
 .home__marcas {
@@ -403,7 +412,7 @@ body.camera-ativa .home > *:not(.home__menu-mobile) {
 
 .home__nav-link--contato {
   opacity: 1 !important;
-  font-size: clamp(56px, 8vw, 110px);
+  font-size: min(clamp(40px, 8vw, 216px), calc(68vh / 3 / 0.75));
   color: #000001 !important;
 }
 
@@ -499,6 +508,13 @@ body.camera-ativa .home > *:not(.home__menu-mobile) {
   background: #ffffff;
 }
 
+.home__menu-mobile--aberto ~ header .home__logo,
+.home__menu-mobile--aberto ~ header .home__hamburger {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.35s ease;
+}
+
 .home__menu-mobile__inner {
   position: absolute;
   top: 0;
@@ -520,7 +536,7 @@ body.camera-ativa .home > *:not(.home__menu-mobile) {
 }
 
 .home__menu-mobile__logo img {
-  height: 32px;
+  height: 28px;
   width: auto;
   object-fit: contain;
   display: block;
@@ -543,10 +559,12 @@ body.camera-ativa .home > *:not(.home__menu-mobile) {
 .home__menu-mobile__nav {
   display: flex;
   flex-direction: column;
-  gap: 28px;
+  gap: 0;
   padding: 40px 20px;
   flex: 1;
   overflow-y: auto;
+  align-items: center;
+  justify-content: center;
 }
 
 .home__menu-mobile__nav-link {
@@ -554,15 +572,20 @@ body.camera-ativa .home > *:not(.home__menu-mobile) {
   border: none;
   padding: 0;
   font-family: 'Gilroy', sans-serif;
-  font-size: 64px;
+  font-size: clamp(36px, 13vw, 64px);
   font-weight: 900;
   font-style: italic;
   text-transform: uppercase;
   color: #000001;
-  text-align: left;
+  text-align: center;
   cursor: pointer;
-  line-height: 0.85;
+  line-height: 0.88;
+  margin-bottom: 0.44em;
   transition: opacity 0.2s ease;
+}
+
+.home__menu-mobile__nav-link:last-child {
+  margin-bottom: 0;
 }
 
 .home__menu-mobile__nav-link:active {
@@ -739,7 +762,7 @@ body.camera-ativa .home > *:not(.home__menu-mobile) {
     left: 50%;
     transform: translate(-50%, -50%);
     width: 100%;
-    gap: 16px;
+    gap: 0;
     margin-top: 0;
     padding: 0 20px;
     flex-direction: column;
@@ -754,7 +777,7 @@ body.camera-ativa .home > *:not(.home__menu-mobile) {
 
   .home__nav-link {
     font-size: clamp(36px, 13vw, 64px);
-    line-height: 1;
+    line-height: 0.88;
     font-weight: 900;
     font-style: italic;
     text-transform: uppercase;
@@ -775,6 +798,29 @@ body.camera-ativa .home > *:not(.home__menu-mobile) {
   /* ── Rodapé ── */
   .home__bottom {
     display: none;
+  }
+
+  .home__marcas-mobile {
+    display: block;
+    position: absolute;
+    bottom: 40px;
+    left: 0;
+    right: 0;
+    z-index: 3;
+  }
+
+  .home__marcas-mobile .home__menu-mobile__marcas {
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 20px 24px;
+    padding: 0 20px 32px;
+  }
+
+  .home__marcas-mobile .home__menu-mobile__marcas a {
+    justify-content: center;
+  }
+
+  .home__marcas-mobile .home__menu-mobile__marcas img {
+    height: 16px;
   }
 
 }

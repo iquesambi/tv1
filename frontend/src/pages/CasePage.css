@@ -285,17 +285,16 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 535px;
-  height: 665px;
+  height: clamp(300px, 70vh, 720px);
+  width: auto;
   overflow: hidden;
   z-index: 2;
   pointer-events: none;
 }
 
 .block-trio__center img {
-  width: 100%;
   height: 100%;
-  object-fit: cover;
+  width: auto;
   display: block;
 }
 
@@ -601,6 +600,12 @@
     transform: translate(-50%, -50%);
     z-index: 2;
     pointer-events: none;
+  }
+
+  .block-trio__center img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
 
   /* Números como overlay no canto inferior direito */

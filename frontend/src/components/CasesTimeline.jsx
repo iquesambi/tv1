@@ -108,17 +108,16 @@ function CaseCard({ entrada, idx, carousel, proporcaoNatural = false, maxImageHe
   const goTo = useGoTo()
 
   const cardStyle = proporcaoNatural
-    ? { alignSelf: 'center', width: 'fit-content', height: 'fit-content', background: 'transparent' }
+    ? { alignSelf: 'center', height: 'fit-content', background: 'transparent' }
     : carousel ? { height: alturaParaIdx(idx) } : undefined
 
   const imgStyle = proporcaoNatural
     ? {
         display: 'block',
-        width: 'auto',
+        width: '100%',
         height: 'auto',
-        maxHeight: maxImageHeight ? `${maxImageHeight}px` : '60vh',
-        maxWidth: 'clamp(220px, 26vw, 380px)',
-        objectFit: 'unset',
+        maxHeight: maxImageHeight ? `${maxImageHeight}px` : '70vh',
+        objectFit: 'fill',
       }
     : undefined
 
@@ -405,7 +404,18 @@ export default function CasesTimeline({
       }))
     } else if (!usaCarrossel) {
       const grupos = gruposDeLabels(entradas)
-      setLabels(grupos.map(g => ({ label: g.label, pos: ((g.indices[0] + 0.5) / n) * 100 })))
+      const timelineInner = container.closest('.cases-timeline')?.querySelector('.timeline__inner')
+      const innerRect = timelineInner?.getBoundingClientRect()
+      const allCards  = Array.from(container.querySelectorAll('.cliente-card'))
+      setLabels(grupos.map(g => {
+        const card = allCards[g.indices[0]]
+        if (card && innerRect) {
+          const cardRect = card.getBoundingClientRect()
+          const center   = cardRect.left + cardRect.width / 2 - innerRect.left
+          return { label: g.label, pos: Math.max(0, Math.min(100, (center / innerRect.width) * 100)) }
+        }
+        return { label: g.label, pos: ((g.indices[0] + 0.5) / n) * 100 }
+      }))
     }
 
     const onWheel = (e) => {
@@ -524,7 +534,7 @@ export default function CasesTimeline({
         </div>
       ) : (
         <div className={`cliente-static cliente-static--${n}`} ref={viewportRef}>
-          {triplicadas.map(e => <CaseCard key={e._key} entrada={e} idx={e._idx} carousel={false} navState={navState} />)}
+          {triplicadas.map(e => <CaseCard key={e._key} entrada={e} idx={e._idx} carousel={false} proporcaoNatural={proporcaoNatural} maxImageHeight={vpHeight} navState={navState} />)}
         </div>
       )}
 
