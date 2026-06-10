@@ -678,28 +678,30 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
   // Centro y natural do item i (.home__nav está com top 47% + translate -50% -50%)
   const naturalCenter = (i) => vh * 0.47 + (i - (N - 1) / 2) * itemH
 
-  // Cada item se move (translateY apenas — nunca diminui). O ativo vai pro
-  // topo, os "acima" empilham tight em cima do ativo, os "abaixo" empilham
-  // tight a partir do fim da área reservada ao submenu.
-  const computeTransform = (i) => {
+  // Quando um menu é aberto, o item ativo vai para o topo e os demais saem
+  // da tela (acima pelo topo, abaixo pelo rodapé) sem encolher.
+  const computeStyle = (i) => {
     if (aberto === null) return undefined
     const activeTarget = vh * 0.13 + itemH / 2 // centro do ativo
-    const bottomStart  = vh * 0.78 + itemH / 2 // centro do primeiro abaixo
     if (i === aberto) {
-      return `translateY(${activeTarget - naturalCenter(i)}px)`
+      return { transform: `translateY(${activeTarget - naturalCenter(i)}px)` }
     }
     let target
     if (i < aberto) {
-      // Empilha logo acima do ativo: item mais perto do ativo fica colado;
-      // mais distantes vão saindo da tela por cima (sem encolher).
-      const distance = aberto - i // 1 = colado, 2 = mais acima, etc
-      target = activeTarget - distance * itemH
+      // Sai pelo topo — empilhados acima do viewport, item mais próximo
+      // do ativo fica logo encostando na borda superior.
+      const distance = aberto - i // 1 = mais próximo do ativo
+      target = -itemH / 2 - (distance - 1) * itemH
     } else {
-      // Empilha logo abaixo da área de submenu (vh*0.78)
+      // Sai pelo rodapé — empilhados abaixo do viewport
       const distance = i - aberto - 1 // 0 = primeiro abaixo
-      target = bottomStart + distance * itemH
+      target = vh + itemH / 2 + distance * itemH
     }
-    return `translateY(${target - naturalCenter(i)}px)`
+    return {
+      transform: `translateY(${target - naturalCenter(i)}px)`,
+      opacity: 0,
+      pointerEvents: 'none',
+    }
   }
 
   const navBlock = (
@@ -715,12 +717,12 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
         const esteAberto = aberto === i
         const acima  = aberto !== null && !esteAberto && i < aberto
         const abaixo = aberto !== null && !esteAberto && i > aberto
-        const transform = computeTransform(i)
+        const itemStyle = computeStyle(i)
         return (
           <div
             key={i}
             className={['home__nav-item', esteAberto ? 'home__nav-item--ativo' : '', acima ? 'home__nav-item--acima' : '', abaixo ? 'home__nav-item--abaixo' : ''].join(' ')}
-            style={transform ? { transform } : undefined}
+            style={itemStyle}
             onClick={e => e.stopPropagation()}
           >
             <a
