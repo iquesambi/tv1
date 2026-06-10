@@ -678,23 +678,27 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
   // Centro y natural do item i (.home__nav está com top 47% + translate -50% -50%)
   const naturalCenter = (i) => vh * 0.47 + (i - (N - 1) / 2) * itemH
 
-  // Quando um menu é aberto, o item ativo vai pro topo. Os outros se empilham
-  // imediatamente acima/abaixo, com um respiro pequeno pro acima mais próximo
-  // não colar no ativo. Sem opacity 0 — items que não couberem na tela apenas
-  // saem pelas bordas naturalmente.
+  // Quando um menu é aberto:
+  // - O acima mais próximo do ativo ancora o topo do elemento em y=0 (top
+  //   das letras encostando na borda superior do viewport).
+  // - O ativo é empurrado pra baixo o suficiente pra ficar logo abaixo do
+  //   bloco de acima — sem overlap.
+  // - Os abaixo se empilham a partir de vh*0.78.
   const computeStyle = (i) => {
     if (aberto === null) return undefined
-    const activeTarget = vh * 0.13 + itemH / 2  // centro do ativo
-    const bottomStart  = vh * 0.78 + itemH / 2  // centro do primeiro abaixo
+    const acimaCount = aberto
+    // Posição padrão do ativo (vh*0.13). Se houver "acima", desce o ativo
+    // até passar de todos eles + 10px de respiro.
+    const acimaBlock   = acimaCount * itemH
+    const activeTop    = Math.max(vh * 0.13, acimaBlock + (acimaCount > 0 ? 10 : 0))
+    const activeTarget = activeTop + itemH / 2
+    const bottomStart  = vh * 0.78 + itemH / 2
     if (i === aberto) {
       return { transform: `translateY(${activeTarget - naturalCenter(i)}px)` }
     }
     let target
     if (i < aberto) {
-      const distance = aberto - i // 1 = mais próximo do ativo
-      // O acima mais próximo encosta o topo do item na borda superior da
-      // viewport (top: 0). Os mais distantes ficam empilhados acima desse,
-      // saindo pela tela.
+      const distance = aberto - i // 1 = mais próximo do ativo, na borda do topo
       target = itemH / 2 - (distance - 1) * itemH
     } else {
       const distance = i - aberto - 1
