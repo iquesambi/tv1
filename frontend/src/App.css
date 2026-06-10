@@ -170,21 +170,9 @@ body.camera-ativa .home > *:not(.home__menu-mobile) {
   align-items: center;
   transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1),
               opacity  0.35s ease;
-}
-
-/* item clicado: sobe para o topo */
-.home__nav-item--ativo {
-  transform: translateY(-35vh);
-}
-
-/* itens ACIMA do ativo: sobem junto com o ativo, mesma distância */
-.home__nav-item--acima {
-  transform: translateY(-35vh);
-}
-
-/* itens ABAIXO do ativo: descem até PESSOAS cortar ao meio */
-.home__nav-item--abaixo {
-  transform: translateY(34vh);
+  transform-origin: center center;
+  /* posição calculada em JS via inline style (transform) — funciona para
+     qualquer quantidade de itens e qualquer altura de viewport sem chumbar vh */
 }
 
 .home__nav-link {

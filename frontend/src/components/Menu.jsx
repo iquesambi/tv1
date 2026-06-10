@@ -228,6 +228,18 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
   // pronto: footer sempre pronto; home espera preloader; footerHome também pronto de imediato
   const [pronto, setPronto] = useState(!isHome || footerHome)
 
+  // viewport: usado pelo cálculo dinâmico das posições dos itens do nav
+  const [viewport, setViewport] = useState(() =>
+    typeof window === 'undefined'
+      ? { w: 1440, h: 900 }
+      : { w: window.innerWidth, h: window.innerHeight }
+  )
+  useEffect(() => {
+    const onResize = () => setViewport({ w: window.innerWidth, h: window.innerHeight })
+    window.addEventListener('resize', onResize)
+    return () => window.removeEventListener('resize', onResize)
+  }, [])
+
   // useLocation só funciona se houver Router acima — na home há, no footer também (dentro do Router)
   const location = useLocation()
   const contatoAberto = isHome ? location.pathname.startsWith('/contato') : false
@@ -646,8 +658,74 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
 
 
   // ── NAV (compartilhado entre home e footer) ───────────────────────────────
+  // Posicionamento dinâmico dos itens do nav:
+  //
+  // Quando nenhum item está aberto, os itens ficam empilhados no centro
+  // (fluxo natural do flex). Quando um item é ativado, calculamos a posição
+  // alvo de cada item baseado no tamanho real do viewport e na quantidade de
+  // itens — não usamos translateY chumbado em vh, então adicionar/remover
+  // itens ou mudar o tamanho da tela não quebra nada.
+  const N = links.length
+  const vh = viewport.h
+  const vw = viewport.w
+  // Altura de cada item no tamanho cheio (mesma fórmula que o CSS):
+  // font-size = min(clamp(52, 15.8vw, 216), 68vh / N / 0.75); height = font * 0.75
+  const fontSize = Math.min(
+    Math.min(Math.max(52, 0.158 * vw), 216),
+    (0.68 * vh) / Math.max(N, 1) / 0.75
+  )
+  const itemH = fontSize * 0.75
+  // Centro y natural do item i (.home__nav está com top 47% + translate -50% -50%)
+  const naturalCenter = (i) => vh * 0.47 + (i - (N - 1) / 2) * itemH
+
+  // Computa as posições para o estado atual (ativo + acima + abaixo). O ativo
+  // não fica em posição fixa: ele se desloca para baixo o quanto for preciso
+  // para os "acima" caberem confortavelmente entre o topo e ele.
+  const layoutAtivo = (() => {
+    if (aberto === null) return null
+    const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v))
+    const acimaCount  = aberto
+    const abaixoCount = N - aberto - 1
+    const topMargin   = vh * 0.03
+    const bottomMargin = vh * 0.96
+    const gapAcima    = 10
+    const bottomStart = vh * 0.78
+    // Escala dos "acima": cada item ocupa 0.4*itemH ideal; se houver muitos,
+    // reduz até no mínimo 0.18; nunca maior que 0.5
+    const acimaScale  = acimaCount  > 0
+      ? clamp(Math.min(0.4, (vh * 0.22) / (acimaCount * itemH)), 0.18, 0.5)
+      : 0.5
+    const abaixoScale = abaixoCount > 0
+      ? clamp((bottomMargin - bottomStart) / (abaixoCount * itemH), 0.18, 0.5)
+      : 0.5
+    // Bloco que os "acima" ocupam, mais a margem
+    const acimaBlock  = acimaCount * acimaScale * itemH
+    // Topo do item ativo = bem abaixo do bloco "acima"
+    const activeTop    = topMargin + acimaBlock + (acimaCount > 0 ? gapAcima : 0)
+    const activeTarget = activeTop + itemH / 2
+    return { acimaCount, abaixoCount, topMargin, bottomStart, acimaScale, abaixoScale, activeTarget }
+  })()
+
+  const computeTransform = (i) => {
+    if (!layoutAtivo) return undefined
+    const { topMargin, bottomStart, acimaScale, abaixoScale, activeTarget } = layoutAtivo
+    if (i === aberto) {
+      return `translateY(${activeTarget - naturalCenter(i)}px)`
+    }
+    let target, scale
+    if (i < aberto) {
+      scale  = acimaScale
+      target = topMargin + (i + 0.5) * scale * itemH
+    } else {
+      const j = i - aberto - 1
+      scale  = abaixoScale
+      target = bottomStart + (j + 0.5) * scale * itemH
+    }
+    return `translateY(${target - naturalCenter(i)}px) scale(${scale})`
+  }
+
   const navBlock = (
-    <nav className={`home__nav ${aberto !== null ? 'home__nav--aberto' : ''} ${contatoAberto ? 'home__nav--contato' : ''}`} style={{ '--nav-count': links.length }}>
+    <nav className={`home__nav ${aberto !== null ? 'home__nav--aberto' : ''} ${contatoAberto ? 'home__nav--contato' : ''}`} style={{ '--nav-count': N }}>
       {contatoAberto && (
         <div className="home__nav-contato">
           <a href="#" className="home__nav-link home__nav-link--contato" onClick={(e) => { e.preventDefault(); e.stopPropagation() }}>SEJA CLIENTE</a>
@@ -659,10 +737,12 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
         const esteAberto = aberto === i
         const acima  = aberto !== null && !esteAberto && i < aberto
         const abaixo = aberto !== null && !esteAberto && i > aberto
+        const transform = computeTransform(i)
         return (
           <div
             key={i}
             className={['home__nav-item', esteAberto ? 'home__nav-item--ativo' : '', acima ? 'home__nav-item--acima' : '', abaixo ? 'home__nav-item--abaixo' : ''].join(' ')}
+            style={transform ? { transform } : undefined}
             onClick={e => e.stopPropagation()}
           >
             <a
