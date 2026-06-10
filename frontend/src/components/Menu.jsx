@@ -692,9 +692,10 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
     let target
     if (i < aberto) {
       const distance = aberto - i // 1 = mais próximo do ativo
-      // 1.15 dá um respiro pequeno entre o "acima mais próximo" e o ativo,
-      // suficiente pra letras italics não encostarem visualmente.
-      target = activeTarget - distance * itemH * 1.15
+      // O acima mais próximo encosta o topo do item na borda superior da
+      // viewport (top: 0). Os mais distantes ficam empilhados acima desse,
+      // saindo pela tela.
+      target = itemH / 2 - (distance - 1) * itemH
     } else {
       const distance = i - aberto - 1
       target = bottomStart + distance * itemH
