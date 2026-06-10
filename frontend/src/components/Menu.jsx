@@ -678,50 +678,28 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
   // Centro y natural do item i (.home__nav está com top 47% + translate -50% -50%)
   const naturalCenter = (i) => vh * 0.47 + (i - (N - 1) / 2) * itemH
 
-  // Computa as posições para o estado atual (ativo + acima + abaixo). O ativo
-  // não fica em posição fixa: ele se desloca para baixo o quanto for preciso
-  // para os "acima" caberem confortavelmente entre o topo e ele.
-  const layoutAtivo = (() => {
-    if (aberto === null) return null
-    const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v))
-    const acimaCount  = aberto
-    const abaixoCount = N - aberto - 1
-    const topMargin   = vh * 0.03
-    const bottomMargin = vh * 0.96
-    const gapAcima    = 10
-    const bottomStart = vh * 0.78
-    // Escala dos "acima": cada item ocupa 0.4*itemH ideal; se houver muitos,
-    // reduz até no mínimo 0.18; nunca maior que 0.5
-    const acimaScale  = acimaCount  > 0
-      ? clamp(Math.min(0.4, (vh * 0.22) / (acimaCount * itemH)), 0.18, 0.5)
-      : 0.5
-    const abaixoScale = abaixoCount > 0
-      ? clamp((bottomMargin - bottomStart) / (abaixoCount * itemH), 0.18, 0.5)
-      : 0.5
-    // Bloco que os "acima" ocupam, mais a margem
-    const acimaBlock  = acimaCount * acimaScale * itemH
-    // Topo do item ativo = bem abaixo do bloco "acima"
-    const activeTop    = topMargin + acimaBlock + (acimaCount > 0 ? gapAcima : 0)
-    const activeTarget = activeTop + itemH / 2
-    return { acimaCount, abaixoCount, topMargin, bottomStart, acimaScale, abaixoScale, activeTarget }
-  })()
-
+  // Cada item se move (translateY apenas — nunca diminui). O ativo vai pro
+  // topo, os "acima" empilham tight em cima do ativo, os "abaixo" empilham
+  // tight a partir do fim da área reservada ao submenu.
   const computeTransform = (i) => {
-    if (!layoutAtivo) return undefined
-    const { topMargin, bottomStart, acimaScale, abaixoScale, activeTarget } = layoutAtivo
+    if (aberto === null) return undefined
+    const activeTarget = vh * 0.13 + itemH / 2 // centro do ativo
+    const bottomStart  = vh * 0.78 + itemH / 2 // centro do primeiro abaixo
     if (i === aberto) {
       return `translateY(${activeTarget - naturalCenter(i)}px)`
     }
-    let target, scale
+    let target
     if (i < aberto) {
-      scale  = acimaScale
-      target = topMargin + (i + 0.5) * scale * itemH
+      // Empilha logo acima do ativo: item mais perto do ativo fica colado;
+      // mais distantes vão saindo da tela por cima (sem encolher).
+      const distance = aberto - i // 1 = colado, 2 = mais acima, etc
+      target = activeTarget - distance * itemH
     } else {
-      const j = i - aberto - 1
-      scale  = abaixoScale
-      target = bottomStart + (j + 0.5) * scale * itemH
+      // Empilha logo abaixo da área de submenu (vh*0.78)
+      const distance = i - aberto - 1 // 0 = primeiro abaixo
+      target = bottomStart + distance * itemH
     }
-    return `translateY(${target - naturalCenter(i)}px) scale(${scale})`
+    return `translateY(${target - naturalCenter(i)}px)`
   }
 
   const navBlock = (
