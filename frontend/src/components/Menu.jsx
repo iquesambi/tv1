@@ -678,33 +678,28 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
   // Centro y natural do item i (.home__nav está com top 47% + translate -50% -50%)
   const naturalCenter = (i) => vh * 0.47 + (i - (N - 1) / 2) * itemH
 
-  // Quando um menu é aberto:
-  // - item ativo vai para o topo (visível)
-  // - itens "acima" sobem para a borda superior do viewport, ficando
-  //   parcialmente visíveis (saindo pelo topo)
-  // - itens "abaixo" são removidos (saem por baixo com fade)
+  // Quando um menu é aberto, o item ativo vai pro topo. Os outros se empilham
+  // imediatamente acima/abaixo, com um respiro pequeno pro acima mais próximo
+  // não colar no ativo. Sem opacity 0 — items que não couberem na tela apenas
+  // saem pelas bordas naturalmente.
   const computeStyle = (i) => {
     if (aberto === null) return undefined
-    const activeTarget = vh * 0.13 + itemH / 2 // centro do ativo
+    const activeTarget = vh * 0.13 + itemH / 2  // centro do ativo
+    const bottomStart  = vh * 0.78 + itemH / 2  // centro do primeiro abaixo
     if (i === aberto) {
       return { transform: `translateY(${activeTarget - naturalCenter(i)}px)` }
     }
+    let target
     if (i < aberto) {
-      // Acima — visível na borda superior, saindo pelo topo. O mais próximo
-      // do ativo fica meio para dentro/meio para fora; os anteriores vão
-      // empilhando para fora.
       const distance = aberto - i // 1 = mais próximo do ativo
-      const target = 0 - (distance - 1) * itemH // centro: 0 = metade off-screen
-      return { transform: `translateY(${target - naturalCenter(i)}px)` }
+      // 1.15 dá um respiro pequeno entre o "acima mais próximo" e o ativo,
+      // suficiente pra letras italics não encostarem visualmente.
+      target = activeTarget - distance * itemH * 1.15
+    } else {
+      const distance = i - aberto - 1
+      target = bottomStart + distance * itemH
     }
-    // Abaixo — sai pelo rodapé com opacity 0 (efetivamente removido)
-    const distance = i - aberto - 1
-    const target = vh + itemH / 2 + distance * itemH
-    return {
-      transform: `translateY(${target - naturalCenter(i)}px)`,
-      opacity: 0,
-      pointerEvents: 'none',
-    }
+    return { transform: `translateY(${target - naturalCenter(i)}px)` }
   }
 
   const navBlock = (
