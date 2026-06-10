@@ -678,25 +678,28 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
   // Centro y natural do item i (.home__nav está com top 47% + translate -50% -50%)
   const naturalCenter = (i) => vh * 0.47 + (i - (N - 1) / 2) * itemH
 
-  // Quando um menu é aberto, o item ativo vai para o topo e os demais saem
-  // da tela (acima pelo topo, abaixo pelo rodapé) sem encolher.
+  // Quando um menu é aberto:
+  // - item ativo vai para o topo (visível)
+  // - itens "acima" sobem para a borda superior do viewport, ficando
+  //   parcialmente visíveis (saindo pelo topo)
+  // - itens "abaixo" são removidos (saem por baixo com fade)
   const computeStyle = (i) => {
     if (aberto === null) return undefined
     const activeTarget = vh * 0.13 + itemH / 2 // centro do ativo
     if (i === aberto) {
       return { transform: `translateY(${activeTarget - naturalCenter(i)}px)` }
     }
-    let target
     if (i < aberto) {
-      // Sai pelo topo — empilhados acima do viewport, item mais próximo
-      // do ativo fica logo encostando na borda superior.
+      // Acima — visível na borda superior, saindo pelo topo. O mais próximo
+      // do ativo fica meio para dentro/meio para fora; os anteriores vão
+      // empilhando para fora.
       const distance = aberto - i // 1 = mais próximo do ativo
-      target = -itemH / 2 - (distance - 1) * itemH
-    } else {
-      // Sai pelo rodapé — empilhados abaixo do viewport
-      const distance = i - aberto - 1 // 0 = primeiro abaixo
-      target = vh + itemH / 2 + distance * itemH
+      const target = 0 - (distance - 1) * itemH // centro: 0 = metade off-screen
+      return { transform: `translateY(${target - naturalCenter(i)}px)` }
     }
+    // Abaixo — sai pelo rodapé com opacity 0 (efetivamente removido)
+    const distance = i - aberto - 1
+    const target = vh + itemH / 2 + distance * itemH
     return {
       transform: `translateY(${target - naturalCenter(i)}px)`,
       opacity: 0,
