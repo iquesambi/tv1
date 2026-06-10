@@ -192,7 +192,7 @@ function AgenciaLogos({ agencias, className }) {
         const renderH  = Math.round(naturalH * (TARGET_H / MAX_NATURAL))
         const renderW  = Math.round(naturalW * (TARGET_H / MAX_NATURAL))
         return (
-          <a key={i} href={externalUrl(a.url_externo)} target="_blank" rel="noreferrer">
+          <a key={i} href={externalUrl(a.url_externa)} target="_blank" rel="noreferrer">
             <img src={mediaUrl(a.logo)} alt={a.nome} style={{ height: renderH, width: renderW }} />
           </a>
         )
@@ -788,7 +788,7 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
           <div className="home__marcas-mobile" onClick={e => e.stopPropagation()}>
             <div className="home__menu-mobile__marcas">
               {agencias?.filter(a => a.logo).map((a, i) => (
-                <a key={i} href={externalUrl(a.url_externo)} target="_blank" rel="noreferrer">
+                <a key={i} href={externalUrl(a.url_externa)} target="_blank" rel="noreferrer">
                   <img src={mediaUrl(a.logo)} alt={a.nome} />
                 </a>
               ))}
@@ -857,7 +857,7 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
           </nav>
           <div className="home__menu-mobile__marcas">
             {agencias?.filter(a => a.logo).map((a, i) => (
-              <a key={i} href={externalUrl(a.url_externo)} target="_blank" rel="noreferrer">
+              <a key={i} href={externalUrl(a.url_externa)} target="_blank" rel="noreferrer">
                 <img src={mediaUrl(a.logo)} alt={a.nome} />
               </a>
             ))}
