@@ -191,8 +191,14 @@ function AgenciaLogos({ agencias, className }) {
         const naturalW = a.logo.width  || 60
         const renderH  = Math.round(naturalH * (TARGET_H / MAX_NATURAL))
         const renderW  = Math.round(naturalW * (TARGET_H / MAX_NATURAL))
+        const novaAba = a.abrir_nova_aba !== false
         return (
-          <a key={i} href={externalUrl(a.url_externa)} target="_blank" rel="noreferrer">
+          <a
+            key={i}
+            href={externalUrl(a.url_externa)}
+            target={novaAba ? '_blank' : undefined}
+            rel={novaAba ? 'noreferrer' : undefined}
+          >
             <img src={mediaUrl(a.logo)} alt={a.nome} style={{ height: renderH, width: renderW }} />
           </a>
         )
@@ -788,7 +794,7 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
           <div className="home__marcas-mobile" onClick={e => e.stopPropagation()}>
             <div className="home__menu-mobile__marcas">
               {agencias?.filter(a => a.logo).map((a, i) => (
-                <a key={i} href={externalUrl(a.url_externa)} target="_blank" rel="noreferrer">
+                <a key={i} href={externalUrl(a.url_externa)} target={a.abrir_nova_aba !== false ? '_blank' : undefined} rel={a.abrir_nova_aba !== false ? 'noreferrer' : undefined}>
                   <img src={mediaUrl(a.logo)} alt={a.nome} />
                 </a>
               ))}
@@ -857,7 +863,7 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
           </nav>
           <div className="home__menu-mobile__marcas">
             {agencias?.filter(a => a.logo).map((a, i) => (
-              <a key={i} href={externalUrl(a.url_externa)} target="_blank" rel="noreferrer">
+              <a key={i} href={externalUrl(a.url_externa)} target={a.abrir_nova_aba !== false ? '_blank' : undefined} rel={a.abrir_nova_aba !== false ? 'noreferrer' : undefined}>
                 <img src={mediaUrl(a.logo)} alt={a.nome} />
               </a>
             ))}

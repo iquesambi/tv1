@@ -74,7 +74,7 @@ export default function MobileMenu({ logo, logoFiltro = 'brightness(0)' }) {
           {/* Marcas */}
           <div className="mobile-menu__marcas">
             {agencias?.filter(a => a.logo).map((a, i) => (
-              <a key={i} href={externalUrl(a.url_externa)} target="_blank" rel="noreferrer">
+              <a key={i} href={externalUrl(a.url_externa)} target={a.abrir_nova_aba !== false ? '_blank' : undefined} rel={a.abrir_nova_aba !== false ? 'noreferrer' : undefined}>
                 <img src={mediaUrl(a.logo)} alt={a.nome} />
               </a>
             ))}

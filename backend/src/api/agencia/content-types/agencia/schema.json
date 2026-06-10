@@ -29,6 +29,10 @@
     "url_externa": {
       "type": "string"
     },
+    "abrir_nova_aba": {
+      "type": "boolean",
+      "default": true
+    },
     "posicao": {
       "type": "integer",
       "default": 1,
