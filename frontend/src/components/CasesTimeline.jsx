@@ -430,14 +430,19 @@ export default function CasesTimeline({
 
     const calcLabels = () => {
       if (usaCarrossel && timelineTrackRef.current) {
+        // Recalcula oneSet do estado atual do DOM — pode ter mudado depois que
+        // imagens/fontes carregaram. Sem isso, posicionamento usa valor antigo
+        // e os labels viram um amontoado em cima do "1997".
+        const currentOneSet = track.scrollWidth / 3
+        oneSetRef.current = currentOneSet
         const sets = timelineTrackRef.current.querySelectorAll('.timeline__labels-set')
-        sets.forEach(s => { s.style.width = `${oneSet}px` })
+        sets.forEach(s => { s.style.width = `${currentOneSet}px` })
         const firstSetCards = cards.slice(0, n)
         const grupos = gruposDeLabels(entradas)
         setLabels(grupos.map(g => {
           const card   = firstSetCards[g.indices[0]]
           const center = card ? card.offsetLeft + card.offsetWidth / 2 : 0
-          return { label: g.label, pos: (center / oneSet) * 100, cardIdx: g.indices[0] }
+          return { label: g.label, pos: (center / currentOneSet) * 100, cardIdx: g.indices[0] }
         }))
       } else if (!usaCarrossel) {
         const grupos = gruposDeLabels(entradas)
@@ -466,6 +471,21 @@ export default function CasesTimeline({
       if (img.complete) { loaded++; if (loaded >= imgs.length) calcLabels() }
       else { img.addEventListener('load', onImgLoad, { once: true }); img.addEventListener('error', onImgLoad, { once: true }) }
     })
+
+    // Refaz depois que as fontes terminam de carregar (a largura dos cards
+    // muda quando a fonte custom substitui a fallback, e isso desloca os labels)
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(() => calcLabels())
+    }
+
+    // Refaz se o track mudar de tamanho por qualquer outro motivo (resize,
+    // lazy-load de imagem solta, etc) — RAF amortiza disparos consecutivos
+    let resizeRaf = 0
+    const resizeObserver = new ResizeObserver(() => {
+      cancelAnimationFrame(resizeRaf)
+      resizeRaf = requestAnimationFrame(calcLabels)
+    })
+    resizeObserver.observe(track)
 
     const onWheel = (e) => {
       if (!usaCarrossel) return
@@ -543,6 +563,8 @@ export default function CasesTimeline({
       container.removeEventListener('touchmove',  onTouchMove)
       container.removeEventListener('touchend',   onTouchEnd)
       cancelAnimationFrame(raf)
+      cancelAnimationFrame(resizeRaf)
+      resizeObserver.disconnect()
     }
   }, [n, usaCarrossel, contexto])
 
