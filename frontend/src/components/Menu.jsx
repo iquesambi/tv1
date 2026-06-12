@@ -633,9 +633,17 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
       )
     }
 
+    // Posiciona o submenu central abaixo do item ativo (não no centro do
+    // viewport), pra não encavalar com o ativo em telas mais curtas. Usa a
+    // mesma fórmula de activeTop do computeStyle: max(vh*0.13, acimaBlock+10)
+    // OBS: dentro de renderSubmenu, `itemH` é o tamanho dos sublinks (70px);
+    // o tamanho dos itens do nav é navItemH (declarado acima).
+    const acimaCountSub = aberto
+    const activeTopSub  = acimaCountSub > 0 ? acimaCountSub * navItemH + 10 : 0
+    const submenuTop    = activeTopSub + navItemH + 40 // bloco do ativo + respiro
     return (
       <div className="home__submenu" onClick={e => e.stopPropagation()}>
-        <div className="home__submenu-center">
+        <div className="home__submenu-center" style={{ inset: 'auto 0 0 0', top: submenuTop, justifyContent: 'flex-start' }}>
           {sublinks.map((sub, j) => {
             const isAtivo = hoveredSub ? hoveredSub === sub : j === 0
             return (
@@ -687,10 +695,10 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
   const computeStyle = (i) => {
     if (aberto === null) return undefined
     const acimaCount = aberto
-    // Posição padrão do ativo (vh*0.13). Se houver "acima", desce o ativo
-    // até passar de todos eles + 10px de respiro.
+    // Ativo encosta no topo do viewport. Se houver "acima", ele desce só o
+    // suficiente pra ficar logo abaixo do bloco de acima.
     const acimaBlock   = acimaCount * itemH
-    const activeTop    = Math.max(vh * 0.13, acimaBlock + (acimaCount > 0 ? 10 : 0))
+    const activeTop    = acimaCount > 0 ? acimaBlock + 10 : 0
     const activeTarget = activeTop + itemH / 2
     const bottomStart  = vh * 0.78 + itemH / 2
     if (i === aberto) {
