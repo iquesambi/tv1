@@ -216,13 +216,15 @@ function TimelineBar({ labels, xRef, tiltDeltaRef, timelineTrackRef, usaCarrosse
 
 /* ── Componente principal ── */
 export default function CasesTimeline({
-  conteudo,               // 'marca' | 'especialidade' | 'quarentaAnos'
+  conteudo,               // 'marca' | 'especialidade' | 'quarentaAnos' | 'unified'
   tipo,                   // retrocompat: 'cliente' | 'especialidade'
   slug,
   contexto = 'case',      // 'pagina' | 'case'
   tema     = 'claro',     // 'claro'  | 'escuro'
   proporcaoNatural = true,
   navState = null,
+  entradasPre = null,     // p/ modo unified: entradas já montadas pela página
+  anchorMap   = null,     // p/ modo unified: slug -> entry id (rolagem por âncora)
 }) {
   // Resolve tipo/conteudo
   const tipoResolvido = conteudo ?? (tipo === 'cliente' ? 'marca' : (tipo ?? 'marca'))
@@ -278,6 +280,14 @@ export default function CasesTimeline({
 
   // Fetch de dados
   useEffect(() => {
+    // Modo unified: a página já montou as entradas, só repassa.
+    if (tipoResolvido === 'unified') {
+      if (entradasPre) {
+        setEntradas(entradasPre)
+        setCarregando(false)
+      }
+      return
+    }
     if (tipoResolvido === 'quarentaAnos') {
       apiGet(
         'quarenta-anos' +
@@ -313,7 +323,7 @@ export default function CasesTimeline({
       })
       .catch(() => {})
       .finally(() => setCarregando(false))
-  }, [tipoResolvido, slug])
+  }, [tipoResolvido, slug, entradasPre])
 
   // Mantém labelsRef em sincronia para o tick poder ler sem fechar sobre o state
   useEffect(() => {
@@ -352,6 +362,19 @@ export default function CasesTimeline({
     const options = [base - oneSet, base, base + oneSet]
     xTargetRef.current = options.reduce((a, b) => Math.abs(b - cur) < Math.abs(a - cur) ? b : a)
   }
+
+  // Modo unified: ouve evento global pra centralizar uma entrada (âncora)
+  useEffect(() => {
+    if (tipoResolvido !== 'unified') return
+    const onScrollTo = (e) => {
+      const entryId = e.detail?.entryId
+      if (!entryId) return
+      const idx = entradas.findIndex(en => en.id === entryId)
+      if (idx >= 0) handleLabelClick(idx)
+    }
+    window.addEventListener('cases-scroll-to', onScrollTo)
+    return () => window.removeEventListener('cases-scroll-to', onScrollTo)
+  }, [tipoResolvido, entradas])
 
   useEffect(() => {
     if (!n) return

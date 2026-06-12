@@ -441,6 +441,7 @@ export interface ApiAgenciaAgencia extends Struct.CollectionTypeSchema {
     draftAndPublish: true;
   };
   attributes: {
+    abrir_nova_aba: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
     cases: Schema.Attribute.Relation<'oneToMany', 'api::case.case'>;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
@@ -494,6 +495,7 @@ export interface ApiCaseCase extends Struct.CollectionTypeSchema {
         'blocks.big-numbers',
       ]
     >;
+    breadcrumb: Schema.Attribute.String;
     cliente: Schema.Attribute.Relation<'manyToOne', 'api::cliente.cliente'>;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
@@ -533,6 +535,15 @@ export interface ApiClienteCliente extends Struct.CollectionTypeSchema {
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    escala_logo: Schema.Attribute.Decimal &
+      Schema.Attribute.SetMinMax<
+        {
+          max: 3;
+          min: 0.3;
+        },
+        number
+      > &
+      Schema.Attribute.DefaultTo<1>;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
@@ -737,7 +748,7 @@ export interface ApiQuemSomosQuemSomos extends Struct.SingleTypeSchema {
       Schema.Attribute.Private;
     publishedAt: Schema.Attribute.DateTime;
     tagline: Schema.Attribute.Text;
-    texto_era: Schema.Attribute.Blocks;
+    texto_era: Schema.Attribute.RichText;
     texto_intro: Schema.Attribute.RichText;
     titulo_era: Schema.Attribute.String;
     titulo_era_italico: Schema.Attribute.String;

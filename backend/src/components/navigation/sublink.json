@@ -12,10 +12,19 @@
     "url": {
       "type": "string"
     },
-    "especialidade": {
+    "slug": {
+      "type": "uid",
+      "targetField": "label"
+    },
+    "especialidades": {
       "type": "relation",
-      "relation": "oneToOne",
+      "relation": "oneToMany",
       "target": "api::especialidade.especialidade"
+    },
+    "cases": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::case.case"
     }
   }
 }

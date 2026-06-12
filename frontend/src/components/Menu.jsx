@@ -527,10 +527,14 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
 
     const handleSubClick = (sub) => (e) => {
       e.preventDefault()
-      if (sub.url) {
-        const [path, hash] = sub.url.split('#')
-        goTo(path || '/', () => { if (hash) window.location.hash = hash })
-      }
+      // Sublinks do "Cases" navegam pra /cases#slug (timeline unificada),
+      // a menos que o CMS tenha colocado um url explícito.
+      const isCases = (link.label ?? '').toLowerCase() === 'cases' || link.url === '/cases'
+      let target = sub.url
+      if (!target && isCases && sub.slug) target = `/cases#${sub.slug}`
+      if (!target) return
+      const [path, hash] = target.split('#')
+      goTo(path || '/', () => { if (hash) window.location.hash = '#' + hash })
     }
 
     const vw = window.innerWidth
