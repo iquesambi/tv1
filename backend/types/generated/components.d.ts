@@ -159,13 +159,13 @@ export interface NavigationSublink extends Struct.ComponentSchema {
     icon: 'arrowRight';
   };
   attributes: {
+    ancora: Schema.Attribute.String;
     cases: Schema.Attribute.Relation<'oneToMany', 'api::case.case'>;
     especialidades: Schema.Attribute.Relation<
       'oneToMany',
       'api::especialidade.especialidade'
     >;
     label: Schema.Attribute.String & Schema.Attribute.Required;
-    slug: Schema.Attribute.UID<'label'>;
     url: Schema.Attribute.String;
   };
 }

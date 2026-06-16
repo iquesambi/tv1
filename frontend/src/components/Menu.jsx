@@ -527,11 +527,11 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
 
     const handleSubClick = (sub) => (e) => {
       e.preventDefault()
-      // Sublinks do "Cases" navegam pra /cases#slug (timeline unificada),
-      // a menos que o CMS tenha colocado um url explícito.
+      // Sublinks do "Cases" SEMPRE navegam pra /cases#slug (timeline unificada).
+      // O campo `url` do sublink fica como fallback pra outros menus.
       const isCases = (link.label ?? '').toLowerCase() === 'cases' || link.url === '/cases'
-      let target = sub.url
-      if (!target && isCases && sub.slug) target = `/cases#${sub.slug}`
+      const ancora = sub.ancora || sub.slug
+      let target = isCases && ancora ? `/cases#${ancora}` : sub.url
       if (!target) return
       const [path, hash] = target.split('#')
       goTo(path || '/', () => { if (hash) window.location.hash = '#' + hash })

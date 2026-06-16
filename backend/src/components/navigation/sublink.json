@@ -12,9 +12,8 @@
     "url": {
       "type": "string"
     },
-    "slug": {
-      "type": "uid",
-      "targetField": "label"
+    "ancora": {
+      "type": "string"
     },
     "especialidades": {
       "type": "relation",

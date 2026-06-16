@@ -49,7 +49,7 @@ export default function CasesPage() {
       const secoes = []
 
       for (const sub of sublinks) {
-        const subSlug  = sub.slug || (sub.label ?? '').toLowerCase().replace(/\s+/g, '-')
+        const subSlug  = sub.ancora || sub.slug || (sub.label ?? '').toLowerCase().replace(/\s+/g, '-')
         const esps     = sub.especialidades ?? []
         const subCases = sub.cases ?? []
         if (esps.length > 0) {
