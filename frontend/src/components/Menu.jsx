@@ -496,6 +496,11 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
     e.preventDefault()
     e.stopPropagation()
     const sublinks = getSublinks(link)
+    const isCases = (link.label ?? '').toLowerCase() === 'cases' || link.url === '/cases'
+    // Quando abre o submenu de Cases, dispara prefetch da página /cases
+    if (isCases) {
+      import('../pages/CasesPage.jsx').then(m => m.prefetchCases?.())
+    }
 
     if (isMobile()) {
       if (link.url && link.url !== '#') { goTo(link.url); return }

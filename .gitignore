@@ -19,3 +19,16 @@
 /mequi no lolla/
 /↪ Desktop/
 frontend/.firebase/
+
+# Pastas de mídia/vídeo grandes
+/CASES/
+/CASES_2025/
+/CASES_2026/
+/CAMERA_ROTATION TV1 folder/
+/camera rotation 05 2/
+/Fotos Pessoas/
+/Marca TV1.ico
+
+# Arquivos Claude internos
+.claude/
+frontend/.claude/

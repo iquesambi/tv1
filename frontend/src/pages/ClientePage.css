@@ -221,12 +221,10 @@
 .timeline__next-arrow {
   position: absolute;
   right: calc(2% + 12px); /* alinha com o fim dos ticks: 100%-98% + padding-right do inner */
-  top: 38px; /* ticks (20px) + labels margin-top (18px) */
-  height: 28px;
-  display: flex;
-  align-items: center;
-  padding: 0;
-  background: none;
+  /* .timeline tem padding-top:16, ticks 20, labels margin-top 18 → labels começam em 54 */
+  top: 54px;
+  padding: 0 0 0 60px; /* espaço para o fade à esquerda da seta */
+  background: linear-gradient(to right, rgba(255,255,255,0) 0%, #fff 50%, #fff 100%);
   border: none;
   cursor: pointer;
   font-family: 'Gilroy', sans-serif;
@@ -234,12 +232,13 @@
   font-weight: 500;
   color: #000001;
   transition: opacity 0.25s ease;
-  line-height: 1;
+  line-height: 1; /* mesma do label — assim a baseline bate */
   user-select: none;
   z-index: 2;
 }
 
 .cases-timeline--escuro .timeline__next-arrow {
+  background: linear-gradient(to right, rgba(0,0,1,0) 0%, #000001 50%, #000001 100%);
   color: #fff;
 }
 

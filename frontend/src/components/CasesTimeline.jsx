@@ -191,7 +191,8 @@ function TimelineBar({ labels, xRef, tiltDeltaRef, timelineTrackRef, usaCarrosse
         <button
           ref={arrowRef}
           className="timeline__next-arrow"
-          onClick={onArrowClick}
+          onMouseDown={e => e.stopPropagation()}
+          onClick={e => { e.stopPropagation(); onArrowClick?.(e) }}
           style={{ opacity: 0, pointerEvents: 'none' }}
         >&gt;</button>
       </div>
@@ -363,17 +364,39 @@ export default function CasesTimeline({
     xTargetRef.current = options.reduce((a, b) => Math.abs(b - cur) < Math.abs(a - cur) ? b : a)
   }
 
-  // Modo unified: ouve evento global pra centralizar uma entrada (âncora)
+  // Posiciona o card na borda esquerda do viewport (usado no carregamento da
+  // timeline unificada sem âncora — primeiro case mais novo no canto esquerdo).
+  const handleAlignLeft = (cardIdx) => {
+    const cards     = firstSetCardsRef.current
+    const container = viewportRef.current
+    if (!cards[cardIdx] || !container) return
+    const cardLeft = cards[cardIdx].offsetLeft
+    const base    = -oneSetRef.current - cardLeft
+    const oneSet  = oneSetRef.current
+    const cur     = xRef.current.x
+    const options = [base - oneSet, base, base + oneSet]
+    xTargetRef.current = options.reduce((a, b) => Math.abs(b - cur) < Math.abs(a - cur) ? b : a)
+  }
+
+  // Modo unified: ouve eventos globais pra mover a timeline pra uma entrada
+  // específica — centralizada (âncora clicada) ou alinhada à esquerda (load).
   useEffect(() => {
     if (tipoResolvido !== 'unified') return
+    const idxOf = (entryId) => entradas.findIndex(en => en.id === entryId)
     const onScrollTo = (e) => {
-      const entryId = e.detail?.entryId
-      if (!entryId) return
-      const idx = entradas.findIndex(en => en.id === entryId)
+      const idx = idxOf(e.detail?.entryId)
       if (idx >= 0) handleLabelClick(idx)
     }
+    const onAlignLeft = (e) => {
+      const idx = idxOf(e.detail?.entryId)
+      if (idx >= 0) handleAlignLeft(idx)
+    }
     window.addEventListener('cases-scroll-to', onScrollTo)
-    return () => window.removeEventListener('cases-scroll-to', onScrollTo)
+    window.addEventListener('cases-align-left', onAlignLeft)
+    return () => {
+      window.removeEventListener('cases-scroll-to', onScrollTo)
+      window.removeEventListener('cases-align-left', onAlignLeft)
+    }
   }, [tipoResolvido, entradas])
 
   useEffect(() => {
@@ -532,7 +555,12 @@ export default function CasesTimeline({
       if (xTargetRef.current !== null) {
         const diff = xTargetRef.current - xRef.current.x
         if (Math.abs(diff) < 1) { xRef.current.x = xTargetRef.current; xTargetRef.current = null }
-        else { const move = diff * 0.1; xRef.current.x += move; tiltDeltaRef.current = -move * 4 }
+        else {
+          const move = diff * 0.1
+          xRef.current.x += move
+          // Clamp pro tilt animado não acumular em cliques rápidos
+          tiltDeltaRef.current = Math.max(-30, Math.min(30, -move * 4))
+        }
       }
       const targetTilt = Math.max(-60, Math.min(60, tiltDeltaRef.current * 0.55))
       tilt += (targetTilt - tilt) * 0.08
