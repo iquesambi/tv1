@@ -34,14 +34,14 @@
 /* Página própria: ocupa a tela inteira, scroll hijackado */
 .cases-timeline--pagina {
   height: 100dvh;
-  overflow: hidden;
+  overflow: visible;
   background: #fff;
 }
 
 /* Embutida no meio do case: altura definida, sem interferir no scroll vertical */
 .cases-timeline--case {
   height: 100dvh;
-  overflow: hidden;
+  overflow: visible;
   background: #fff;
 }
 

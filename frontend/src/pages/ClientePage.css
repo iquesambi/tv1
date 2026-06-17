@@ -178,8 +178,11 @@
 
 .cliente-viewport {
   flex: 1;
-  overflow: hidden;
+  overflow: visible;
+  clip-path: inset(-200px 0);
   cursor: grab;
+  position: relative;
+  z-index: 1;
 }
 
 .cliente-viewport:active {

@@ -538,8 +538,7 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
       const ancora = sub.especialidade?.slug || sub.ancora || sub.slug
       let target = isCases && ancora ? `/cases#${ancora}` : sub.url
       if (!target) return
-      const [path, hash] = target.split('#')
-      goTo(path || '/', () => { if (hash) window.location.hash = '#' + hash })
+      goTo(target)
     }
 
     const vw = window.innerWidth

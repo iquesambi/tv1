@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef } from 'react'
+import { useLocation } from 'react-router-dom'
 import axios from 'axios'
 import CasesTimeline from '../components/CasesTimeline.jsx'
 
@@ -50,11 +51,7 @@ async function construirEntradas() {
   const queries = [
     axios.get(
       `${STRAPI}/api/cases?${slugFilters}` +
-      `&populate[especialidade]=true` +
-      `&populate[sub_especialidade]=true` +
-      `&populate[cliente]=true` +
-      `&populate[agencia][populate][logo]=true` +
-      `&populate[imagem_capa]=true` +
+      `&populate[0]=especialidade&populate[1]=sub_especialidade&populate[2]=cliente&populate[3]=agencia&populate[4]=imagem_capa` +
       `&pagination[pageSize]=200&sort=Data:desc`
     ).then(r => r.data.data ?? []).catch(() => [])
   ]
@@ -75,18 +72,16 @@ async function construirEntradas() {
       secaoLabel = sec?.label || c.especialidade?.nome || ''
     }
     entradas.push({
-      id:          `${c.id}-main`,
+      id:            `${c.id}-main`,
       ancora,
-      // Label = sub_especialidade do case se houver (ex: cada case de Live
-      // Marketing aparece com seu próprio nome). Cai pra nome da seção
-      // (especialidade/sublink) quando o case não tem sub_especialidade.
-      label:       c.sub_especialidade?.nome || secaoLabel,
-      data:        c.Data ? new Date(c.Data) : new Date(0),
-      nome:        c.titulo,
-      capa:        c.imagem_capa,
-      href:        clienteSlug && caseSlug ? `/${clienteSlug}/${caseSlug}` : `/${caseSlug}`,
-      agenciaLogo: c.agencia?.logo ?? null,
-      agenciaNome: c.agencia?.nome ?? null,
+      subEspAncora:  c.sub_especialidade?.slug || null,
+      label:         c.sub_especialidade?.nome || secaoLabel,
+      data:          c.Data ? new Date(c.Data) : new Date(0),
+      nome:          c.titulo,
+      capa:          c.imagem_capa,
+      href:          clienteSlug && caseSlug ? `/${clienteSlug}/${caseSlug}` : `/${caseSlug}`,
+      agenciaLogo:   c.agencia?.logo ?? null,
+      agenciaNome:   c.agencia?.nome ?? null,
     })
   }
   // Ordem da timeline:
@@ -104,10 +99,16 @@ async function construirEntradas() {
     return b.data - a.data
   })
   const map = {}
-  for (const e of entradas) if (e.ancora && !map[e.ancora]) map[e.ancora] = e.id
-  for (const secao of secoes) {
-    if (!map[secao.parentSublinkSlug] && map[secao.slug]) {
-      map[secao.parentSublinkSlug] = map[secao.slug]
+  // Âncora por sub-especialidade slug (ex: #ativacao)
+  for (const e of entradas) if (e.subEspAncora && !map[e.subEspAncora]) map[e.subEspAncora] = e.id
+  // Âncora por especialidade: se a área tem subs, aponta pro primeiro case com sub;
+  // se não tem, aponta pro primeiro case da área
+  for (const e of entradas) {
+    if (!e.ancora) continue
+    if (!map[e.ancora]) {
+      map[e.ancora] = e.id
+    } else if (e.subEspAncora && !entradas.find(x => x.id === map[e.ancora])?.subEspAncora) {
+      map[e.ancora] = e.id
     }
   }
   return { entradas, map }
@@ -127,9 +128,9 @@ async function construirEntradas() {
  * entradas com âncoras e passa pro CasesTimeline.
  */
 export default function CasesPage() {
+  const location = useLocation()
   const [entradasPre, setEntradasPre] = useState(entradasCache)  // usa cache se houver
   const [anchorMap, setAnchorMap]     = useState(anchorMapCache ?? {})
-  const hashAtivoRef = useRef('')
 
   useEffect(() => {
     document.body.classList.add('scroll-locked')
@@ -262,35 +263,30 @@ export default function CasesPage() {
     carregar()
   }, [])
 
-  // Posiciona a timeline ao montar e em hashchange:
-  //   - Com hash: centraliza o primeiro card daquela âncora
-  //   - Sem hash: alinha o primeiro case (entradasPre[0]) à esquerda
+  // Posiciona a timeline ao montar e quando o hash muda (via React Router).
   // Tenta repetidamente até a timeline ter os cards montados.
   useEffect(() => {
     if (!entradasPre) return
-    const aplicar = () => {
-      const hash = window.location.hash.slice(1)
-      const semHash = !hash
-      const targetId = semHash ? entradasPre[0]?.id : anchorMap[hash]
-      if (!targetId) return
-      if (hashAtivoRef.current === (hash || '__start__')) return
-      let tentativas = 0
-      const tentar = () => {
-        const card = document.querySelector('.cliente-card')
-        if (card) {
-          hashAtivoRef.current = hash || '__start__'
-          const evName = semHash ? 'cases-align-left' : 'cases-scroll-to'
-          window.dispatchEvent(new CustomEvent(evName, { detail: { entryId: targetId } }))
-          return
+    const hash = location.hash.slice(1)
+    const targetId = hash ? anchorMap[hash] : entradasPre[0]?.id
+    if (!targetId) return
+    let tentativas = 0
+    const tentar = () => {
+      const card = document.querySelector('.cliente-card')
+      if (card) {
+        window.dispatchEvent(new CustomEvent('cases-align-left', { detail: { entryId: targetId } }))
+        if (hash) {
+          const limparHash = { once: true }
+          const clearHash = () => history.replaceState(null, '', location.pathname)
+          window.addEventListener('wheel', clearHash, limparHash)
+          window.addEventListener('touchstart', clearHash, limparHash)
         }
-        if (++tentativas < 30) setTimeout(tentar, 100)
+        return
       }
-      tentar()
+      if (++tentativas < 30) setTimeout(tentar, 100)
     }
-    aplicar()
-    window.addEventListener('hashchange', aplicar)
-    return () => window.removeEventListener('hashchange', aplicar)
-  }, [entradasPre, anchorMap])
+    tentar()
+  }, [location.hash, entradasPre, anchorMap])
 
   if (entradasPre === null) {
     return (

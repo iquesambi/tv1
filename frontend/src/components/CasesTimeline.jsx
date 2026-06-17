@@ -360,7 +360,7 @@ export default function CasesTimeline({
     const base    = container.clientWidth / 2 - oneSetRef.current - cardCenter
     const oneSet  = oneSetRef.current
     const cur     = xRef.current.x
-    const options = [base - oneSet, base, base + oneSet]
+    const options = [base, base + oneSet]
     xTargetRef.current = options.reduce((a, b) => Math.abs(b - cur) < Math.abs(a - cur) ? b : a)
   }
 
@@ -374,7 +374,7 @@ export default function CasesTimeline({
     const base    = -oneSetRef.current - cardLeft
     const oneSet  = oneSetRef.current
     const cur     = xRef.current.x
-    const options = [base - oneSet, base, base + oneSet]
+    const options = [base, base + oneSet]
     xTargetRef.current = options.reduce((a, b) => Math.abs(b - cur) < Math.abs(a - cur) ? b : a)
   }
 
@@ -566,8 +566,9 @@ export default function CasesTimeline({
       tilt += (targetTilt - tilt) * 0.08
       tiltDeltaRef.current *= 0.91
       if (usaCarrossel) {
-        if (xRef.current.x < -2 * oneSet) xRef.current.x += oneSet
-        if (xRef.current.x > 0)           xRef.current.x -= oneSet
+        const os = oneSetRef.current
+        if (xRef.current.x < -2 * os) xRef.current.x += os
+        if (xRef.current.x > 0)       xRef.current.x -= os
         track.style.transform = `translateX(${xRef.current.x}px)`
         if (timelineTrackRef.current) timelineTrackRef.current.style.transform = `translateX(${xRef.current.x}px)`
       }
@@ -690,7 +691,7 @@ export default function CasesTimeline({
         tiltDeltaRef={tiltDeltaRef}
         timelineTrackRef={timelineTrackRef}
         usaCarrossel={usaCarrossel}
-        onLabelClick={handleLabelClick}
+        onLabelClick={handleAlignLeft}
         arrowRef={arrowRef}
         onArrowClick={handleNextArrow}
       />
