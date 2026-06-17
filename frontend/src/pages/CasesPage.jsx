@@ -49,7 +49,13 @@ async function construirEntradas() {
     .join('&')
   const queries = [
     axios.get(
-      `${STRAPI}/api/cases?${slugFilters}&populate=*&pagination[pageSize]=200&sort=Data:desc`
+      `${STRAPI}/api/cases?${slugFilters}` +
+      `&populate[especialidade]=true` +
+      `&populate[sub_especialidade]=true` +
+      `&populate[cliente]=true` +
+      `&populate[agencia][populate][logo]=true` +
+      `&populate[imagem_capa]=true` +
+      `&pagination[pageSize]=200&sort=Data:desc`
     ).then(r => r.data.data ?? []).catch(() => [])
   ]
   const resultados = await Promise.all(queries)
