@@ -280,7 +280,7 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
 
   // Fetch de dados
   useEffect(() => {
-    api('navigation?populate[links][populate]=*').then(setNav)
+    api('navigation?populate[links][populate][sublinks][populate]=*').then(setNav)
     api('logo-site?populate=logo').then(setLogo)
     api('agencias?populate=*&sort=posicao:asc').then(data =>
       setAgencias(Array.isArray(data) ? data.map(a => ({ ...a, logo: a.Logo ?? a.logo, nome: a.Nome ?? a.nome, slug: a.Slug ?? a.slug })) : [])
@@ -535,7 +535,7 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
       // Sublinks do "Cases" SEMPRE navegam pra /cases#slug (timeline unificada).
       // O campo `url` do sublink fica como fallback pra outros menus.
       const isCases = (link.label ?? '').toLowerCase() === 'cases' || link.url === '/cases'
-      const ancora = sub.ancora || sub.slug
+      const ancora = sub.especialidade?.slug || sub.ancora || sub.slug
       let target = isCases && ancora ? `/cases#${ancora}` : sub.url
       if (!target) return
       const [path, hash] = target.split('#')

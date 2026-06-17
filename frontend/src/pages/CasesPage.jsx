@@ -26,15 +26,12 @@ async function construirEntradas() {
   )
   const sublinks = linkCases?.sublinks ?? []
   const especialidadeSlugs = new Set()
-  const sublinkCasesIds    = new Set()
   const secoes = []
-  // ancora → índice do sublink (pra ordenar entradas conforme a ordem do menu)
   const ordemSublink = {}
   for (let subIdx = 0; subIdx < sublinks.length; subIdx++) {
     const sub = sublinks[subIdx]
-    const subSlug  = sub.ancora || sub.slug || (sub.label ?? '').toLowerCase().replace(/\s+/g, '-')
-    const esps     = sub.especialidades ?? []
-    const subCases = sub.cases ?? []
+    const subSlug  = sub.especialidade?.slug || sub.slug || (sub.label ?? '').toLowerCase().replace(/\s+/g, '-')
+    const esps     = sub.especialidade ? [sub.especialidade] : []
     ordemSublink[subSlug] = subIdx
     for (const e of esps) {
       if (e.slug) {
@@ -43,31 +40,18 @@ async function construirEntradas() {
         ordemSublink[e.slug] = subIdx
       }
     }
-    if (subCases.length > 0) {
-      for (const c of subCases) sublinkCasesIds.add(c.id)
-      secoes.push({ tipo: 'sub', slug: subSlug, label: sub.label, caseIds: subCases.map(c => c.id) })
-    }
   }
-  if (especialidadeSlugs.size === 0 && sublinkCasesIds.size === 0) {
+  if (especialidadeSlugs.size === 0) {
     return { entradas: [], map: {} }
   }
-  const queries = []
-  if (especialidadeSlugs.size > 0) {
-    const slugFilters = Array.from(especialidadeSlugs)
-      .map(s => `filters[especialidade][slug][$in]=${encodeURIComponent(s)}`)
-      .join('&')
-    queries.push(axios.get(
+  const slugFilters = Array.from(especialidadeSlugs)
+    .map(s => `filters[especialidade][slug][$in]=${encodeURIComponent(s)}`)
+    .join('&')
+  const queries = [
+    axios.get(
       `${STRAPI}/api/cases?${slugFilters}&populate=*&pagination[pageSize]=200&sort=Data:desc`
-    ).then(r => r.data.data ?? []).catch(() => []))
-  }
-  if (sublinkCasesIds.size > 0) {
-    const idFilters = Array.from(sublinkCasesIds)
-      .map(id => `filters[id][$in]=${id}`)
-      .join('&')
-    queries.push(axios.get(
-      `${STRAPI}/api/cases?${idFilters}&populate=*&pagination[pageSize]=200&sort=Data:desc`
-    ).then(r => r.data.data ?? []).catch(() => []))
-  }
+    ).then(r => r.data.data ?? []).catch(() => [])
+  ]
   const resultados = await Promise.all(queries)
   const casesMap = new Map()
   for (const lista of resultados) for (const c of lista) casesMap.set(c.id, c)
@@ -81,16 +65,8 @@ async function construirEntradas() {
     const especialidadeSlug = c.especialidade?.slug
     if (especialidadeSlug && especialidadeSlugs.has(especialidadeSlug)) {
       ancora = especialidadeSlug
-      const sec = secoes.find(s => s.tipo === 'esp' && s.slug === especialidadeSlug)
+      const sec = secoes.find(s => s.slug === especialidadeSlug)
       secaoLabel = sec?.label || c.especialidade?.nome || ''
-    } else {
-      for (const secao of secoes) {
-        if (secao.tipo === 'sub' && secao.caseIds?.includes(c.id)) {
-          ancora = secao.slug
-          secaoLabel = secao.label
-          break
-        }
-      }
     }
     entradas.push({
       id:          `${c.id}-main`,
@@ -98,7 +74,7 @@ async function construirEntradas() {
       // Label = sub_especialidade do case se houver (ex: cada case de Live
       // Marketing aparece com seu próprio nome). Cai pra nome da seção
       // (especialidade/sublink) quando o case não tem sub_especialidade.
-      label:       c.sub_especialidade || secaoLabel,
+      label:       c.sub_especialidade?.nome || secaoLabel,
       data:        c.Data ? new Date(c.Data) : new Date(0),
       nome:        c.titulo,
       capa:        c.imagem_capa,
@@ -124,7 +100,7 @@ async function construirEntradas() {
   const map = {}
   for (const e of entradas) if (e.ancora && !map[e.ancora]) map[e.ancora] = e.id
   for (const secao of secoes) {
-    if (secao.tipo === 'esp' && !map[secao.parentSublinkSlug] && map[secao.slug]) {
+    if (!map[secao.parentSublinkSlug] && map[secao.slug]) {
       map[secao.parentSublinkSlug] = map[secao.slug]
     }
   }
@@ -183,23 +159,13 @@ export default function CasesPage() {
       const secoes = []
 
       for (const sub of sublinks) {
-        const subSlug  = sub.ancora || sub.slug || (sub.label ?? '').toLowerCase().replace(/\s+/g, '-')
-        const esps     = sub.especialidades ?? []
-        const subCases = sub.cases ?? []
-        // Processa especialidades (sub-seções)
+        const subSlug  = sub.especialidade?.slug || sub.slug || (sub.label ?? '').toLowerCase().replace(/\s+/g, '-')
+        const esps     = sub.especialidade ? [sub.especialidade] : []
         for (const e of esps) {
           if (e.slug) {
             especialidadeSlugs.add(e.slug)
             secoes.push({ tipo: 'esp', slug: e.slug, label: e.nome, parentSublinkSlug: subSlug })
           }
-        }
-        // Processa cases atribuídos diretamente ao sublink (acima das
-        // especialidades, vinculados ao próprio sublink). Acontece quando o
-        // sublink não tem especialidade definida ou quando o curador quis
-        // adicionar um case avulso.
-        if (subCases.length > 0) {
-          for (const c of subCases) sublinkCasesIds.add(c.id)
-          secoes.push({ tipo: 'sub', slug: subSlug, label: sub.label, caseIds: subCases.map(c => c.id) })
         }
       }
 

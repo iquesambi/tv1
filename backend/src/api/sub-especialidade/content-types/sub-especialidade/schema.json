@@ -1,0 +1,35 @@
+{
+  "kind": "collectionType",
+  "collectionName": "sub_especialidades",
+  "info": {
+    "singularName": "sub-especialidade",
+    "pluralName": "sub-especialidades",
+    "displayName": "Sub Especialidade"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "nome": {
+      "type": "string",
+      "required": true
+    },
+    "slug": {
+      "type": "uid",
+      "targetField": "nome",
+      "required": true
+    },
+    "especialidade": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::especialidade.especialidade",
+      "inversedBy": "sub_especialidades"
+    },
+    "cases": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::case.case",
+      "mappedBy": "sub_especialidade"
+    }
+  }
+}

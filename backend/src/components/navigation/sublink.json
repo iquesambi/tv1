@@ -12,18 +12,10 @@
     "url": {
       "type": "string"
     },
-    "ancora": {
-      "type": "string"
-    },
-    "especialidades": {
+    "especialidade": {
       "type": "relation",
-      "relation": "oneToMany",
+      "relation": "manyToOne",
       "target": "api::especialidade.especialidade"
-    },
-    "cases": {
-      "type": "relation",
-      "relation": "oneToMany",
-      "target": "api::case.case"
     }
   }
 }

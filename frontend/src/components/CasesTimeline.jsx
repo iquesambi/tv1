@@ -60,7 +60,7 @@ function montarEntradas(cases, tipoResolvido) {
       id:          `${c.id}-main`,
       label:       tipoResolvido === 'marca'
         ? (c.Data ? new Date(c.Data).getFullYear() : null)
-        : (c.sub_especialidade || ''),
+        : (c.sub_especialidade?.nome || ''),
       data:        c.Data ? new Date(c.Data) : new Date(0),
       nome:        c.titulo,
       capa:        c.imagem_capa,
@@ -74,7 +74,7 @@ function montarEntradas(cases, tipoResolvido) {
           id:          `${c.id}-sub-${bloco.id}`,
           label:       tipoResolvido === 'marca'
             ? new Date(bloco.timeline_data).getFullYear()
-            : (c.sub_especialidade || ''),
+            : (c.sub_especialidade?.nome || ''),
           data:        new Date(bloco.timeline_data),
           nome:        bloco.timeline_nome || bloco.texto,
           capa:        bloco.timeline_capa || c.imagem_capa,

@@ -55,7 +55,10 @@
       "inversedBy": "cases"
     },
     "sub_especialidade": {
-      "type": "string"
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::sub-especialidade.sub-especialidade",
+      "inversedBy": "cases"
     },
     "blocos": {
       "type": "dynamiczone",

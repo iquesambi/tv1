@@ -24,6 +24,12 @@
       "relation": "oneToMany",
       "target": "api::case.case",
       "mappedBy": "especialidade"
+    },
+    "sub_especialidades": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::sub-especialidade.sub-especialidade",
+      "mappedBy": "especialidade"
     }
   }
 }

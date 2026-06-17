@@ -512,7 +512,10 @@ export interface ApiCaseCase extends Struct.CollectionTypeSchema {
       Schema.Attribute.Private;
     publishedAt: Schema.Attribute.DateTime;
     slug: Schema.Attribute.UID<'titulo'> & Schema.Attribute.Required;
-    sub_especialidade: Schema.Attribute.String;
+    sub_especialidade: Schema.Attribute.Relation<
+      'manyToOne',
+      'api::sub-especialidade.sub-especialidade'
+    >;
     titulo: Schema.Attribute.String & Schema.Attribute.Required;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
@@ -585,6 +588,10 @@ export interface ApiEspecialidadeEspecialidade
     nome: Schema.Attribute.String & Schema.Attribute.Required;
     publishedAt: Schema.Attribute.DateTime;
     slug: Schema.Attribute.UID<'nome'> & Schema.Attribute.Required;
+    sub_especialidades: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::sub-especialidade.sub-especialidade'
+    >;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -782,6 +789,41 @@ export interface ApiRedesSociaisRedesSociais extends Struct.SingleTypeSchema {
     publishedAt: Schema.Attribute.DateTime;
     redes: Schema.Attribute.Component<'social.rede', true> &
       Schema.Attribute.Required;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiSubEspecialidadeSubEspecialidade
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'sub_especialidades';
+  info: {
+    displayName: 'Sub Especialidade';
+    pluralName: 'sub-especialidades';
+    singularName: 'sub-especialidade';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    cases: Schema.Attribute.Relation<'oneToMany', 'api::case.case'>;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    especialidade: Schema.Attribute.Relation<
+      'manyToOne',
+      'api::especialidade.especialidade'
+    >;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::sub-especialidade.sub-especialidade'
+    > &
+      Schema.Attribute.Private;
+    nome: Schema.Attribute.String & Schema.Attribute.Required;
+    publishedAt: Schema.Attribute.DateTime;
+    slug: Schema.Attribute.UID<'nome'> & Schema.Attribute.Required;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -1341,6 +1383,7 @@ declare module '@strapi/strapi' {
       'api::quarenta-anos.quarenta-anos': ApiQuarentaAnosQuarentaAnos;
       'api::quem-somos.quem-somos': ApiQuemSomosQuemSomos;
       'api::redes-sociais.redes-sociais': ApiRedesSociaisRedesSociais;
+      'api::sub-especialidade.sub-especialidade': ApiSubEspecialidadeSubEspecialidade;
       'api::trabalhe-conosco.trabalhe-conosco': ApiTrabalheConoscoTrabalheConosco;
       'plugin::content-releases.release': PluginContentReleasesRelease;
       'plugin::content-releases.release-action': PluginContentReleasesReleaseAction;

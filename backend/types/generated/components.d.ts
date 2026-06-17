@@ -159,10 +159,8 @@ export interface NavigationSublink extends Struct.ComponentSchema {
     icon: 'arrowRight';
   };
   attributes: {
-    ancora: Schema.Attribute.String;
-    cases: Schema.Attribute.Relation<'oneToMany', 'api::case.case'>;
-    especialidades: Schema.Attribute.Relation<
-      'oneToMany',
+    especialidade: Schema.Attribute.Relation<
+      'manyToOne',
       'api::especialidade.especialidade'
     >;
     label: Schema.Attribute.String & Schema.Attribute.Required;
