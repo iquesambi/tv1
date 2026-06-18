@@ -530,7 +530,7 @@ export interface ApiCaseQuarentaAnosCaseQuarentaAnos extends Struct.CollectionTy
   collectionName: 'case_quarenta_anos';
   info: {
     displayName: 'Cases 40 Anos';
-    pluralName: 'case-quarenta-anos';
+    pluralName: 'cases-quarenta-anos';
     singularName: 'case-quarenta-anos';
   };
   options: {
