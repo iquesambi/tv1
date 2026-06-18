@@ -58,8 +58,11 @@ export default function PessoasPage() {
     if (!hash) return
     const tentar = (n = 0) => {
       const el = document.getElementById(hash)
-      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' })
-      else if (n < 10) setTimeout(() => tentar(n + 1), 150)
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+        const clearHash = () => history.replaceState(null, '', location.pathname)
+        window.addEventListener('scroll', clearHash, { once: true })
+      } else if (n < 10) setTimeout(() => tentar(n + 1), 150)
     }
     tentar()
   }, [equipe, pronto])

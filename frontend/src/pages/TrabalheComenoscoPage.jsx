@@ -78,16 +78,14 @@ export default function TrabalheComenoscoPage() {
                 <div key={idx} className="trabalhe-vaga">
                   <div className="trabalhe-vaga__titulo">{vaga.titulo}</div>
                   <div className="trabalhe-vaga__descricao">{vaga.descricao}</div>
-                  {vaga.link_aplicacao && (
-                    <a
-                      href={vaga.link_aplicacao}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="trabalhe-vaga__btn"
-                    >
-                      Aplicar
-                    </a>
-                  )}
+                  <a
+                    href={vaga.link_aplicacao || '/contato/trabalhe-conosco/formulario'}
+                    target={vaga.link_aplicacao ? '_blank' : '_self'}
+                    rel={vaga.link_aplicacao ? 'noopener noreferrer' : undefined}
+                    className="trabalhe-vaga__btn"
+                  >
+                    Aplicar
+                  </a>
                 </div>
               ))}
             </div>

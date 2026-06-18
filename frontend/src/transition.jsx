@@ -74,6 +74,7 @@ export function TransitionProvider({ children }) {
           ref={overlayVideoRef}
           playsInline
           muted
+          className="camera-overlay-video"
           style={{
             position: 'fixed',
             zIndex: 9999,

@@ -206,6 +206,10 @@
     padding: 60px 24px;
   }
 
+  .qs-era__titulo-normal {
+    font-size: 26px;
+  }
+
   .qs-footer-dark {
     flex: none;
     flex-direction: column;

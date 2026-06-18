@@ -8,6 +8,8 @@ const STRAPI = 'https://tv1-53ev.onrender.com'
 const api = (path) => axios.get(`${STRAPI}/api/${path}`).then(r => r.data.data).catch(() => null)
 const mediaUrl = (obj) => !obj?.url ? null : obj.url.startsWith("http") ? obj.url : `${STRAPI}${obj.url}`
 
+const cleanStr = (s) => (s || '').replace(/[­​‌‍﻿ ]/g, ' ').replace(/ +/g, ' ').trim()
+
 // Suporta Markdown (Strapi richtext), HTML string, e blocks JSON (Strapi v5)
 function renderRichText(value) {
   if (!value) return ''
@@ -18,7 +20,7 @@ function renderRichText(value) {
       if (block.type === 'paragraph') {
         const inner = (block.children || []).map(child => {
           if (child.type === 'linebreak') return '<br>'
-          const text = (child.text || '').replace(/\n/g, '<br>')
+          const text = cleanStr(child.text || '').replace(/\n/g, '<br>')
           if (child.bold && child.italic) return `<strong><em>${text}</em></strong>`
           if (child.bold)   return `<strong>${text}</strong>`
           if (child.italic) return `<em>${text}</em>`

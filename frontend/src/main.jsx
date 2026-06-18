@@ -11,6 +11,7 @@ import SlugRouter from './pages/SlugRouter.jsx'
 import PessoasPage from './pages/PessoasPage.jsx'
 import QuarentaAnosPage from './pages/QuarentaAnosPage.jsx'
 import TrabalheComenoscoPage from './pages/TrabalheComenoscoPage.jsx'
+import TrabalheFormularioPage from './pages/TrabalheFormularioPage.jsx'
 import OutrosAssuntosPage from './pages/OutrosAssuntosPage.jsx'
 import QuemSomosPage from './pages/QuemSomosPage.jsx'
 import SejaClientePage from './pages/SejaClientePage.jsx'
@@ -25,6 +26,7 @@ createRoot(document.getElementById('root')).render(
           <Route path="/contato" element={<App />} />
           <Route path="/contato/seja-cliente" element={<SejaClientePage />} />
           <Route path="/contato/trabalhe-conosco" element={<TrabalheComenoscoPage />} />
+          <Route path="/contato/trabalhe-conosco/formulario" element={<TrabalheFormularioPage />} />
           <Route path="/contato/outros-assuntos" element={<OutrosAssuntosPage />} />
           <Route path="/quem-somos" element={<QuemSomosPage />} />
           <Route path="/pessoas" element={<PessoasPage />} />

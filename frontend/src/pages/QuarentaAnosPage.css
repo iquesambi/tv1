@@ -365,7 +365,8 @@
 
   /* Esconde elementos de texto do SVG — aparecem como HTML abaixo */
   .qa-fo-lorem,
-  .qa-texto-sv-experiencias {
+  .qa-texto-sv-experiencias,
+  .qa-texto-sv-bv {
     display: none;
   }
 
@@ -378,11 +379,17 @@
     background: #000001;
   }
 
-  .qa-texto-mobile__lorem {
+  .qa-texto-mobile__paragrafos {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
     font-size: 13px;
     font-weight: 400;
     line-height: 1.7;
     color: rgba(255, 255, 255, 0.6);
+  }
+
+  .qa-texto-mobile__paragrafos p {
     margin: 0;
   }
 

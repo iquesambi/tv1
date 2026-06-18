@@ -597,7 +597,7 @@ body.camera-ativa .home > *:not(.home__menu-mobile) {
 }
 
 .home__menu-mobile__marcas img {
-  height: 24px;
+  height: 16px;
   width: auto;
   max-width: 90%;
   object-fit: contain;
@@ -808,7 +808,66 @@ body.camera-ativa .home > *:not(.home__menu-mobile) {
   }
 
   .home__marcas-mobile .home__menu-mobile__marcas img {
-    height: 16px;
+    height: 14px;
+  }
+
+  /* Câmera: contain no mobile pra não cortar */
+  .camera-overlay-video {
+    object-fit: contain !important;
+    background: #000;
+  }
+
+  /* Contato nav — mais espaço entre itens no mobile */
+  .home__nav-contato {
+    gap: 12px;
+  }
+
+  /* Clientes submenu — grid 3 colunas no mobile */
+  .home__submenu-logos {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    grid-auto-rows: 56px !important;
+    width: 100vw !important;
+    padding: 16px !important;
+    gap: 8px !important;
+    box-sizing: border-box;
+    align-items: center;
+  }
+
+  /* Rows viram containers transparentes, itens fluem para o grid pai */
+  .home__submenu-logos__row {
+    display: contents !important;
+  }
+
+  .home__submenu-logo-item {
+    flex: unset !important;
+    width: 100% !important;
+    height: 56px !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .home__submenu-logo-item img {
+    max-width: 80%;
+    max-height: 32px !important;
+    height: auto !important;
+    width: auto;
+    object-fit: contain;
+  }
+
+  /* Oculta marcas mobile quando submenu está aberto */
+  .home__marcas-mobile--oculto {
+    display: none !important;
+  }
+
+  /* Pessoas submenu — nomes nunca cortados */
+  .home__submenu-link {
+    white-space: normal !important;
+    text-align: center;
+    line-height: 1 !important;
+    font-size: 36px !important;
+    padding: 4px 16px;
   }
 
 }

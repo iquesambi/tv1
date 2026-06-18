@@ -139,6 +139,7 @@ const api = (path) => axios.get(`${STRAPI}/api/${path}`).then(r => r.data.data).
 const mediaUrl = (obj) => !obj?.url ? null : obj.url.startsWith("http") ? obj.url : `${STRAPI}${obj.url}`
 const externalUrl = (url) => {
   if (!url) return '#'
+  if (url.startsWith('/')) return url
   return /^https?:\/\//i.test(url) ? url : `https://${url}`
 }
 
@@ -183,7 +184,7 @@ const WIN_PAD  = 48
 const MAX_NATURAL = 20
 const TARGET_H    = 24
 
-function AgenciaLogos({ agencias, className }) {
+function AgenciaLogos({ agencias, className, goTo }) {
   return (
     <div className={className}>
       {agencias?.filter(a => a.logo).map((a, i) => {
@@ -191,13 +192,16 @@ function AgenciaLogos({ agencias, className }) {
         const naturalW = a.logo.width  || 60
         const renderH  = Math.round(naturalH * (TARGET_H / MAX_NATURAL))
         const renderW  = Math.round(naturalW * (TARGET_H / MAX_NATURAL))
-        const novaAba = a.abrir_nova_aba !== false
+        const url = a.url_externa || null
+        const isInterno = url?.startsWith('/')
+        const novaAba = !isInterno && a.abrir_nova_aba !== false
         return (
           <a
             key={i}
-            href={externalUrl(a.url_externa)}
+            href={externalUrl(url)}
             target={novaAba ? '_blank' : undefined}
             rel={novaAba ? 'noreferrer' : undefined}
+            onClick={isInterno && goTo ? (e) => { e.preventDefault(); goTo(url) } : undefined}
           >
             <img src={mediaUrl(a.logo)} alt={a.nome} style={{ height: renderH, width: renderW }} />
           </a>
@@ -610,9 +614,9 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
       const offset     = Math.max(0, Math.min(activeSubIdx, sublinks.length - 1))
       const winPad     = mobile ? 28 : WIN_PAD
       const windowH    = SUBMENU_VISIBLE * itemH + winPad * 2
-      // Desconta o translateY(-35vh) do CSS no item ativo
-      const actualItemBottomY = itemBottomY - vh * 0.35
-      const windowTop = Math.max(actualItemBottomY + 60, vh * 0.27)
+      // Bottom real do item ativo após o translateY do computeStyle
+      const computedActiveBottom = (aberto > 0 ? aberto * navItemH + 10 : 0) + navItemH
+      const windowTop = Math.max(computedActiveBottom + 60, vh * 0.27)
       const listOffset = winPad - offset * itemH
 
       return (
@@ -708,14 +712,16 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
     const acimaBlock   = acimaCount * itemH
     const activeTop    = acimaCount > 0 ? acimaBlock + 10 : 0
     const activeTarget = activeTop + itemH / 2
-    const bottomStart  = vh * 0.78 + itemH / 2
+    // Primeiro item abaixo: centro exatamente na borda inferior do viewport (metade visível como hint)
+    const bottomStart  = vh
     if (i === aberto) {
       return { transform: `translateY(${activeTarget - naturalCenter(i)}px)` }
     }
     let target
     if (i < aberto) {
-      const distance = aberto - i // 1 = mais próximo do ativo, na borda do topo
-      target = itemH / 2 - (distance - 1) * itemH
+      // distance=1 → centro em 0 (cortado pela metade no topo); distance=2 → fora da tela
+      const distance = aberto - i
+      target = -(distance - 1) * itemH
     } else {
       const distance = i - aberto - 1
       target = bottomStart + distance * itemH
@@ -727,7 +733,7 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
     <nav className={`home__nav ${aberto !== null ? 'home__nav--aberto' : ''} ${contatoAberto ? 'home__nav--contato' : ''}`} style={{ '--nav-count': N }}>
       {contatoAberto && (
         <div className="home__nav-contato">
-          <a href="#" className="home__nav-link home__nav-link--contato" onClick={(e) => { e.preventDefault(); e.stopPropagation() }}>SEJA CLIENTE</a>
+          <a href="/contato/seja-cliente" className="home__nav-link home__nav-link--contato" onClick={(e) => { e.preventDefault(); e.stopPropagation(); goTo('/contato/seja-cliente') }}>SEJA CLIENTE</a>
           <a href="/contato/trabalhe-conosco" className="home__nav-link home__nav-link--contato" onClick={(e) => { e.preventDefault(); e.stopPropagation(); goTo('/contato/trabalhe-conosco') }}>TRABALHE CONOSCO</a>
           <a href="/contato/outros-assuntos" className="home__nav-link home__nav-link--contato" onClick={(e) => { e.preventDefault(); e.stopPropagation(); goTo('/contato/outros-assuntos') }}>OUTROS ASSUNTOS</a>
         </div>
@@ -784,7 +790,7 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
               <nav className="home__menu-mobile__nav">
                 <button
                   className="home__menu-mobile__nav-link"
-                  onClick={(e) => { e.preventDefault(); goTo('/contato'); setMenuMobile(false) }}
+                  onClick={(e) => { e.preventDefault(); goTo('/contato/seja-cliente'); setMenuMobile(false) }}
                 >
                   Seja cliente
                 </button>
@@ -869,11 +875,11 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
           {/* Submenu */}
           {renderSubmenu()}
 
-          {/* Logos mobile — visível só no mobile */}
-          <div className="home__marcas-mobile" onClick={e => e.stopPropagation()}>
+          {/* Logos mobile — esconde quando qualquer submenu está aberto */}
+          <div className={`home__marcas-mobile${aberto !== null ? ' home__marcas-mobile--oculto' : ''}`} onClick={e => e.stopPropagation()}>
             <div className="home__menu-mobile__marcas">
               {agencias?.filter(a => a.logo).map((a, i) => (
-                <a key={i} href={externalUrl(a.url_externa)} target={a.abrir_nova_aba !== false ? '_blank' : undefined} rel={a.abrir_nova_aba !== false ? 'noreferrer' : undefined}>
+                <a key={i} href={externalUrl(a.url_externa)} target={!a.url_externa?.startsWith('/') && a.abrir_nova_aba !== false ? '_blank' : undefined} rel={!a.url_externa?.startsWith('/') && a.abrir_nova_aba !== false ? 'noreferrer' : undefined} onClick={a.url_externa?.startsWith('/') ? (e) => { e.preventDefault(); goTo(a.url_externa) } : undefined}>
                   <img src={mediaUrl(a.logo)} alt={a.nome} />
                 </a>
               ))}
@@ -886,7 +892,7 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
               className={`home__contato${contatoAberto ? ' home__contato--inativo' : ''}`}
               onClick={(e) => { e.stopPropagation(); if (!contatoAberto) goTo('/contato') }}
             >Contato</button>
-            <AgenciaLogos agencias={agencias} className={`home__marcas ${aberto !== null ? 'home__marcas--oculto' : ''}`} />
+            <AgenciaLogos agencias={agencias} className={`home__marcas ${aberto !== null ? 'home__marcas--oculto' : ''}`} goTo={goTo} />
             <div className="home__redes">
               {redes?.redes?.map((rede, i) => (
                 <a key={i} href={externalUrl(rede.url)} target="_blank" rel="noreferrer">
@@ -923,7 +929,7 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
           <nav className="home__menu-mobile__nav">
             <button
               className="home__menu-mobile__nav-link"
-              onClick={(e) => { e.preventDefault(); goTo('/contato'); setMenuMobile(false) }}
+              onClick={(e) => { e.preventDefault(); goTo('/contato/seja-cliente'); setMenuMobile(false) }}
             >
               Seja cliente
             </button>
@@ -1009,7 +1015,7 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
           className="footer-branco__contato"
           onClick={(e) => { e.stopPropagation(); goTo('/contato') }}
         >Contato</button>
-        {!semMarcas && <AgenciaLogos agencias={agencias} className={`footer-branco__marcas ${aberto !== null ? 'footer-branco__marcas--oculto' : ''}`} />}
+        {!semMarcas && <AgenciaLogos agencias={agencias} className={`footer-branco__marcas ${aberto !== null ? 'footer-branco__marcas--oculto' : ''}`} goTo={goTo} />}
         <div className="footer-branco__redes">
           {redes?.redes?.map((rede, i) => (
             <a key={i} href={externalUrl(rede.url)} target="_blank" rel="noreferrer">

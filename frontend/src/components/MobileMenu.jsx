@@ -8,6 +8,7 @@ const api = (path) => axios.get(`${STRAPI}/api/${path}`).then(r => r.data.data).
 const mediaUrl = (obj) => !obj?.url ? null : obj.url.startsWith("http") ? obj.url : `${STRAPI}${obj.url}`
 const externalUrl = (url) => {
   if (!url) return '#'
+  if (url.startsWith('/')) return url
   return /^https?:\/\//i.test(url) ? url : `https://${url}`
 }
 const slugify = (str) => str.toLowerCase()
@@ -74,7 +75,7 @@ export default function MobileMenu({ logo, logoFiltro = 'brightness(0)' }) {
           {/* Marcas */}
           <div className="mobile-menu__marcas">
             {agencias?.filter(a => a.logo).map((a, i) => (
-              <a key={i} href={externalUrl(a.url_externa)} target={a.abrir_nova_aba !== false ? '_blank' : undefined} rel={a.abrir_nova_aba !== false ? 'noreferrer' : undefined}>
+              <a key={i} href={externalUrl(a.url_externa)} target={!a.url_externa?.startsWith('/') && a.abrir_nova_aba !== false ? '_blank' : undefined} rel={!a.url_externa?.startsWith('/') && a.abrir_nova_aba !== false ? 'noreferrer' : undefined} onClick={a.url_externa?.startsWith('/') ? (e) => { e.preventDefault(); goTo(a.url_externa); setAberto(false) } : undefined}>
                 <img src={mediaUrl(a.logo)} alt={a.nome} />
               </a>
             ))}

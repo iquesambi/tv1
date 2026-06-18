@@ -1,0 +1,257 @@
+/* TRABALHE CONOSCO — FORMULÁRIO */
+
+.tform-page {
+  background: #fff;
+  color: #000001;
+  font-family: 'Gilroy', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── HEADER ─────────────────────────── */
+
+.tform-header {
+  padding: 40px 40px 0;
+}
+
+.tform-logo {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  height: 40px;
+}
+
+.tform-logo img {
+  height: 100%;
+  width: auto;
+  display: block;
+  filter: brightness(0);
+  transition: opacity 0.25s ease;
+}
+
+.tform-logo:hover img {
+  opacity: 0.4;
+}
+
+/* ── MAIN ────────────────────────────── */
+
+.tform-main {
+  padding: 120px 16.67% 160px;
+  display: flex;
+  flex-direction: column;
+  gap: 64px;
+}
+
+/* ── TÍTULO ─────────────────────────── */
+
+.tform-title {
+  font-size: 130px;
+  font-weight: 900;
+  text-transform: uppercase;
+  line-height: 0.9;
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+/* ── CONTENT ────────────────────────── */
+
+.tform-content {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+/* ── FORM ───────────────────────────── */
+
+.tform-form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* ── FIELD ──────────────────────────── */
+
+.tform-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.tform-field__label {
+  font-size: 24px;
+  font-weight: 900;
+  line-height: 1.4;
+  color: #000001;
+}
+
+.tform-required {
+  color: #cc0000;
+}
+
+.tform-field__hint {
+  font-size: 14px;
+  font-weight: 500;
+  opacity: 0.5;
+  margin-top: -2px;
+}
+
+.tform-field__input {
+  font-family: 'Gilroy', sans-serif;
+  font-size: 18px;
+  font-weight: 500;
+  color: #000001;
+  background: #fff;
+  border: 1px solid #000001;
+  border-radius: 999px;
+  outline: none;
+  padding: 0 28px;
+  height: 58px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.tform-field__input::placeholder {
+  color: #000001;
+  opacity: 0.3;
+}
+
+.tform-field__input:focus {
+  border-width: 2px;
+}
+
+/* ── UPLOAD ─────────────────────────── */
+
+.tform-upload {
+  border: 1px dashed #000001;
+  border-radius: 16px;
+  padding: 48px 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.tform-upload:hover,
+.tform-upload--drag {
+  background: rgba(0, 0, 1, 0.04);
+}
+
+.tform-upload--filled {
+  border-style: solid;
+  background: rgba(0, 0, 1, 0.03);
+}
+
+.tform-upload__icon {
+  width: 40px;
+  height: 40px;
+  opacity: 0.6;
+}
+
+.tform-upload__text {
+  font-size: 16px;
+  font-weight: 500;
+  text-align: center;
+  line-height: 1.5;
+}
+
+.tform-upload__link {
+  color: #0066cc;
+  text-decoration: underline;
+}
+
+.tform-upload__name {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+/* ── BOTÃO ──────────────────────────── */
+
+.tform-form__footer {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 8px;
+}
+
+.tform-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 32px;
+  border: 1px solid #000001;
+  border-radius: 999px;
+  font-family: 'Gilroy', sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  text-transform: uppercase;
+  color: #000001;
+  background: #fff;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.2s, color 0.2s;
+}
+
+.tform-btn:hover:not(:disabled) {
+  background: #000001;
+  color: #fff;
+}
+
+.tform-btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* ── SUCESSO ────────────────────────── */
+
+.tform-sucesso {
+  padding: 40px 0;
+  font-size: 24px;
+  font-weight: 500;
+  border-top: 1px solid #000001;
+}
+
+.tform-sucesso p {
+  margin: 0;
+}
+
+/* ── LOADING ────────────────────────── */
+
+.tform-spinner {
+  width: 32px;
+  height: 32px;
+  border: 2px solid rgba(0, 0, 0, 0.12);
+  border-top-color: #000001;
+  border-radius: 50%;
+  animation: tform-spin 0.8s linear infinite;
+}
+
+@keyframes tform-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── RESPONSIVO ─────────────────────── */
+
+@media (max-width: 768px) {
+  .tform-header {
+    padding: 24px 24px 0;
+  }
+
+  .tform-main {
+    padding: 60px 24px 80px;
+    gap: 40px;
+  }
+
+  .tform-title {
+    font-size: 48px;
+  }
+
+  .tform-field__label {
+    font-size: 18px;
+  }
+
+  .tform-upload {
+    padding: 32px 24px;
+  }
+}

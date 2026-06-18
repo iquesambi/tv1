@@ -59,11 +59,6 @@ export default function OutrosAssuntosPage() {
         <h1 className="outros-title">Outros assuntos</h1>
 
         <div className="outros-content">
-          <p className="outros-desc">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed eget dui nisi.
-            Donec molestie convallis sodales. Praesent lobortis hendrerit sem eget.
-          </p>
-
           {enviado ? (
             <div className="outros-sucesso">
               <p>Mensagem enviada! Em breve entraremos em contato.</p>
