@@ -1,10 +1,10 @@
 {
   "kind": "collectionType",
-  "collectionName": "cases",
+  "collectionName": "case_quarenta_anos",
   "info": {
-    "singularName": "case",
-    "pluralName": "cases",
-    "displayName": "Cases"
+    "singularName": "case-quarenta-anos",
+    "pluralName": "case-quarenta-anos",
+    "displayName": "Cases 40 Anos"
   },
   "options": {
     "draftAndPublish": true
@@ -22,12 +22,6 @@
     },
     "Data": {
       "type": "date"
-    },
-    "breadcrumb": {
-      "type": "string"
-    },
-    "descricao": {
-      "type": "text"
     },
     "imagem_capa": {
       "type": "media",
@@ -50,26 +44,7 @@
     "cliente": {
       "type": "relation",
       "relation": "manyToOne",
-      "target": "api::cliente.cliente",
-      "inversedBy": "cases"
-    },
-    "agencia": {
-      "type": "relation",
-      "relation": "manyToOne",
-      "target": "api::agencia.agencia",
-      "inversedBy": "cases"
-    },
-    "especialidade": {
-      "type": "relation",
-      "relation": "manyToOne",
-      "target": "api::especialidade.especialidade",
-      "inversedBy": "cases"
-    },
-    "sub_especialidade": {
-      "type": "relation",
-      "relation": "manyToOne",
-      "target": "api::sub-especialidade.sub-especialidade",
-      "inversedBy": "cases"
+      "target": "api::cliente.cliente"
     },
     "blocos": {
       "type": "dynamiczone",

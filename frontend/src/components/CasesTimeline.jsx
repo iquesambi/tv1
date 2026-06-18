@@ -295,13 +295,15 @@ export default function CasesTimeline({
     }
     if (tipoResolvido === 'quarentaAnos') {
       apiGet(
-        'quarenta-anos' +
-        '?populate[cases_destaque][populate][imagem_capa]=true' +
-        '&populate[cases_destaque][populate][imagem_timeline]=true' +
-        '&populate[cases_destaque][populate][cliente]=true' +
-        '&populate[cases_destaque][populate][blocos][populate]=*'
+        'case-quarenta-anos' +
+        '?populate[imagem_capa]=true' +
+        '&populate[imagem_timeline]=true' +
+        '&populate[cliente]=true' +
+        '&populate[blocos][populate]=*' +
+        '&sort=Data:desc' +
+        '&pagination[limit]=100'
       ).then(data => {
-        setEntradas(montarEntradas(data?.cases_destaque ?? [], 'quarentaAnos'))
+        setEntradas(montarEntradas(data ?? [], 'quarentaAnos'))
         setCarregando(false)
       })
       return
