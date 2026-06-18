@@ -496,7 +496,8 @@ export interface ApiCaseCase extends Struct.CollectionTypeSchema {
       ]
     >;
     breadcrumb: Schema.Attribute.String;
-    clicavel: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
+    clicavel: Schema.Attribute.Enumeration<['clicável', 'não clicável']> &
+      Schema.Attribute.DefaultTo<'clicável'>;
     cliente: Schema.Attribute.Relation<'manyToOne', 'api::cliente.cliente'>;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
@@ -548,7 +549,8 @@ export interface ApiCaseQuarentaAnosCaseQuarentaAnos extends Struct.CollectionTy
         'blocks.big-numbers',
       ]
     >;
-    clicavel: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
+    clicavel: Schema.Attribute.Enumeration<['clicável', 'não clicável']> &
+      Schema.Attribute.DefaultTo<'clicável'>;
     cliente: Schema.Attribute.Relation<'manyToOne', 'api::cliente.cliente'>;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &

@@ -44,8 +44,9 @@
       ]
     },
     "clicavel": {
-      "type": "boolean",
-      "default": true
+      "type": "enumeration",
+      "enum": ["clicável", "não clicável"],
+      "default": "clicável"
     },
     "cliente": {
       "type": "relation",

@@ -29,7 +29,7 @@ function montarEntradas(cases, tipoResolvido) {
           nome:        c.titulo || '',
           capa:        imgTimeline,
           href:        clienteSlug && caseSlug ? `/${clienteSlug}/${caseSlug}` : `/${caseSlug ?? ''}`,
-          clicavel:    c.clicavel !== false,
+          clicavel:    c.clicavel !== 'não clicável',
           agenciaLogo: null,
           agenciaNome: null,
         })
@@ -67,7 +67,7 @@ function montarEntradas(cases, tipoResolvido) {
       nome:        c.titulo,
       capa:        c.imagem_timeline || c.imagem_capa,
       href:        clienteSlug && caseSlug ? `/${clienteSlug}/${caseSlug}` : `/${caseSlug}`,
-      clicavel:    c.clicavel !== false,
+      clicavel:    c.clicavel !== 'não clicável',
       agenciaLogo: c.agencia?.logo ?? null,
       agenciaNome: c.agencia?.nome ?? null,
     })
