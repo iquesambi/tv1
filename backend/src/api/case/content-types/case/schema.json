@@ -36,6 +36,17 @@
         "images"
       ]
     },
+    "imagem_timeline": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images"
+      ]
+    },
+    "clicavel": {
+      "type": "boolean",
+      "default": true
+    },
     "cliente": {
       "type": "relation",
       "relation": "manyToOne",
@@ -59,6 +70,10 @@
       "relation": "manyToOne",
       "target": "api::sub-especialidade.sub-especialidade",
       "inversedBy": "cases"
+    },
+    "quarenta_anos": {
+      "type": "boolean",
+      "default": false
     },
     "blocos": {
       "type": "dynamiczone",

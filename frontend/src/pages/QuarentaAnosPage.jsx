@@ -137,15 +137,6 @@ export default function QuarentaAnosPage() {
               <tspan x="730" y="669">ências</tspan>
             </text>
 
-            {/* SEJAM BEM-VINDOS ao futuro — oculto no mobile (aparece como HTML abaixo) */}
-            <text className="qa-texto-sv-bv" fontFamily="Gilroy, sans-serif" fontWeight="900" fontStyle="italic" fontSize="40" fill="white" textAnchor="start">
-              <tspan x="730" y="1730">SEJAM </tspan>
-              <tspan x="730" y="1767">BEM-VINDOS</tspan>
-            </text>
-            <text className="qa-texto-sv-bv" fontFamily="PP Hatton, serif" fontStyle="italic" fontWeight="500" fontSize="105" fill="white" textAnchor="start">
-              <tspan x="730" y="1860">ao futuro</tspan>
-            </text>
-
           </svg>
         </div>
       </section>
@@ -160,10 +151,6 @@ export default function QuarentaAnosPage() {
           <p>Nós não apenas vivemos 40 anos de história. O que importa é como usamos esses 40 anos para construir o depois.</p>
           <p>Quatro décadas atravessando mudanças de tecnologia, mídia, comportamento e cultura nos ensinaram algo essencial: futuro não é previsão, é construção diária.</p>
           <p>Cada experiência que criamos para ajudar a transformar pessoas, marcas e negócios nos abre novos caminhos de evolução.</p>
-        </div>
-        <div className="qa-texto-mobile__bv">
-          <span className="qa-texto-mobile__bv-sejam">SEJAM BEM-VINDOS</span>
-          <span className="qa-texto-mobile__bv-futuro">ao futuro</span>
         </div>
       </section>
 

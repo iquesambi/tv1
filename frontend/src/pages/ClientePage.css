@@ -49,6 +49,14 @@
   background: #111;
 }
 
+.cliente-card--sem-link {
+  cursor: default;
+}
+
+.cliente-card--sem-link:hover .cliente-card__img {
+  transform: none;
+}
+
 .cliente-card__img {
   width: 100%;
   height: 100%;

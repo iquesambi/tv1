@@ -20,14 +20,16 @@ function montarEntradas(cases, tipoResolvido) {
     for (const c of cases) {
       const clienteSlug = c.cliente?.slug
       const caseSlug    = c.slug
-      if (c.imagem_capa) {
+      const imgTimeline = c.imagem_timeline || c.imagem_capa
+      if (imgTimeline) {
         entradas.push({
           id:          `${c.id}-main`,
           label:       c.Data ? new Date(c.Data).getFullYear() : null,
           data:        c.Data ? new Date(c.Data) : new Date(0),
           nome:        c.titulo || '',
-          capa:        c.imagem_capa,
+          capa:        imgTimeline,
           href:        clienteSlug && caseSlug ? `/${clienteSlug}/${caseSlug}` : `/${caseSlug ?? ''}`,
+          clicavel:    c.clicavel !== false,
           agenciaLogo: null,
           agenciaNome: null,
         })
@@ -63,8 +65,9 @@ function montarEntradas(cases, tipoResolvido) {
         : (c.sub_especialidade?.nome || ''),
       data:        c.Data ? new Date(c.Data) : new Date(0),
       nome:        c.titulo,
-      capa:        c.imagem_capa,
+      capa:        c.imagem_timeline || c.imagem_capa,
       href:        clienteSlug && caseSlug ? `/${clienteSlug}/${caseSlug}` : `/${caseSlug}`,
+      clicavel:    c.clicavel !== false,
       agenciaLogo: c.agencia?.logo ?? null,
       agenciaNome: c.agencia?.nome ?? null,
     })
@@ -121,11 +124,12 @@ function CaseCard({ entrada, idx, carousel, proporcaoNatural = false, maxImageHe
       }
     : undefined
 
+  const clickable = entrada.clicavel !== false
   return (
     <div
-      className={['cliente-card', 'cliente-card--ativo', carousel ? 'cliente-card--carousel' : ''].join(' ')}
+      className={['cliente-card', 'cliente-card--ativo', carousel ? 'cliente-card--carousel' : '', !clickable ? 'cliente-card--sem-link' : ''].join(' ')}
       style={cardStyle}
-      onClick={() => goTo(entrada.href, null, navState)}
+      onClick={clickable ? () => goTo(entrada.href, null, navState) : undefined}
     >
       {entrada.capa && (
         <img src={mediaUrl(entrada.capa)} alt={entrada.nome} className="cliente-card__img" style={imgStyle} />
@@ -293,6 +297,7 @@ export default function CasesTimeline({
       apiGet(
         'quarenta-anos' +
         '?populate[cases_destaque][populate][imagem_capa]=true' +
+        '&populate[cases_destaque][populate][imagem_timeline]=true' +
         '&populate[cases_destaque][populate][cliente]=true' +
         '&populate[cases_destaque][populate][blocos][populate]=*'
       ).then(data => {
@@ -313,6 +318,7 @@ export default function CasesTimeline({
       `&populate[cliente]=true` +
       `&populate[especialidade]=true` +
       `&populate[imagem_capa]=true` +
+      `&populate[imagem_timeline]=true` +
       `&populate[blocos][populate]=*` +
       `&sort=Data:desc`
     )
