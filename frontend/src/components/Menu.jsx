@@ -614,8 +614,8 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
       const offset     = Math.max(0, Math.min(activeSubIdx, sublinks.length - 1))
       const winPad     = mobile ? 28 : WIN_PAD
       const windowH    = SUBMENU_VISIBLE * itemH + winPad * 2
-      // Bottom real do item ativo após o translateY do computeStyle
-      const computedActiveBottom = (aberto > 0 ? aberto * navItemH + 10 : 0) + navItemH
+      // Espelha o computeStyle: activeTop = navItemH/2 + 10, bottom = activeTop + navItemH
+      const computedActiveBottom = navItemH / 2 + 10 + navItemH
       const windowTop = Math.max(computedActiveBottom + 60, vh * 0.27)
       const listOffset = winPad - offset * itemH
 
@@ -709,11 +709,11 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
     const acimaCount = aberto
     // Ativo encosta no topo do viewport. Se houver "acima", ele desce só o
     // suficiente pra ficar logo abaixo do bloco de acima.
-    const acimaBlock   = acimaCount * itemH
-    const activeTop    = acimaCount > 0 ? acimaBlock + 10 : 0
+    // Acima está cortado na metade (center=0, bottom=itemH/2); ativo começa logo após
+    const activeTop    = itemH / 2 + 10
     const activeTarget = activeTop + itemH / 2
-    // Primeiro item abaixo: centro exatamente na borda inferior do viewport (metade visível como hint)
-    const bottomStart  = vh
+    // Primeiro item abaixo: completamente fora da tela (centro além da borda inferior)
+    const bottomStart  = vh + itemH / 2
     if (i === aberto) {
       return { transform: `translateY(${activeTarget - naturalCenter(i)}px)` }
     }
