@@ -496,6 +496,7 @@ export interface ApiCaseCase extends Struct.CollectionTypeSchema {
       ]
     >;
     breadcrumb: Schema.Attribute.String;
+    clicavel: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
     cliente: Schema.Attribute.Relation<'manyToOne', 'api::cliente.cliente'>;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
@@ -507,6 +508,7 @@ export interface ApiCaseCase extends Struct.CollectionTypeSchema {
       'api::especialidade.especialidade'
     >;
     imagem_capa: Schema.Attribute.Media<'images'>;
+    imagem_timeline: Schema.Attribute.Media<'images'>;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<'oneToMany', 'api::case.case'> &
       Schema.Attribute.Private;
@@ -516,6 +518,47 @@ export interface ApiCaseCase extends Struct.CollectionTypeSchema {
       'manyToOne',
       'api::sub-especialidade.sub-especialidade'
     >;
+    titulo: Schema.Attribute.String & Schema.Attribute.Required;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiCaseQuarentaAnosCaseQuarentaAnos extends Struct.CollectionTypeSchema {
+  collectionName: 'case_quarenta_anos';
+  info: {
+    displayName: 'Cases 40 Anos';
+    pluralName: 'case-quarenta-anos';
+    singularName: 'case-quarenta-anos';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    blocos: Schema.Attribute.DynamicZone<
+      [
+        'blocks.subtitulo',
+        'blocks.subcase',
+        'blocks.texto',
+        'blocks.imagem-simples',
+        'blocks.galeria',
+        'blocks.imagem-trio',
+        'blocks.video',
+        'blocks.big-numbers',
+      ]
+    >;
+    clicavel: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
+    cliente: Schema.Attribute.Relation<'manyToOne', 'api::cliente.cliente'>;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    Data: Schema.Attribute.Date;
+    imagem_capa: Schema.Attribute.Media<'images'>;
+    imagem_timeline: Schema.Attribute.Media<'images'>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
+    slug: Schema.Attribute.UID<'titulo'> & Schema.Attribute.Required;
     titulo: Schema.Attribute.String & Schema.Attribute.Required;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
@@ -1375,6 +1418,7 @@ declare module '@strapi/strapi' {
       'admin::user': AdminUser;
       'api::agencia.agencia': ApiAgenciaAgencia;
       'api::case.case': ApiCaseCase;
+      'api::case-quarenta-anos.case-quarenta-anos': ApiCaseQuarentaAnosCaseQuarentaAnos;
       'api::cliente.cliente': ApiClienteCliente;
       'api::especialidade.especialidade': ApiEspecialidadeEspecialidade;
       'api::logo-site.logo-site': ApiLogoSiteLogoSite;
