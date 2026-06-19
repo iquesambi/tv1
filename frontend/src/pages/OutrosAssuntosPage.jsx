@@ -106,7 +106,7 @@ export default function OutrosAssuntosPage() {
               </div>
 
               <div className="outros-field">
-                <label className="outros-field__label">Digite aqui</label>
+                <label className="outros-field__label">Fale com a gente</label>
                 <textarea
                   className="outros-field__textarea"
                   name="mensagem"

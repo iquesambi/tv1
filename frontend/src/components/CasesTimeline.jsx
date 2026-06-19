@@ -58,6 +58,7 @@ function montarEntradas(cases, tipoResolvido) {
   for (const c of cases) {
     const clienteSlug = c.cliente?.slug
     const caseSlug    = c.slug
+    const ordemSub    = c.sub_especialidade?.ordem ?? 9999
     entradas.push({
       id:          `${c.id}-main`,
       label:       tipoResolvido === 'marca'
@@ -70,6 +71,7 @@ function montarEntradas(cases, tipoResolvido) {
       clicavel:    c.clicavel !== 'não clicável',
       agenciaLogo: c.agencia?.logo ?? null,
       agenciaNome: c.agencia?.nome ?? null,
+      ordemSub,
     })
     for (const bloco of c.blocos ?? []) {
       if (bloco.__component === 'blocks.subtitulo' && bloco.timeline && bloco.timeline_data) {
@@ -86,11 +88,18 @@ function montarEntradas(cases, tipoResolvido) {
             : `/${caseSlug}#${bloco.ancora_id ?? ''}`,
           agenciaLogo: c.agencia?.logo ?? null,
           agenciaNome: c.agencia?.nome ?? null,
+          ordemSub,
         })
       }
     }
   }
-  entradas.sort((a, b) => b.data - a.data || 0)
+  // Para especialidade: agrupa por ordem da sub-especialidade, data desc dentro de cada grupo.
+  // Para marca: ordena só por data desc.
+  if (tipoResolvido === 'especialidade') {
+    entradas.sort((a, b) => a.ordemSub - b.ordemSub || b.data - a.data)
+  } else {
+    entradas.sort((a, b) => b.data - a.data)
+  }
   return entradas
 }
 
@@ -319,6 +328,7 @@ export default function CasesTimeline({
       `${STRAPI}/api/cases?${filtro}` +
       `&populate[cliente]=true` +
       `&populate[especialidade]=true` +
+      `&populate[sub_especialidade]=true` +
       `&populate[imagem_capa]=true` +
       `&populate[imagem_timeline]=true` +
       `&populate[blocos][populate]=*` +

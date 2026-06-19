@@ -195,7 +195,8 @@ function AgenciaLogos({ agencias, className, goTo }) {
         const url = a.url_externa || null
         const isInterno = url?.startsWith('/')
         const novaAba = !isInterno && a.abrir_nova_aba !== false
-        return (
+        const img = <img src={mediaUrl(a.logo)} alt={a.nome} style={{ height: renderH, width: renderW }} />
+        return url ? (
           <a
             key={i}
             href={externalUrl(url)}
@@ -203,8 +204,10 @@ function AgenciaLogos({ agencias, className, goTo }) {
             rel={novaAba ? 'noreferrer' : undefined}
             onClick={isInterno && goTo ? (e) => { e.preventDefault(); goTo(url) } : undefined}
           >
-            <img src={mediaUrl(a.logo)} alt={a.nome} style={{ height: renderH, width: renderW }} />
+            {img}
           </a>
+        ) : (
+          <span key={i}>{img}</span>
         )
       })}
     </div>
