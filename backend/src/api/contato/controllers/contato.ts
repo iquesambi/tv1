@@ -35,10 +35,11 @@ export default {
       'outros-assuntos':   config?.email_outros_assuntos,
     };
 
-    const para = destinatarioMap[tipo];
-    if (!para) {
+    const paraRaw = destinatarioMap[tipo];
+    if (!paraRaw) {
       return ctx.badRequest('Tipo inválido ou destinatário não configurado no CMS');
     }
+    const para = paraRaw.split(',').map((e: string) => e.trim()).filter(Boolean);
 
     const remetente = config?.email_remetente || 'formularios@tv1.com.br';
 
@@ -83,7 +84,7 @@ export default {
     // Monta payload do Resend
     const payload: Record<string, unknown> = {
       from: remetente,
-      to:   [para],
+      to:   para,
       subject: assunto,
       html,
     };

@@ -887,9 +887,9 @@ export interface ApiConfiguracoesEmailConfiguracoesEmail
     draftAndPublish: false;
   };
   attributes: {
-    email_seja_cliente: Schema.Attribute.Email;
-    email_trabalhe_conosco: Schema.Attribute.Email;
-    email_outros_assuntos: Schema.Attribute.Email;
+    email_seja_cliente: Schema.Attribute.Text;
+    email_trabalhe_conosco: Schema.Attribute.Text;
+    email_outros_assuntos: Schema.Attribute.Text;
     email_remetente: Schema.Attribute.String;
     createdAt: Schema.Attribute.DateTime;
     updatedAt: Schema.Attribute.DateTime;

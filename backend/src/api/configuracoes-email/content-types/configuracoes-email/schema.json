@@ -11,13 +11,16 @@
   },
   "attributes": {
     "email_seja_cliente": {
-      "type": "email"
+      "type": "text",
+      "placeholder": "email1@tv1.com.br, email2@tv1.com.br"
     },
     "email_trabalhe_conosco": {
-      "type": "email"
+      "type": "text",
+      "placeholder": "email1@tv1.com.br, email2@tv1.com.br"
     },
     "email_outros_assuntos": {
-      "type": "email"
+      "type": "text",
+      "placeholder": "email1@tv1.com.br, email2@tv1.com.br"
     },
     "email_remetente": {
       "type": "string",
