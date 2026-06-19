@@ -875,6 +875,31 @@ export interface ApiSubEspecialidadeSubEspecialidade
   };
 }
 
+export interface ApiConfiguracoesEmailConfiguracoesEmail
+  extends Struct.SingleTypeSchema {
+  collectionName: 'configuracoes_emails';
+  info: {
+    displayName: 'Configurações de Email';
+    pluralName: 'configuracoes-emails';
+    singularName: 'configuracoes-email';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    email_seja_cliente: Schema.Attribute.Email;
+    email_trabalhe_conosco: Schema.Attribute.Email;
+    email_outros_assuntos: Schema.Attribute.Email;
+    email_remetente: Schema.Attribute.String;
+    createdAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiTrabalheConoscoTrabalheConosco
   extends Struct.SingleTypeSchema {
   collectionName: 'trabalhe_conoscos';
@@ -1421,6 +1446,7 @@ declare module '@strapi/strapi' {
       'api::agencia.agencia': ApiAgenciaAgencia;
       'api::case.case': ApiCaseCase;
       'api::case-quarenta-anos.case-quarenta-anos': ApiCaseQuarentaAnosCaseQuarentaAnos;
+      'api::configuracoes-email.configuracoes-email': ApiConfiguracoesEmailConfiguracoesEmail;
       'api::cliente.cliente': ApiClienteCliente;
       'api::especialidade.especialidade': ApiEspecialidadeEspecialidade;
       'api::logo-site.logo-site': ApiLogoSiteLogoSite;

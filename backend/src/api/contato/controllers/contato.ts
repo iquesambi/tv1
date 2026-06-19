@@ -1,5 +1,3 @@
-import type { Core } from '@strapi/strapi';
-
 function linha(label: string, valor: string | undefined) {
   if (!valor) return '';
   return `<tr><td style="padding:6px 16px 6px 0;font-weight:600;white-space:nowrap;vertical-align:top">${label}</td><td style="padding:6px 0">${valor.replace(/\n/g, '<br>')}</td></tr>`;
@@ -20,7 +18,7 @@ function template(titulo: string, linhas: string) {
 }
 
 export default {
-  async enviar(ctx: Core.Context) {
+  async enviar(ctx: any) {
     const body = ctx.request.body as Record<string, string>;
     const { tipo, curriculo_base64, curriculo_nome, ...campos } = body;
 
