@@ -82,8 +82,7 @@ export default function PessoasPage() {
 
       <PageHeader
         logoUrl={mediaUrl(logo?.logo)}
-        label="Pessoas"
-        onLogoClick={() => goTo('/')}
+        onLogoClick={() => footerRef.current?.scrollIntoView({ behavior: 'smooth' })}
       />
 
       <main className="pessoas-main">
@@ -98,8 +97,8 @@ export default function PessoasPage() {
               className="pessoa-bloco"
             >
               {foto && (
-                <div className={`pessoa-foto ${i % 2 === 0 ? 'pessoa-foto--portrait' : 'pessoa-foto--landscape'}`}>
-                  <img src={mediaUrl(foto)} alt={m.nome} />
+                <div className="pessoa-foto pessoa-foto--landscape">
+                  <img src={mediaUrl(foto)} alt={m.nome} style={{ objectPosition: m.posicao_foto ?? 'center' }} />
                 </div>
               )}
               <div className="pessoa-texto">

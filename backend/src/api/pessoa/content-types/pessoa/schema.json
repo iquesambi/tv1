@@ -37,6 +37,11 @@
     "ativo": {
       "type": "boolean",
       "default": true
+    },
+    "posicao_foto": {
+      "type": "enumeration",
+      "enum": ["topo", "centro", "baixo"],
+      "default": "centro"
     }
   }
 }

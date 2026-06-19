@@ -265,13 +265,6 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
 
   // Sublinks dinâmicos
   const getSublinks = (link) => {
-    if (link.label?.toLowerCase() === 'pessoas') {
-      return (equipe ?? []).map(p => ({
-        label: p.nome,
-        url: `/pessoas#${p.slug}`,
-        imagem_hover: null,
-      }))
-    }
     if (link.url === '/clientes') {
       return (clientes ?? []).map(c => ({
         label: c.nome,
@@ -504,6 +497,12 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
     // Quando abre o submenu de Cases, dispara prefetch da página /cases
     if (isCases) {
       import('../pages/CasesPage.jsx').then(m => m.prefetchCases?.())
+    }
+
+    // Pessoas: navega direto, sem submenu
+    if (link.label?.toLowerCase() === 'pessoas') {
+      goTo(link.url || '/pessoas')
+      return
     }
 
     // Clientes sempre abre submenu (grid de logos)
