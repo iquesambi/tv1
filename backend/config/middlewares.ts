@@ -29,7 +29,7 @@ const config: Core.Config.Middlewares = [
 
   'strapi::poweredBy',
   'strapi::query',
-  'strapi::body',
+  { name: 'strapi::body', config: { jsonLimit: '10mb', formLimit: '10mb' } },
   'strapi::session',
   'strapi::favicon',
   'strapi::public',

@@ -30,11 +30,14 @@ export default function OutrosAssuntosPage() {
   const handleSubmit = async (e) => {
     e.preventDefault()
     setEnviando(true)
-    // Aqui você pode integrar com um serviço de e-mail (ex: nodemailer via Strapi, EmailJS, etc.)
-    // Por ora, simula o envio
-    await new Promise(r => setTimeout(r, 800))
-    setEnviado(true)
-    setEnviando(false)
+    try {
+      await axios.post(`${STRAPI}/api/contato`, { tipo: 'outros-assuntos', ...form })
+      setEnviado(true)
+    } catch {
+      alert('Erro ao enviar. Tente novamente.')
+    } finally {
+      setEnviando(false)
+    }
   }
 
   if (!pronto) return (

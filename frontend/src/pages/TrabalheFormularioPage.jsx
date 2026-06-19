@@ -49,12 +49,44 @@ export default function TrabalheFormularioPage() {
     if (file) handleFile(file)
   }
 
+  const toBase64 = (file) => new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = () => resolve(reader.result.split(',')[1])
+    reader.onerror = reject
+    reader.readAsDataURL(file)
+  })
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     setEnviando(true)
-    await new Promise(r => setTimeout(r, 800))
-    setEnviado(true)
-    setEnviando(false)
+    try {
+      let curriculo_base64 = null
+      let curriculo_nome = null
+      if (form.curriculo) {
+        curriculo_base64 = await toBase64(form.curriculo)
+        curriculo_nome = form.curriculo.name
+      }
+      await axios.post(`${STRAPI}/api/contato`, {
+        tipo: 'trabalhe-conosco',
+        nome: form.nome,
+        cargo: form.cargo,
+        area: form.area,
+        email: form.email,
+        telefone: form.telefone,
+        cidade: form.cidade,
+        empresa: form.empresa,
+        pretensao: form.pretensao,
+        portfolio_link: form.portfolio_link,
+        linkedin: form.linkedin,
+        curriculo_base64,
+        curriculo_nome,
+      })
+      setEnviado(true)
+    } catch {
+      alert('Erro ao enviar. Tente novamente.')
+    } finally {
+      setEnviando(false)
+    }
   }
 
   if (!logo) return (

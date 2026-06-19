@@ -28,9 +28,14 @@ export default function SejaClientePage() {
   const handleSubmit = async (e) => {
     e.preventDefault()
     setEnviando(true)
-    await new Promise(r => setTimeout(r, 800))
-    setEnviado(true)
-    setEnviando(false)
+    try {
+      await axios.post(`${STRAPI}/api/contato`, { tipo: 'seja-cliente', ...form })
+      setEnviado(true)
+    } catch {
+      alert('Erro ao enviar. Tente novamente.')
+    } finally {
+      setEnviando(false)
+    }
   }
 
   if (!pronto) return (

@@ -1,0 +1,27 @@
+{
+  "kind": "singleType",
+  "collectionName": "configuracoes_emails",
+  "info": {
+    "singularName": "configuracoes-email",
+    "pluralName": "configuracoes-emails",
+    "displayName": "Configurações de Email"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "attributes": {
+    "email_seja_cliente": {
+      "type": "email"
+    },
+    "email_trabalhe_conosco": {
+      "type": "email"
+    },
+    "email_outros_assuntos": {
+      "type": "email"
+    },
+    "email_remetente": {
+      "type": "string",
+      "default": "noreply@tv1.com.br"
+    }
+  }
+}
