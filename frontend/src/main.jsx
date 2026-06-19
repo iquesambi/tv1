@@ -15,6 +15,7 @@ import TrabalheFormularioPage from './pages/TrabalheFormularioPage.jsx'
 import OutrosAssuntosPage from './pages/OutrosAssuntosPage.jsx'
 import QuemSomosPage from './pages/QuemSomosPage.jsx'
 import SejaClientePage from './pages/SejaClientePage.jsx'
+import ClientesGridPage from './pages/ClientesGridPage.jsx'
 import { TransitionProvider } from './transition.jsx'
 
 createRoot(document.getElementById('root')).render(
@@ -28,6 +29,7 @@ createRoot(document.getElementById('root')).render(
           <Route path="/contato/trabalhe-conosco" element={<TrabalheComenoscoPage />} />
           <Route path="/contato/trabalhe-conosco/formulario" element={<TrabalheFormularioPage />} />
           <Route path="/contato/outros-assuntos" element={<OutrosAssuntosPage />} />
+          <Route path="/clientes" element={<ClientesGridPage />} />
           <Route path="/quem-somos" element={<QuemSomosPage />} />
           <Route path="/pessoas" element={<PessoasPage />} />
           <Route path="/quarenta-anos" element={<QuarentaAnosPage />} />

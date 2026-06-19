@@ -182,7 +182,7 @@ const WIN_PAD  = 48
 
 // Escala proporcional de logos: maior logo natural (20px) → 24px target
 const MAX_NATURAL = 20
-const TARGET_H    = 24
+const TARGET_H    = 21.6
 
 function AgenciaLogos({ agencias, className, goTo }) {
   return (
@@ -499,22 +499,17 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
       import('../pages/CasesPage.jsx').then(m => m.prefetchCases?.())
     }
 
-    // Pessoas: navega direto, sem submenu
-    if (link.label?.toLowerCase() === 'pessoas') {
-      goTo(link.url || '/pessoas')
-      return
-    }
-
-    // Clientes sempre abre submenu (grid de logos)
-    const isClientes = link.url === '/clientes'
+    // Pessoas e Clientes: navegam direto, sem submenu
+    if (link.label?.toLowerCase() === 'pessoas') { goTo(link.url || '/pessoas'); return }
+    if (link.url === '/clientes' || link.label?.toLowerCase() === 'clientes') { goTo('/clientes'); return }
 
     if (isMobile()) {
       if (link.url && link.url !== '#') { goTo(link.url); return }
-      if (sublinks.length > 0 || isClientes) { setAberto(aberto === i ? null : i); setHoveredSub(null) }
+      if (sublinks.length > 0) { setAberto(aberto === i ? null : i); setHoveredSub(null) }
       return
     }
     // Desktop: sem sublinks → navega direto; com sublinks → toggle submenu
-    if (sublinks.length === 0 && !isClientes) {
+    if (sublinks.length === 0) {
       if (link.url) goTo(link.url)
       return
     }
@@ -616,9 +611,9 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
       const offset     = Math.max(0, Math.min(activeSubIdx, sublinks.length - 1))
       const winPad     = mobile ? 28 : WIN_PAD
       const windowH    = SUBMENU_VISIBLE * itemH + winPad * 2
-      // Espelha o computeStyle: activeTop = navItemH/2 + 10, bottom = activeTop + navItemH
-      const computedActiveBottom = navItemH / 2 + 10 + navItemH
-      const windowTop = Math.max(computedActiveBottom + 60, vh * 0.27)
+      // Espelha o computeStyle: aberto=0 → bottom=navItemH; aberto>0 → bottom=1.5*navItemH+10
+      const computedActiveBottom = aberto === 0 ? navItemH : navItemH * 1.5 + 10
+      const windowTop = Math.max(computedActiveBottom + Math.max(40, navItemH * 0.5), vh * 0.25)
       const listOffset = winPad - offset * itemH
 
       return (
@@ -647,14 +642,11 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
       )
     }
 
-    // Posiciona o submenu central abaixo do item ativo (não no centro do
-    // viewport), pra não encavalar com o ativo em telas mais curtas. Usa a
-    // mesma fórmula de activeTop do computeStyle: max(vh*0.13, acimaBlock+10)
-    // OBS: dentro de renderSubmenu, `itemH` é o tamanho dos sublinks (70px);
-    // o tamanho dos itens do nav é navItemH (declarado acima).
-    const acimaCountSub = aberto
-    const activeTopSub  = acimaCountSub > 0 ? acimaCountSub * navItemH + 10 : 0
-    const submenuTop    = activeTopSub + navItemH + 40 // bloco do ativo + respiro
+    // Fundo do item ativo — espelha exatamente o computeStyle:
+    // aberto=0 (sem itens acima): activeTop=0 → bottom=navItemH
+    // aberto>0 (tem item acima):  activeTop=navItemH/2+10 → bottom=1.5*navItemH+10
+    const activeBottom = aberto === 0 ? navItemH : navItemH * 1.5 + 10
+    const submenuTop   = activeBottom + Math.max(40, navItemH * 0.5)
     return (
       <div className="home__submenu" onClick={e => e.stopPropagation()}>
         <div className="home__submenu-center" style={{ inset: 'auto 0 0 0', top: submenuTop, justifyContent: 'flex-start' }}>
@@ -709,13 +701,13 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
   const computeStyle = (i) => {
     if (aberto === null) return undefined
     const acimaCount = aberto
-    // Ativo encosta no topo do viewport. Se houver "acima", ele desce só o
-    // suficiente pra ficar logo abaixo do bloco de acima.
-    // Acima está cortado na metade (center=0, bottom=itemH/2); ativo começa logo após
-    const activeTop    = itemH / 2 + 10
+    // Sem itens acima → texto cola no topo (activeTop=0).
+    // Com itens acima → deixa metade do item acima aparecer cortado no topo.
+    const activeTop    = acimaCount > 0 ? itemH / 2 + 10 : 0
     const activeTarget = activeTop + itemH / 2
-    // Primeiro item abaixo: completamente fora da tela (centro além da borda inferior)
-    const bottomStart  = vh + itemH / 2
+    // Primeiro item abaixo: centro na borda inferior do viewport (simétrico ao acima que fica em y=0)
+    // → metade superior visível, metade inferior cortada pelo overflow:hidden
+    const bottomStart  = vh
     if (i === aberto) {
       return { transform: `translateY(${activeTarget - naturalCenter(i)}px)` }
     }

@@ -298,7 +298,7 @@ body.camera-ativa .home > *:not(.home__menu-mobile) {
   bottom: 0;
   left: 0;
   right: 0;
-  padding: 60px 40px;
+  padding: 24px 40px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -307,7 +307,7 @@ body.camera-ativa .home > *:not(.home__menu-mobile) {
 }
 
 .home__contato {
-  font-size: 24px;
+  font-size: 21.6px;
   font-weight: 900;
   text-transform: uppercase;
   color: #000001;
@@ -329,7 +329,7 @@ body.camera-ativa .home > *:not(.home__menu-mobile) {
 .home__marcas {
   display: flex;
   align-items: center;
-  gap: 32px;
+  gap: 48px;
   padding: 16px 32px;
   position: relative;
   transition: opacity 0.4s ease;
@@ -358,8 +358,8 @@ body.camera-ativa .home > *:not(.home__menu-mobile) {
 }
 
 .home__redes img {
-  width: 28px;
-  height: 28px;
+  width: 25px;
+  height: 25px;
   object-fit: contain;
   display: block;
   filter: brightness(0);

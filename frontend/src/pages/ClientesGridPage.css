@@ -1,0 +1,97 @@
+/* CLIENTES GRID PAGE - TV1 */
+
+.clientes-grid-page {
+  background: #fff;
+  color: #000001;
+  font-family: 'Gilroy', sans-serif;
+  height: 100vh;
+  overflow: hidden;
+  position: relative;
+}
+
+.clientes-grid-page .page-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: #fff;
+}
+
+/* ── MAIN ─────────────────────────────── */
+
+.clientes-grid-main {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  left: 0;
+  right: 0;
+  padding: 0 80px;
+  display: flex;
+  flex-direction: column;
+  gap: 56px;
+}
+
+/* ── LINHA ────────────────────────────── */
+
+.clientes-grid-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+}
+
+/* ── ITEM ─────────────────────────────── */
+
+.clientes-grid-item {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 72px;
+  transition: opacity 0.2s ease;
+  text-decoration: none;
+}
+
+.clientes-grid-item img {
+  display: block;
+  object-fit: contain;
+  max-width: 100%;
+}
+
+.clientes-grid-item--sem-case {
+  cursor: default;
+}
+
+a.clientes-grid-item:hover {
+  opacity: 0.6;
+}
+
+.clientes-grid-fallback {
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #000001;
+  text-align: center;
+}
+
+/* ── LOADING ──────────────────────────── */
+
+.clientes-grid-page--loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+}
+
+/* ── MOBILE ───────────────────────────── */
+
+@media (max-width: 768px) {
+  .clientes-grid-main {
+    padding: 0 24px;
+    gap: 32px;
+  }
+
+  .clientes-grid-item {
+    flex: 0 0 calc(100% / 3);
+    height: 56px;
+  }
+}

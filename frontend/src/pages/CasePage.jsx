@@ -40,9 +40,18 @@ function isYoutube(url) {
   return url?.includes('youtube.com') || url?.includes('youtu.be')
 }
 
+function youtubeId(url) {
+  return url?.match(/(?:v=|youtu\.be\/|shorts\/)([^&?/]+)/)?.[1] ?? null
+}
+
 function youtubeEmbed(url) {
-  const id = url.match(/(?:v=|youtu\.be\/)([^&?/]+)/)?.[1]
+  const id = youtubeId(url)
   return id ? `https://www.youtube.com/embed/${id}` : null
+}
+
+function youtubeCapa(url) {
+  const id = youtubeId(url)
+  return id ? `https://img.youtube.com/vi/${id}/hqdefault.jpg` : null
 }
 
 /* ── Video ──────────────────────────────── */
@@ -62,7 +71,7 @@ function Video({ block }) {
   useEffect(() => {
     if (!aberto) return
 
-    const videoId = block.url.match(/(?:v=|youtu\.be\/)([^&?/]+)/)?.[1]
+    const videoId = youtubeId(block.url)
     if (!videoId || !divRef.current) return
 
     const criar = () => {
@@ -107,7 +116,7 @@ function Video({ block }) {
       />
       {!aberto && (
         <>
-          <img src={mediaUrl(block.capa)} alt={block.legenda ?? ''} className="block-video__capa" />
+          <img src={block.capa ? mediaUrl(block.capa) : youtubeCapa(block.url)} alt={block.titulo ?? ''} className="block-video__capa" />
           <div className="block-video__play">
             <svg className="block-video__play-btn" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
               <circle cx="32" cy="32" r="30" fill="none" stroke="#fff" strokeWidth="2" />
