@@ -76,6 +76,7 @@ async function construirEntradas() {
       ancora,
       subEspAncora:  c.sub_especialidade?.slug || null,
       label:         c.sub_especialidade?.nome || secaoLabel,
+      ordemSub:      c.sub_especialidade?.ordem ?? 9999,
       data:          c.Data ? new Date(c.Data) : new Date(0),
       nome:          c.titulo,
       capa:          c.imagem_capa,
@@ -86,16 +87,13 @@ async function construirEntradas() {
   }
   // Ordem da timeline:
   //   1. Ordem do sublink no menu (live marketing → conteúdo → advertising…)
-  //   2. Dentro da área: alfabético pelo label (sub_especialidade ou nome)
+  //   2. Dentro da área: ordem do campo `ordem` da sub-especialidade no CMS
   //   3. Dentro do label: mais novo primeiro
   entradas.sort((a, b) => {
     const oa = ordemSublink[a.ancora] ?? 9999
     const ob = ordemSublink[b.ancora] ?? 9999
     if (oa !== ob) return oa - ob
-    const la = (a.label || '').toLowerCase()
-    const lb = (b.label || '').toLowerCase()
-    const cmp = la.localeCompare(lb)
-    if (cmp !== 0) return cmp
+    if (a.ordemSub !== b.ordemSub) return a.ordemSub - b.ordemSub
     return b.data - a.data
   })
   const map = {}
