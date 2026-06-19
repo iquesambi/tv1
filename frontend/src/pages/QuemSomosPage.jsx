@@ -108,7 +108,7 @@ export default function QuemSomosPage() {
       )}
 
       {/* ── Terceira dobra: era (70%) + footer dark (30%) ── */}
-      <div className="qs-terceira-dobra" ref={footerRef}>
+      <div className="qs-terceira-dobra">
 
         <section className="qs-era">
           <div className="qs-era__titulo">
@@ -140,7 +140,7 @@ export default function QuemSomosPage() {
 
       </div>
 
-      <Menu />
+      <div ref={footerRef}><Menu /></div>
 
     </div>
   )
