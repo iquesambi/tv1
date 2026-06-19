@@ -506,13 +506,23 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
       import('../pages/CasesPage.jsx').then(m => m.prefetchCases?.())
     }
 
+    // Links com conteúdo dinâmico: sempre abrem submenu, mesmo se dados ainda
+    // estiverem carregando (equipe/clientes null).
+    const isPessoas  = link.label?.toLowerCase() === 'pessoas'
+    const isClientes = link.url === '/clientes'
+    const temSubmenuDinamico = isPessoas || isClientes
+
     if (isMobile()) {
-      if (link.url && link.url !== '#') { goTo(link.url); return }
-      if (sublinks.length > 0) { setAberto(aberto === i ? null : i); setHoveredSub(null) }
+      // No mobile, sublinks têm prioridade sobre navegação direta
+      if (sublinks.length > 0 || temSubmenuDinamico) {
+        setAberto(aberto === i ? null : i); setHoveredSub(null)
+      } else if (link.url && link.url !== '#') {
+        goTo(link.url)
+      }
       return
     }
-    // Desktop home: sem sublinks → navega direto; com sublinks → toggle submenu
-    if (sublinks.length === 0) {
+    // Desktop: sem sublinks → navega direto; com sublinks → toggle submenu
+    if (sublinks.length === 0 && !temSubmenuDinamico) {
       if (link.url) goTo(link.url)
       return
     }
