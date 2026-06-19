@@ -304,7 +304,7 @@ export default function CasesTimeline({
     }
     if (tipoResolvido === 'quarentaAnos') {
       apiGet(
-        'case-quarenta-anos' +
+        'cases-quarenta-anos' +
         '?populate[imagem_capa]=true' +
         '&populate[imagem_timeline]=true' +
         '&populate[cliente]=true' +
@@ -553,14 +553,14 @@ export default function CasesTimeline({
 
     const onWheel = (e) => {
       if (!usaCarrossel) return
-      if (contexto === 'pagina') {
-        // Página 100vh: scroll vertical E horizontal movem a timeline
+      if (contexto === 'pagina' && tipoResolvido !== 'quarentaAnos') {
+        // Página 100vh (cases): scroll vertical E horizontal movem a timeline
         e.preventDefault()
         const delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY
         xRef.current.x -= delta
         tiltDeltaRef.current = -delta * 4
       } else {
-        // Embutido numa case page: só scroll horizontal move a timeline
+        // quarentaAnos ou embutido: só scroll horizontal move a timeline
         if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
           e.preventDefault()
           xRef.current.x -= e.deltaX

@@ -157,7 +157,7 @@ export default function QuarentaAnosPage() {
       {/* CASES */}
       <CasesTimeline conteudo="quarentaAnos" contexto="pagina" tema="escuro" proporcaoNatural />
 
-      <Menu semMarcas />
+      <Menu />
 
     </div>
   )

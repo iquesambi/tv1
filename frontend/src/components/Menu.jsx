@@ -970,7 +970,7 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
           {logo?.logo && <img src={mediaUrl(logo.logo)} alt="TV1" />}
         </div>
         {/* câmera — só no desktop */}
-        <div className="home__camera-wrap">
+        <div className={`home__camera-wrap${cameraAtiva ? ' home__camera-wrap--oculta' : ''}`}>
           <button
             className="footer-branco__camera"
             onClick={(e) => { e.stopPropagation(); if (quarentaAnos?.ativo) startCamera(e.currentTarget.getBoundingClientRect()) }}

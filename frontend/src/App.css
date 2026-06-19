@@ -61,6 +61,13 @@ body.camera-ativa .home > *:not(.home__menu-mobile) {
   opacity: 0;
   transition: opacity 0.2s ease;
 }
+body.camera-ativa .footer-branco {
+  background: transparent;
+}
+body.camera-ativa .footer-branco > * {
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
 
 /* ── BACKGROUND POR LINK ──────────────── */
 

@@ -101,6 +101,7 @@
   width: auto;
   object-fit: contain;
   display: block;
+  background: transparent;
 }
 
 /* Nav central */
@@ -332,20 +333,24 @@
   .footer-branco__camera-mobile {
     display: block;
     position: absolute;
-    top: 30%;
+    top: 32%;
     left: 50%;
     transform: translate(-50%, -50%);
     z-index: 3;
+    text-align: center;
     pointer-events: auto;
     cursor: pointer;
+    transition: opacity 0.3s ease;
   }
 
-  .footer-branco__camera-mobile video {
+  .footer-branco__camera-mobile video,
+  .footer-branco__camera-mobile img {
     height: 162px;
     width: auto;
     object-fit: contain;
     display: block;
     margin: 0 auto;
+    background: transparent;
   }
 
   .footer-branco__nav {
