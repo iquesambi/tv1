@@ -35,13 +35,14 @@ function montarEntradas(cases, tipoResolvido) {
         })
       }
       for (const bloco of c.blocos ?? []) {
-        if (bloco.__component === 'blocks.subcase' && bloco.ancora_id && bloco.imagem) {
+        const blocoCapa = bloco.imagem_timeline || bloco.imagem_capa
+        if (bloco.__component === 'blocks.subcase' && bloco.ancora_id && blocoCapa) {
           entradas.push({
             id:          `${c.id}-${bloco.ancora_id}`,
             label:       c.Data ? new Date(c.Data).getFullYear() : null,
             data:        c.Data ? new Date(c.Data) : new Date(0),
             nome:        bloco.titulo || '',
-            capa:        bloco.imagem,
+            capa:        blocoCapa,
             href:        clienteSlug && caseSlug
               ? `/${clienteSlug}/${caseSlug}#${bloco.ancora_id}`
               : `/${caseSlug ?? ''}#${bloco.ancora_id}`,
@@ -204,7 +205,11 @@ function TimelineBar({ labels, xRef, tiltDeltaRef, timelineTrackRef, usaCarrosse
         <button
           ref={arrowRef}
           className="timeline__next-arrow"
-          onMouseDown={e => e.stopPropagation()}
+          // preventDefault no mousedown evita o foco nativo do botão — sem
+          // isso, o navegador rola a página pra trazer o botão pra vista
+          // (já que o layout usa transform em vez de scroll nativo, isso
+          // bagunçava a posição de tudo)
+          onMouseDown={e => { e.preventDefault(); e.stopPropagation() }}
           onClick={e => { e.stopPropagation(); onArrowClick?.(e) }}
           style={{ opacity: 0, pointerEvents: 'none' }}
         >&gt;</button>
@@ -356,15 +361,15 @@ export default function CasesTimeline({
   const handleNextArrow = () => {
     const container = viewportRef.current
     if (!container) return
-    const fsc    = firstSetCardsRef.current
-    const oneSet = oneSetRef.current
-    const vw     = container.clientWidth
-    // Encontra o primeiro card cujo lado direito ultrapassa o viewport
+    const fsc = firstSetCardsRef.current
+    // Avança pro primeiro card ainda não visto (seenLabelsRef já é mantido
+    // pelo tick()). Calcular "qual card estourou o viewport" via posição é
+    // ambíguo num carrossel em loop infinito — depois de avançar uma vez,
+    // a mesma posição corresponde a voltas diferentes do loop e a conta
+    // ficava presa sempre no mesmo card (ou oscilando entre dois).
     for (let i = 0; i < fsc.length; i++) {
-      const card  = fsc[i]
-      const right = card.offsetLeft + oneSet + xRef.current.x + card.offsetWidth
-      if (right > vw + 10) {
-        handleLabelClick(i)   // handleLabelClick funciona com qualquer índice do set 0
+      if (!seenLabelsRef.current.has(i)) {
+        handleLabelClick(i)
         return
       }
     }
@@ -382,9 +387,10 @@ export default function CasesTimeline({
     xTargetRef.current = options.reduce((a, b) => Math.abs(b - cur) < Math.abs(a - cur) ? b : a)
   }
 
-  // Posiciona o card na borda esquerda do viewport (usado no carregamento da
-  // timeline unificada sem âncora — primeiro case mais novo no canto esquerdo).
-  const handleAlignLeft = (cardIdx) => {
+  // Posiciona o card na borda esquerda do viewport. Usado tanto no
+  // carregamento da timeline unificada sem âncora (primeiro case mais novo
+  // no canto esquerdo) quanto no clique nas labels da barra de timeline.
+  const handleAlignLeft = (cardIdx, instant = false) => {
     const cards     = firstSetCardsRef.current
     const container = viewportRef.current
     if (!cards[cardIdx] || !container) return
@@ -393,7 +399,18 @@ export default function CasesTimeline({
     const oneSet  = oneSetRef.current
     const cur     = xRef.current.x
     const options = [base, base + oneSet]
-    xTargetRef.current = options.reduce((a, b) => Math.abs(b - cur) < Math.abs(a - cur) ? b : a)
+    const target  = options.reduce((a, b) => Math.abs(b - cur) < Math.abs(a - cur) ? b : a)
+    if (instant) {
+      // Só no carregamento da página — aplica direto, sem easing. O alvo
+      // costuma estar bem longe da posição inicial (-oneSet), e o easing
+      // de 10%/frame levava vários segundos pra acomodar, parecendo um
+      // "scroll infinito" ao carregar a página.
+      xRef.current.x = target
+      xTargetRef.current = null
+    } else {
+      // Clique do usuário na label — mantém o scroll suave.
+      xTargetRef.current = target
+    }
   }
 
   // Modo unified: ouve eventos globais pra mover a timeline pra uma entrada
@@ -407,7 +424,7 @@ export default function CasesTimeline({
     }
     const onAlignLeft = (e) => {
       const idx = idxOf(e.detail?.entryId)
-      if (idx >= 0) handleAlignLeft(idx)
+      if (idx >= 0) handleAlignLeft(idx, true) // instant — carregamento da página
     }
     window.addEventListener('cases-scroll-to', onScrollTo)
     window.addEventListener('cases-align-left', onAlignLeft)
@@ -607,7 +624,10 @@ export default function CasesTimeline({
         const oneSet = oneSetRef.current
         let hasRight = false
         fsc.forEach((card, idx) => {
-          const left  = card.offsetLeft + oneSet + xRef.current.x
+          // Normaliza (mod oneSet) pra achar a cópia certa do card num
+          // carrossel em loop infinito — "+oneSet" cru só valia perto da
+          // posição inicial de x.
+          const left  = ((card.offsetLeft + xRef.current.x) % oneSet + oneSet) % oneSet
           const right = left + card.offsetWidth
           if (left >= -1 && right <= vw + 1) seenLabelsRef.current.add(idx)
           if (right > vw + 10) hasRight = true

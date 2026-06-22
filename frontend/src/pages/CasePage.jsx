@@ -207,9 +207,6 @@ function Block({ block }) {
       return (
         <section className="block-subcase" id={block.ancora_id || undefined}>
           <div className="block-subcase__content">
-            {block.subtitulo && (
-              <span className="block-subcase__breadcrumb">{block.subtitulo}</span>
-            )}
             <h2 className="block-subcase__title">{block.titulo}</h2>
             {block.descricao && (
               <div
@@ -218,9 +215,9 @@ function Block({ block }) {
               />
             )}
           </div>
-          {block.imagem && (
+          {block.imagem_capa && (
             <div className="block-subcase__image">
-              <img src={mediaUrl(block.imagem)} alt={block.titulo} />
+              <img src={mediaUrl(block.imagem_capa)} alt={block.titulo} />
             </div>
           )}
         </section>
@@ -346,7 +343,7 @@ export default function CasePage() {
       mediaUrl(data.imagem_capa),
       ...(data.blocos ?? []).flatMap(b => {
         if (b.__component === 'blocks.imagem-simples') return [mediaUrl(b.imagem)]
-        if (b.__component === 'blocks.subcase')       return [mediaUrl(b.imagem)]
+        if (b.__component === 'blocks.subcase')       return [mediaUrl(b.imagem_capa)]
         if (b.__component === 'blocks.video')         return [mediaUrl(b.capa)]
         if (b.__component === 'blocks.imagem-trio')   return [mediaUrl(b.imagem_1), mediaUrl(b.imagem_2), mediaUrl(b.imagem_3)]
         if (b.__component === 'blocks.galeria')       return (b.itens ?? []).map(it => mediaUrl(it?.imagem))
