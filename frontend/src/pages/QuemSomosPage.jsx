@@ -114,7 +114,7 @@ export default function QuemSomosPage() {
           <div className="qs-era__titulo">
             <span className="qs-era__titulo-normal">
               {data?.titulo_era}
-            </span>
+            </span>{' '}
             <em className="qs-era__titulo-italico">
               {data?.titulo_era_italico}
             </em>
