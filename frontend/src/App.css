@@ -785,11 +785,6 @@ body.camera-ativa .footer-branco > * {
     opacity: 0.4;
   }
 
-  /* ── Submenu mobile ── */
-  .home__submenu-link {
-    font-size: 46px;
-  }
-
   /* ── Rodapé ── */
   .home__bottom {
     display: none;
@@ -868,12 +863,10 @@ body.camera-ativa .footer-branco > * {
     display: none !important;
   }
 
-  /* Pessoas submenu — nomes nunca cortados */
-  .home__submenu-link {
+  /* Pessoas submenu — nomes nunca cortados (fonte segue inline, via JS) */
+  .home__submenu-link--wrap {
     white-space: normal !important;
     text-align: center;
-    line-height: 1 !important;
-    font-size: 36px !important;
     padding: 4px 16px;
   }
 

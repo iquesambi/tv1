@@ -176,9 +176,28 @@ function logoImgStyle(logo, escala = 1) {
   if (w > LOGO_MAX_W) { w = LOGO_MAX_W; h = Math.round(w / aspect) }
   return { height: h, width: w }
 }
-const ITEM_H_D = 70
-const ITEM_H_M = 46
 const WIN_PAD  = 48
+
+// Fonte do nav principal — fonte única de verdade, espelha exatamente o
+// CSS de .home__nav-link (incl. breakpoint mobile) para que JS e CSS nunca
+// fiquem dessincronizados.
+function navFontSizeFor(vw, vh, N) {
+  if (vw <= 768) return Math.min(Math.max(36, 0.13 * vw), 64)
+  return Math.min(
+    Math.min(Math.max(52, 0.158 * vw), 216),
+    (0.68 * vh) / Math.max(N, 1) / 0.75,
+    0.11 * vw
+  )
+}
+function navLineHeightRatio(vw) {
+  return vw <= 768 ? 0.88 : 0.75
+}
+// Fonte dos links do submenu — responsiva (antes era um valor fixo em px)
+function submenuFontSizeFor(vw) {
+  return vw <= 768
+    ? Math.min(Math.max(28, 0.1 * vw), 46)
+    : Math.min(Math.max(36, 0.052 * vw), 70)
+}
 
 // Escala proporcional de logos: maior logo natural (20px) → 24px target
 const MAX_NATURAL = 20
@@ -235,16 +254,37 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
   // pronto: footer sempre pronto; home espera preloader; footerHome também pronto de imediato
   const [pronto, setPronto] = useState(!isHome || footerHome)
 
-  // viewport: usado pelo cálculo dinâmico das posições dos itens do nav
+  // viewport: usado pelo cálculo dinâmico das posições dos itens do nav.
+  // Medido a partir do container real (rootRef), não de window.innerHeight —
+  // no mobile, 100dvh (CSS) e window.innerHeight podem divergir (barra de
+  // endereço dinâmica), o que deixava itens posicionados fora da área
+  // realmente visível.
+  const rootRef = useRef(null)
   const [viewport, setViewport] = useState(() =>
     typeof window === 'undefined'
       ? { w: 1440, h: 900 }
       : { w: window.innerWidth, h: window.innerHeight }
   )
   useEffect(() => {
-    const onResize = () => setViewport({ w: window.innerWidth, h: window.innerHeight })
-    window.addEventListener('resize', onResize)
-    return () => window.removeEventListener('resize', onResize)
+    const measure = () => {
+      const el = rootRef.current
+      if (el) setViewport({ w: el.clientWidth, h: el.clientHeight })
+      else setViewport({ w: window.innerWidth, h: window.innerHeight })
+    }
+    measure()
+    const ro = rootRef.current ? new ResizeObserver(measure) : null
+    ro?.observe(rootRef.current)
+    window.addEventListener('resize', measure)
+    window.addEventListener('orientationchange', measure)
+    // Mobile: a barra de endereço some/aparece mudando a altura visível sem
+    // disparar 'resize' de forma confiável — visualViewport cobre esse caso.
+    window.visualViewport?.addEventListener('resize', measure)
+    return () => {
+      ro?.disconnect()
+      window.removeEventListener('resize', measure)
+      window.removeEventListener('orientationchange', measure)
+      window.visualViewport?.removeEventListener('resize', measure)
+    }
   }, [])
 
   // useLocation só funciona se houver Router acima — na home há, no footer também (dentro do Router)
@@ -527,12 +567,16 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
 
     const link = links[aberto]
     const isClientes = link && (link.url?.includes('clientes') || link.label?.toLowerCase().includes('clientes'))
+    const isPessoas  = link && (link.url?.includes('pessoas') || link.label?.toLowerCase().includes('pessoas'))
     const sublinks = link ? getSublinks(link) : []
     if (!isClientes && sublinks.length === 0) return null
 
-    const mobile   = window.innerWidth <= 768
-    const itemH    = mobile ? ITEM_H_M : ITEM_H_D
-    const isRoleta = sublinks.length >= SUBMENU_VISIBLE
+    const vw = viewport.w
+    const vh = viewport.h
+    const mobile      = vw <= 768
+    const subFontSize = submenuFontSizeFor(vw)
+    const itemH       = subFontSize // line-height: 1 nos links do submenu
+    const isRoleta    = sublinks.length >= SUBMENU_VISIBLE
 
     const handleSubClick = (sub) => (e) => {
       e.preventDefault()
@@ -545,11 +589,9 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
       goTo(target)
     }
 
-    const vw = window.innerWidth
-    const vh = window.innerHeight
     const N           = links.length
-    const navFontSize = Math.min(Math.min(Math.max(52, 0.158 * vw), 216), (0.68 * vh) / (N * 0.75))
-    const navItemH    = navFontSize * 0.75
+    const navFontSize = navFontSizeFor(vw, vh, N)
+    const navItemH    = navFontSize * navLineHeightRatio(vw)
     const itemCenterY = vh * 0.47 + (aberto - (N - 1) / 2) * navItemH
     const itemBottomY = itemCenterY + navItemH / 2
 
@@ -614,8 +656,10 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
       const offset     = Math.max(0, Math.min(activeSubIdx, sublinks.length - 1))
       const winPad     = mobile ? 28 : WIN_PAD
       const windowH    = SUBMENU_VISIBLE * itemH + winPad * 2
-      // Espelha o computeStyle: aberto=0 → bottom=navItemH; aberto>0 → bottom=1.5*navItemH+10
-      const computedActiveBottom = aberto === 0 ? navItemH : navItemH * 1.5 + 10
+      // Espelha o computeStyle (incl. headerSafeTop no mobile): aberto=0 →
+      // bottom=headerSafeTop+navItemH; aberto>0 → bottom=1.5*navItemH+10
+      const headerSafeTop = mobile ? 60 : 0
+      const computedActiveBottom = aberto === 0 ? headerSafeTop + navItemH : navItemH * 1.5 + 10
       const windowTop = Math.max(computedActiveBottom + Math.max(40, navItemH * 0.5), vh * 0.25)
       const listOffset = winPad - offset * itemH
 
@@ -629,8 +673,8 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
                   <a
                     key={j}
                     href={sub.url || '#'}
-                    className={`home__submenu-link${isAtivo ? ' home__submenu-link--ativo' : ''}`}
-                    style={{ height: itemH, lineHeight: `${itemH}px` }}
+                    className={`home__submenu-link${isAtivo ? ' home__submenu-link--ativo' : ''}${isPessoas ? ' home__submenu-link--wrap' : ''}`}
+                    style={{ height: itemH, lineHeight: `${itemH}px`, fontSize: subFontSize }}
                     onMouseEnter={() => setHoveredSub(sub)}
                     onMouseLeave={() => setHoveredSub(null)}
                     onClick={handleSubClick(sub)}
@@ -646,20 +690,28 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
     }
 
     // Fundo do item ativo — espelha exatamente o computeStyle:
-    // aberto=0 (sem itens acima): activeTop=0 → bottom=navItemH
+    // aberto=0 (sem itens acima): activeTop=headerSafeTop → bottom=headerSafeTop+navItemH
     // aberto>0 (tem item acima):  activeTop=navItemH/2+10 → bottom=1.5*navItemH+10
-    const activeBottom = aberto === 0 ? navItemH : navItemH * 1.5 + 10
+    const headerSafeTop = mobile ? 60 : 0
+    const activeBottom = aberto === 0 ? headerSafeTop + navItemH : navItemH * 1.5 + 10
     const submenuTop   = activeBottom + Math.max(40, navItemH * 0.5)
+    // Centraliza o bloco de sublinks no espaço disponível abaixo do item ativo;
+    // se não houver espaço suficiente, volta a empilhar a partir do topo desse
+    // espaço (em vez de empurrar pra cima e sobrepor o item ativo)
+    const subContentH = sublinks.length * itemH
+    const subBoxH      = vh - submenuTop
+    const centerSubs   = subContentH < subBoxH * 0.9
     return (
       <div className="home__submenu" onClick={e => e.stopPropagation()}>
-        <div className="home__submenu-center" style={{ inset: 'auto 0 0 0', top: submenuTop, justifyContent: 'flex-start' }}>
+        <div className="home__submenu-center" style={{ inset: 'auto 0 0 0', top: submenuTop, justifyContent: centerSubs ? 'center' : 'flex-start' }}>
           {sublinks.map((sub, j) => {
             const isAtivo = hoveredSub ? hoveredSub === sub : j === 0
             return (
               <a
                 key={j}
                 href={sub.url || '#'}
-                className={`home__submenu-link${isAtivo ? ' home__submenu-link--ativo' : ''}`}
+                className={`home__submenu-link${isAtivo ? ' home__submenu-link--ativo' : ''}${isPessoas ? ' home__submenu-link--wrap' : ''}`}
+                style={{ fontSize: subFontSize }}
                 onMouseEnter={() => setHoveredSub(sub)}
                 onMouseLeave={() => setHoveredSub(null)}
                 onClick={handleSubClick(sub)}
@@ -685,16 +737,15 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
   const N = links.length
   const vh = viewport.h
   const vw = viewport.w
-  // Altura de cada item no tamanho cheio (mesma fórmula que o CSS):
-  // font-size = min(clamp(52, 15.8vw, 216), 68vh / N / 0.75); height = font * 0.75
-  const fontSize = Math.min(
-    Math.min(Math.max(52, 0.158 * vw), 216),
-    (0.68 * vh) / Math.max(N, 1) / 0.75,
-    0.11 * vw
-  )
-  const itemH = fontSize * 0.75
-  // Centro y natural do item i (.home__nav está com top 47% + translate -50% -50%)
-  const naturalCenter = (i) => vh * 0.47 + (i - (N - 1) / 2) * itemH
+  // Altura de cada item no tamanho cheio — espelha exatamente o CSS de
+  // .home__nav-link (navFontSizeFor cobre desktop e o breakpoint mobile)
+  const fontSize = navFontSizeFor(vw, vh, N)
+  const itemH = fontSize * navLineHeightRatio(vw)
+  // Centro y natural do item i (.home__nav está com top 47% no desktop,
+  // mas 55% no breakpoint mobile — precisa bater com o CSS exatamente,
+  // senão os itens "abaixo" calculam a posição errada e saem da tela)
+  const navTopAnchor = vw <= 768 ? 0.55 : 0.47
+  const naturalCenter = (i) => vh * navTopAnchor + (i - (N - 1) / 2) * itemH
 
   // Quando um menu é aberto:
   // - O acima mais próximo do ativo ancora o topo do elemento em y=0 (top
@@ -705,9 +756,13 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
   const computeStyle = (i) => {
     if (aberto === null) return undefined
     const acimaCount = aberto
-    // Sem itens acima → texto cola no topo (activeTop=0).
+    // No mobile, .home__top é fixed com z-index acima do nav (cobre o que
+    // estiver atrás) — então "colar no topo" precisa respeitar a altura do
+    // header fixo, senão o item fica escondido atrás do logo/hambúrguer.
+    const headerSafeTop = vw <= 768 ? 60 : 0
+    // Sem itens acima → texto cola no topo (abaixo do header fixo no mobile).
     // Com itens acima → deixa metade do item acima aparecer cortado no topo.
-    const activeTop    = acimaCount > 0 ? itemH / 2 + 10 : 0
+    const activeTop    = acimaCount > 0 ? itemH / 2 + 10 : headerSafeTop
     const activeTarget = activeTop + itemH / 2
     // Primeiro item abaixo: centro na borda inferior do viewport (simétrico ao acima que fica em y=0)
     // → metade superior visível, metade inferior cortada pelo overflow:hidden
@@ -772,6 +827,7 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
         )}
 
         <div
+          ref={rootRef}
           className={`home${pronto ? ' home--pronto' : ''}`}
           onClick={aberto !== null ? () => { setAberto(null); setHoveredSub(null) } : undefined}
         >
@@ -907,6 +963,7 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
   // ── FOOTER ────────────────────────────────────────────────────────────────
   return (
     <section
+      ref={rootRef}
       className={`footer-branco${escuro ? ' footer-branco--escuro' : ''}`}
       onClick={aberto !== null ? () => { setAberto(null); setHoveredSub(null) } : undefined}
     >
