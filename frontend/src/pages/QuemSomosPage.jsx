@@ -8,7 +8,7 @@ const STRAPI = 'https://tv1-53ev.onrender.com'
 const api = (path) => axios.get(`${STRAPI}/api/${path}`).then(r => r.data.data).catch(() => null)
 const mediaUrl = (obj) => !obj?.url ? null : obj.url.startsWith("http") ? obj.url : `${STRAPI}${obj.url}`
 
-const cleanStr = (s) => (s || '').replace(/[­​‌‍﻿ ]/g, ' ').replace(/ +/g, ' ').trim()
+const cleanStr = (s) => (s || '').replace(/[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]/g, '').replace(/[­​‌‍﻿ ]/g, ' ').replace(/ +/g, ' ').trim()
 
 // Suporta Markdown (Strapi richtext), HTML string, e blocks JSON (Strapi v5)
 function renderRichText(value) {
@@ -42,7 +42,7 @@ function renderRichText(value) {
     // Se já tem tags HTML, usa directamente
     if (/<[a-z][\s\S]*>/i.test(value)) return value
     // Caso contrário, converte Markdown básico
-    return value
+    return cleanStr(value)
       .split(/\n\n+/)
       .map(para => {
         const html = para

@@ -689,7 +689,8 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
   // font-size = min(clamp(52, 15.8vw, 216), 68vh / N / 0.75); height = font * 0.75
   const fontSize = Math.min(
     Math.min(Math.max(52, 0.158 * vw), 216),
-    (0.68 * vh) / Math.max(N, 1) / 0.75
+    (0.68 * vh) / Math.max(N, 1) / 0.75,
+    0.11 * vw
   )
   const itemH = fontSize * 0.75
   // Centro y natural do item i (.home__nav está com top 47% + translate -50% -50%)
