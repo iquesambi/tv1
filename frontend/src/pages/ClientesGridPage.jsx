@@ -60,8 +60,12 @@ export default function ClientesGridPage() {
     <div className="clientes-grid-page">
       <PageHeader
         logoUrl={mediaUrl(logo?.logo)}
+        label="Clientes"
         onLogoClick={() => goTo('/')}
+        mobileMenuLogo={logo?.logo}
       />
+
+      <h1 className="clientes-grid-titulo-mobile">Clientes</h1>
 
       <main className="clientes-grid-main">
         {rows.map((row, r) => (
