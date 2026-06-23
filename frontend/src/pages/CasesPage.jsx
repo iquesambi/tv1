@@ -51,7 +51,9 @@ async function construirEntradas() {
   const queries = [
     axios.get(
       `${STRAPI}/api/cases?${slugFilters}` +
-      `&populate[0]=especialidade&populate[1]=sub_especialidade&populate[2]=cliente&populate[3]=agencia&populate[4]=imagem_capa` +
+      `&populate[especialidade]=true&populate[sub_especialidade]=true&populate[cliente]=true&populate[agencia]=true` +
+      `&populate[imagem_capa]=true&populate[imagem_timeline]=true` +
+      `&populate[blocos][populate]=*` +
       `&pagination[pageSize]=200&sort=Data:desc`
     ).then(r => r.data.data ?? []).catch(() => [])
   ]
@@ -71,19 +73,61 @@ async function construirEntradas() {
       const sec = secoes.find(s => s.slug === especialidadeSlug)
       secaoLabel = sec?.label || c.especialidade?.nome || ''
     }
+    const ordemSub = c.sub_especialidade?.ordem ?? 9999
+    const label    = c.sub_especialidade?.nome || secaoLabel
     entradas.push({
       id:            `${c.id}-main`,
       ancora,
       subEspAncora:  c.sub_especialidade?.slug || null,
-      label:         c.sub_especialidade?.nome || secaoLabel,
-      ordemSub:      c.sub_especialidade?.ordem ?? 9999,
+      label,
+      ordemSub,
       data:          c.Data ? new Date(c.Data) : new Date(0),
       nome:          c.titulo,
-      capa:          c.imagem_capa,
+      capa:          c.imagem_timeline || c.imagem_capa,
       href:          clienteSlug && caseSlug ? `/${clienteSlug}/${caseSlug}` : `/${caseSlug}`,
       agenciaLogo:   c.agencia?.logo ?? null,
       agenciaNome:   c.agencia?.nome ?? null,
     })
+    // Subtítulos/subcases com dados próprios de timeline aparecem como
+    // entradas adicionais, na mesma categoria (especialidade) do case-pai.
+    for (const bloco of c.blocos ?? []) {
+      if (bloco.__component === 'blocks.subtitulo' && bloco.timeline && bloco.timeline_data) {
+        entradas.push({
+          id:            `${c.id}-sub-${bloco.id}`,
+          ancora,
+          subEspAncora:  c.sub_especialidade?.slug || null,
+          label,
+          ordemSub,
+          data:          new Date(bloco.timeline_data),
+          nome:          bloco.timeline_nome || bloco.texto,
+          capa:          bloco.timeline_capa || c.imagem_capa,
+          href:          clienteSlug && caseSlug
+            ? `/${clienteSlug}/${caseSlug}#${bloco.ancora_id ?? ''}`
+            : `/${caseSlug}#${bloco.ancora_id ?? ''}`,
+          agenciaLogo:   c.agencia?.logo ?? null,
+          agenciaNome:   c.agencia?.nome ?? null,
+        })
+      }
+      if (bloco.__component === 'blocks.subcase' && bloco.ancora_id) {
+        const blocoCapa = bloco.imagem_timeline || bloco.imagem_capa
+        if (!blocoCapa) continue
+        entradas.push({
+          id:            `${c.id}-sub-${bloco.id}`,
+          ancora,
+          subEspAncora:  c.sub_especialidade?.slug || null,
+          label,
+          ordemSub,
+          data:          bloco.Data ? new Date(bloco.Data) : (c.Data ? new Date(c.Data) : new Date(0)),
+          nome:          bloco.titulo,
+          capa:          blocoCapa,
+          href:          clienteSlug && caseSlug
+            ? `/${clienteSlug}/${caseSlug}#${bloco.ancora_id}`
+            : `/${caseSlug}#${bloco.ancora_id}`,
+          agenciaLogo:   c.agencia?.logo ?? null,
+          agenciaNome:   c.agencia?.nome ?? null,
+        })
+      }
+    }
   }
   // Ordem da timeline:
   //   1. Ordem do sublink no menu (live marketing → conteúdo → advertising…)
