@@ -393,9 +393,11 @@ export default function CasePage() {
               <img src={mediaUrl(logo.logo)} alt="TV1" />
             </button>
           )}
-          <span className="case-hero__breadcrumb">
-            {data.cliente?.nome} / {data.breadcrumb || data.titulo}
-          </span>
+          {data.breadcrumb && (
+            <span className="case-hero__breadcrumb">
+              {data.cliente?.nome} / {data.breadcrumb}
+            </span>
+          )}
           <h1 className="case-hero__title">{data.titulo}</h1>
           {data.descricao && (
             <div className="case-hero__description" dangerouslySetInnerHTML={{ __html: semViuvas(textoParaHtml(data.descricao)) }} />
