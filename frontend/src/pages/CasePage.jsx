@@ -133,12 +133,9 @@ function Video({ block }) {
 function Galeria({ itens = [] }) {
   const [ativo, setAtivo] = useState(0)
 
-  // Ordena por ordem (se definida), depois mantém a ordem original
-  const imagemsOrdenadas = [...itens].sort((a, b) => {
-    const aOrd = a.ordem ?? Infinity
-    const bOrd = b.ordem ?? Infinity
-    return aOrd - bOrd
-  })
+  // imagens é media múltipla simples — a ordem do array já é a ordem
+  // arrumada no media picker do CMS, sem campo "ordem" próprio.
+  const imagemsOrdenadas = itens
 
   const n = imagemsOrdenadas.length
 
@@ -160,7 +157,7 @@ function Galeria({ itens = [] }) {
   // Preload de todas as imagens assim que a galeria monta
   useEffect(() => {
     imagemsOrdenadas.forEach(item => {
-      const url = mediaUrl(item?.imagem)
+      const url = mediaUrl(item)
       if (url) {
         const img = new Image()
         img.src = url
@@ -173,7 +170,7 @@ function Galeria({ itens = [] }) {
   return (
     <div className="block-galeria">
       <div className="block-galeria__slide">
-        <img src={mediaUrl(imagemsOrdenadas[ativo]?.imagem)} alt="" />
+        <img src={mediaUrl(imagemsOrdenadas[ativo])} alt="" />
         <div className="block-galeria__stepper">
           {imagemsOrdenadas.map((_, i) => (
             <button
@@ -241,7 +238,7 @@ function Block({ block }) {
       )
 
     case 'blocks.galeria':
-      return <Galeria itens={block.itens} />
+      return <Galeria itens={block.imagens} />
 
     case 'blocks.imagem-trio':
       return (
@@ -346,7 +343,7 @@ export default function CasePage() {
         if (b.__component === 'blocks.subcase')       return [mediaUrl(b.imagem_capa)]
         if (b.__component === 'blocks.video')         return [mediaUrl(b.capa)]
         if (b.__component === 'blocks.imagem-trio')   return [mediaUrl(b.imagem_1), mediaUrl(b.imagem_2), mediaUrl(b.imagem_3)]
-        if (b.__component === 'blocks.galeria')       return (b.itens ?? []).map(it => mediaUrl(it?.imagem))
+        if (b.__component === 'blocks.galeria')       return (b.imagens ?? []).map(mediaUrl)
         return []
       }),
     ].filter(Boolean)
