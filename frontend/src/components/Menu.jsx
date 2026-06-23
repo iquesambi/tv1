@@ -694,16 +694,16 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
     // aberto>0 (tem item acima):  activeTop=navItemH/2+10 → bottom=1.5*navItemH+10
     const headerSafeTop = mobile ? 60 : 0
     const activeBottom = aberto === 0 ? headerSafeTop + navItemH : navItemH * 1.5 + 10
-    const submenuTop   = activeBottom + Math.max(40, navItemH * 0.5)
-    // Centraliza o bloco de sublinks no espaço disponível abaixo do item ativo;
-    // se não houver espaço suficiente, volta a empilhar a partir do topo desse
-    // espaço (em vez de empurrar pra cima e sobrepor o item ativo)
+    // O submenu centraliza no meio absoluto da tela, independente de onde o
+    // item ativo está — só recua pra logo abaixo do item ativo se não houver
+    // espaço pra centralizar sem sobrepor (viewport muito curto).
+    const minSafeTop  = activeBottom + Math.max(40, navItemH * 0.5)
     const subContentH = sublinks.length * itemH
-    const subBoxH      = vh - submenuTop
-    const centerSubs   = subContentH < subBoxH * 0.9
+    const centeredTop = vh / 2 - subContentH / 2
+    const submenuTop  = Math.max(minSafeTop, centeredTop)
     return (
       <div className="home__submenu" onClick={e => e.stopPropagation()}>
-        <div className="home__submenu-center" style={{ inset: 'auto 0 0 0', top: submenuTop, justifyContent: centerSubs ? 'center' : 'flex-start' }}>
+        <div className="home__submenu-center" style={{ inset: 'auto 0 0 0', top: submenuTop, justifyContent: 'flex-start' }}>
           {sublinks.map((sub, j) => {
             const isAtivo = hoveredSub ? hoveredSub === sub : j === 0
             return (
@@ -761,8 +761,10 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
     // header fixo, senão o item fica escondido atrás do logo/hambúrguer.
     const headerSafeTop = vw <= 768 ? 60 : 0
     // Sem itens acima → texto cola no topo (abaixo do header fixo no mobile).
+    // O submenu (quando existe) centraliza sozinho no meio absoluto da tela,
+    // independente de onde o item ativo está — ver renderSubmenu.
     // Com itens acima → deixa metade do item acima aparecer cortado no topo.
-    const activeTop    = acimaCount > 0 ? itemH / 2 + 10 : headerSafeTop
+    const activeTop = acimaCount > 0 ? itemH / 2 + 10 : headerSafeTop
     const activeTarget = activeTop + itemH / 2
     // Primeiro item abaixo: centro na borda inferior do viewport (simétrico ao acima que fica em y=0)
     // → metade superior visível, metade inferior cortada pelo overflow:hidden
