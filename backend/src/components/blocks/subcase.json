@@ -7,6 +7,7 @@
     "descricao":        { "type": "text" },
     "imagem_capa":      { "type": "media", "multiple": false, "allowedTypes": ["images"] },
     "imagem_timeline":  { "type": "media", "multiple": false, "allowedTypes": ["images"] },
-    "ancora_id":        { "type": "string" }
+    "ancora_id":        { "type": "string" },
+    "video_url":        { "type": "string" }
   }
 }

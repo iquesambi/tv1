@@ -127,6 +127,25 @@ async function construirEntradas() {
           agenciaNome:   c.agencia?.nome ?? null,
         })
       }
+      if (bloco.__component === 'blocks.video' && bloco.ir_para_timeline && bloco.ancora_id) {
+        const videoCapa = bloco.imagem_timeline || bloco.capa
+        if (!videoCapa) continue
+        entradas.push({
+          id:            `${c.id}-sub-${bloco.id}`,
+          ancora,
+          subEspAncora:  c.sub_especialidade?.slug || null,
+          label,
+          ordemSub,
+          data:          c.Data ? new Date(c.Data) : new Date(0),
+          nome:          bloco.titulo,
+          capa:          videoCapa,
+          href:          clienteSlug && caseSlug
+            ? `/${clienteSlug}/${caseSlug}#${bloco.ancora_id}`
+            : `/${caseSlug}#${bloco.ancora_id}`,
+          agenciaLogo:   c.agencia?.logo ?? null,
+          agenciaNome:   c.agencia?.nome ?? null,
+        })
+      }
     }
   }
   // Ordem da timeline:

@@ -108,7 +108,7 @@ function Video({ block }) {
   }, [aberto, block.url])
 
   return (
-    <div className="block-video" onClick={() => !aberto && setAberto(true)}>
+    <div className="block-video" id={block.ancora_id || undefined} onClick={() => !aberto && setAberto(true)}>
       <div
         ref={divRef}
         className="block-video__player"
@@ -123,9 +123,62 @@ function Video({ block }) {
               <polygon points="26,20 26,44 46,32" fill="#fff" />
             </svg>
           </div>
+          {block.titulo && <span className="block-video__titulo">{block.titulo}</span>}
         </>
       )}
     </div>
+  )
+}
+
+/* ── Subcase ────────────────────────────── */
+function Subcase({ block }) {
+  const [tocando, setTocando] = useState(false)
+  const temVideo = !!block.video_url
+
+  return (
+    <section className="block-subcase" id={block.ancora_id || undefined}>
+      <div className="block-subcase__content">
+        <h2 className="block-subcase__title">{block.titulo}</h2>
+        {block.descricao && (
+          <div
+            className="block-subcase__description"
+            dangerouslySetInnerHTML={{ __html: semViuvas(textoParaHtml(block.descricao)) }}
+          />
+        )}
+      </div>
+      {block.imagem_capa && (
+        <div
+          className={`block-subcase__image${temVideo ? ' block-subcase__image--video' : ''}`}
+          onClick={temVideo ? () => setTocando(true) : undefined}
+        >
+          <img src={mediaUrl(block.imagem_capa)} alt={block.titulo} />
+          {temVideo && (
+            <div className="block-subcase__play">
+              <svg className="block-subcase__play-btn" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="32" cy="32" r="30" fill="none" stroke="#fff" strokeWidth="2" />
+                <polygon points="26,20 26,44 46,32" fill="#fff" />
+              </svg>
+            </div>
+          )}
+        </div>
+      )}
+      {tocando && (
+        <div className="block-subcase__fullscreen" onClick={() => setTocando(false)}>
+          <button className="block-subcase__close" onClick={() => setTocando(false)} aria-label="Fechar">✕</button>
+          {isYoutube(block.video_url) ? (
+            <iframe
+              src={`${youtubeEmbed(block.video_url)}?autoplay=1&rel=0&modestbranding=1`}
+              title={block.titulo}
+              allow="autoplay; encrypted-media; fullscreen"
+              allowFullScreen
+              onClick={e => e.stopPropagation()}
+            />
+          ) : (
+            <video src={block.video_url} autoPlay controls onClick={e => e.stopPropagation()} />
+          )}
+        </div>
+      )}
+    </section>
   )
 }
 
@@ -201,24 +254,7 @@ function Block({ block }) {
       )
 
     case 'blocks.subcase':
-      return (
-        <section className="block-subcase" id={block.ancora_id || undefined}>
-          <div className="block-subcase__content">
-            <h2 className="block-subcase__title">{block.titulo}</h2>
-            {block.descricao && (
-              <div
-                className="block-subcase__description"
-                dangerouslySetInnerHTML={{ __html: semViuvas(textoParaHtml(block.descricao)) }}
-              />
-            )}
-          </div>
-          {block.imagem_capa && (
-            <div className="block-subcase__image">
-              <img src={mediaUrl(block.imagem_capa)} alt={block.titulo} />
-            </div>
-          )}
-        </section>
-      )
+      return <Subcase block={block} />
 
     case 'blocks.texto':
     case 'blocks.descricao':
@@ -357,21 +393,29 @@ export default function CasePage() {
     return () => clearTimeout(timeout)
   }, [data])
 
-  // rola até a âncora depois que os blocos renderizam
+  // Rola até a âncora — precisa esperar "pronto" (não só "data"), porque o
+  // conteúdo real (com os ids de âncora) só renderiza depois do spinner;
+  // antes disso, document.getElementById nunca encontra nada e o retry
+  // desiste sem nunca rolar. Depende de location.hash (não window.location
+  // direto) pra também rolar ao trocar de âncora dentro do mesmo case, sem
+  // troca de rota — caso em que data/pronto não mudam de novo.
   useEffect(() => {
-    if (!data) return
-    const hash = window.location.hash.slice(1)
+    if (!data || !pronto) return
+    const hash = location.hash.slice(1)
     if (!hash) return
     const tentar = (tentativas = 0) => {
       const el = document.getElementById(hash)
       if (el) {
-        el.scrollIntoView({ behavior: 'smooth', block: 'start' })
-      } else if (tentativas < 10) {
+        // Sem "behavior: smooth" — em alguns navegadores/configurações de
+        // acessibilidade (prefers-reduced-motion) o scroll suave falha
+        // silenciosamente e a página nunca rola; instantâneo sempre funciona.
+        el.scrollIntoView({ block: 'start' })
+      } else if (tentativas < 20) {
         setTimeout(() => tentar(tentativas + 1), 150)
       }
     }
     tentar()
-  }, [data])
+  }, [data, pronto, location.hash])
 
   if (!data || !pronto) return (
     <div className="cliente-loading" style={{ height: '100vh' }}>

@@ -51,6 +51,22 @@ function montarEntradas(cases, tipoResolvido) {
             agenciaNome: null,
           })
         }
+        if (bloco.__component === 'blocks.video' && bloco.ir_para_timeline && bloco.ancora_id) {
+          const videoCapa = bloco.imagem_timeline || bloco.capa
+          if (!videoCapa) continue
+          entradas.push({
+            id:          `${c.id}-${bloco.ancora_id}`,
+            label:       c.Data ? new Date(c.Data).getFullYear() : null,
+            data:        c.Data ? new Date(c.Data) : new Date(0),
+            nome:        bloco.titulo || '',
+            capa:        videoCapa,
+            href:        clienteSlug && caseSlug
+              ? `/${clienteSlug}/${caseSlug}#${bloco.ancora_id}`
+              : `/${caseSlug ?? ''}#${bloco.ancora_id}`,
+            agenciaLogo: null,
+            agenciaNome: null,
+          })
+        }
       }
     }
     return entradas.sort((a, b) => b.data - a.data)
@@ -88,6 +104,45 @@ function montarEntradas(cases, tipoResolvido) {
           href:        clienteSlug && caseSlug
             ? `/${clienteSlug}/${caseSlug}#${bloco.ancora_id ?? ''}`
             : `/${caseSlug}#${bloco.ancora_id ?? ''}`,
+          agenciaLogo: c.agencia?.logo ?? null,
+          agenciaNome: c.agencia?.nome ?? null,
+          ordemSub,
+        })
+      }
+      if (bloco.__component === 'blocks.subcase' && bloco.ancora_id) {
+        const blocoCapa = bloco.imagem_timeline || bloco.imagem_capa
+        if (!blocoCapa) continue
+        const blocoData = bloco.Data ? new Date(bloco.Data) : (c.Data ? new Date(c.Data) : new Date(0))
+        entradas.push({
+          id:          `${c.id}-sub-${bloco.id}`,
+          label:       tipoResolvido === 'marca'
+            ? blocoData.getFullYear()
+            : (c.sub_especialidade?.nome || ''),
+          data:        blocoData,
+          nome:        bloco.titulo,
+          capa:        blocoCapa,
+          href:        clienteSlug && caseSlug
+            ? `/${clienteSlug}/${caseSlug}#${bloco.ancora_id}`
+            : `/${caseSlug}#${bloco.ancora_id}`,
+          agenciaLogo: c.agencia?.logo ?? null,
+          agenciaNome: c.agencia?.nome ?? null,
+          ordemSub,
+        })
+      }
+      if (bloco.__component === 'blocks.video' && bloco.ir_para_timeline && bloco.ancora_id) {
+        const videoCapa = bloco.imagem_timeline || bloco.capa
+        if (!videoCapa) continue
+        entradas.push({
+          id:          `${c.id}-sub-${bloco.id}`,
+          label:       tipoResolvido === 'marca'
+            ? (c.Data ? new Date(c.Data).getFullYear() : null)
+            : (c.sub_especialidade?.nome || ''),
+          data:        c.Data ? new Date(c.Data) : new Date(0),
+          nome:        bloco.titulo,
+          capa:        videoCapa,
+          href:        clienteSlug && caseSlug
+            ? `/${clienteSlug}/${caseSlug}#${bloco.ancora_id}`
+            : `/${caseSlug}#${bloco.ancora_id}`,
           agenciaLogo: c.agencia?.logo ?? null,
           agenciaNome: c.agencia?.nome ?? null,
           ordemSub,
