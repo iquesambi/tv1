@@ -36,11 +36,12 @@ function montarEntradas(cases, tipoResolvido) {
       }
       for (const bloco of c.blocos ?? []) {
         const blocoCapa = bloco.imagem_timeline || bloco.imagem_capa
+        const blocoData = bloco.Data || c.Data
         if (bloco.__component === 'blocks.subcase' && bloco.ancora_id && blocoCapa) {
           entradas.push({
             id:          `${c.id}-${bloco.ancora_id}`,
-            label:       c.Data ? new Date(c.Data).getFullYear() : null,
-            data:        c.Data ? new Date(c.Data) : new Date(0),
+            label:       blocoData ? new Date(blocoData).getFullYear() : null,
+            data:        blocoData ? new Date(blocoData) : new Date(0),
             nome:        bloco.titulo || '',
             capa:        blocoCapa,
             href:        clienteSlug && caseSlug

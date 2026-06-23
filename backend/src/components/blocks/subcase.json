@@ -3,9 +3,10 @@
   "info": { "displayName": "Subcase", "icon": "layout" },
   "attributes": {
     "titulo":           { "type": "string", "required": true },
+    "Data":             { "type": "date" },
     "descricao":        { "type": "text" },
     "imagem_capa":      { "type": "media", "multiple": false, "allowedTypes": ["images"] },
     "imagem_timeline":  { "type": "media", "multiple": false, "allowedTypes": ["images"] },
-    "ancora_id":        { "type": "uid", "targetField": "titulo" }
+    "ancora_id":        { "type": "string" }
   }
 }
