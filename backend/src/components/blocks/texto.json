@@ -2,6 +2,7 @@
   "collectionName": "components_blocks_textos",
   "info": { "displayName": "Texto", "icon": "file" },
   "attributes": {
-    "conteudo": { "type": "richtext", "required": true }
+    "conteudo": { "type": "richtext", "required": true },
+    "visivel": { "type": "boolean", "default": true }
   }
 }

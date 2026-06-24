@@ -241,6 +241,8 @@ function Galeria({ itens = [] }) {
 
 /* ── Renderizador de blocos ─────────────── */
 function Block({ block }) {
+  if (block.visivel === false) return null
+
   switch (block.__component) {
 
     case 'blocks.subtitulo':

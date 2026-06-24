@@ -8,6 +8,7 @@
     "imagem_capa":      { "type": "media", "multiple": false, "allowedTypes": ["images"] },
     "imagem_timeline":  { "type": "media", "multiple": false, "allowedTypes": ["images"] },
     "ancora_id":        { "type": "string" },
-    "video_url":        { "type": "string" }
+    "video_url":        { "type": "string" },
+    "visivel":          { "type": "boolean", "default": true }
   }
 }

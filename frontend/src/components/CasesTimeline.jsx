@@ -37,7 +37,7 @@ function montarEntradas(cases, tipoResolvido) {
       for (const bloco of c.blocos ?? []) {
         const blocoCapa = bloco.imagem_timeline || bloco.imagem_capa
         const blocoData = bloco.Data || c.Data
-        if (bloco.__component === 'blocks.subcase' && bloco.ancora_id && blocoCapa) {
+        if (bloco.__component === 'blocks.subcase' && bloco.ancora_id && blocoCapa && bloco.visivel !== false) {
           entradas.push({
             id:          `${c.id}-${bloco.ancora_id}`,
             label:       blocoData ? new Date(blocoData).getFullYear() : null,
@@ -51,7 +51,7 @@ function montarEntradas(cases, tipoResolvido) {
             agenciaNome: null,
           })
         }
-        if (bloco.__component === 'blocks.video' && bloco.ir_para_timeline && bloco.ancora_id) {
+        if (bloco.__component === 'blocks.video' && bloco.ir_para_timeline && bloco.ancora_id && bloco.visivel !== false) {
           const videoCapa = bloco.imagem_timeline || bloco.capa
           if (!videoCapa) continue
           entradas.push({
@@ -92,7 +92,7 @@ function montarEntradas(cases, tipoResolvido) {
       ordemSub,
     })
     for (const bloco of c.blocos ?? []) {
-      if (bloco.__component === 'blocks.subtitulo' && bloco.timeline && bloco.timeline_data) {
+      if (bloco.__component === 'blocks.subtitulo' && bloco.timeline && bloco.timeline_data && bloco.visivel !== false) {
         entradas.push({
           id:          `${c.id}-sub-${bloco.id}`,
           label:       tipoResolvido === 'marca'
@@ -109,7 +109,7 @@ function montarEntradas(cases, tipoResolvido) {
           ordemSub,
         })
       }
-      if (bloco.__component === 'blocks.subcase' && bloco.ancora_id) {
+      if (bloco.__component === 'blocks.subcase' && bloco.ancora_id && bloco.visivel !== false) {
         const blocoCapa = bloco.imagem_timeline || bloco.imagem_capa
         if (!blocoCapa) continue
         const blocoData = bloco.Data ? new Date(bloco.Data) : (c.Data ? new Date(c.Data) : new Date(0))
@@ -129,7 +129,7 @@ function montarEntradas(cases, tipoResolvido) {
           ordemSub,
         })
       }
-      if (bloco.__component === 'blocks.video' && bloco.ir_para_timeline && bloco.ancora_id) {
+      if (bloco.__component === 'blocks.video' && bloco.ir_para_timeline && bloco.ancora_id && bloco.visivel !== false) {
         const videoCapa = bloco.imagem_timeline || bloco.capa
         if (!videoCapa) continue
         entradas.push({

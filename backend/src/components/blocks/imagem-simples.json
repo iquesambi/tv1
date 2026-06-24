@@ -3,6 +3,7 @@
   "info": { "displayName": "Imagem Simples", "icon": "picture" },
   "attributes": {
     "imagem": { "type": "media", "multiple": false, "required": true, "allowedTypes": ["images"] },
-    "legenda": { "type": "string" }
+    "legenda": { "type": "string" },
+    "visivel": { "type": "boolean", "default": true }
   }
 }

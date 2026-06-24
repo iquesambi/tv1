@@ -91,7 +91,7 @@ async function construirEntradas() {
     // Subtítulos/subcases com dados próprios de timeline aparecem como
     // entradas adicionais, na mesma categoria (especialidade) do case-pai.
     for (const bloco of c.blocos ?? []) {
-      if (bloco.__component === 'blocks.subtitulo' && bloco.timeline && bloco.timeline_data) {
+      if (bloco.__component === 'blocks.subtitulo' && bloco.timeline && bloco.timeline_data && bloco.visivel !== false) {
         entradas.push({
           id:            `${c.id}-sub-${bloco.id}`,
           ancora,
@@ -108,7 +108,7 @@ async function construirEntradas() {
           agenciaNome:   c.agencia?.nome ?? null,
         })
       }
-      if (bloco.__component === 'blocks.subcase' && bloco.ancora_id) {
+      if (bloco.__component === 'blocks.subcase' && bloco.ancora_id && bloco.visivel !== false) {
         const blocoCapa = bloco.imagem_timeline || bloco.imagem_capa
         if (!blocoCapa) continue
         entradas.push({
@@ -127,7 +127,7 @@ async function construirEntradas() {
           agenciaNome:   c.agencia?.nome ?? null,
         })
       }
-      if (bloco.__component === 'blocks.video' && bloco.ir_para_timeline && bloco.ancora_id) {
+      if (bloco.__component === 'blocks.video' && bloco.ir_para_timeline && bloco.ancora_id && bloco.visivel !== false) {
         const videoCapa = bloco.imagem_timeline || bloco.capa
         if (!videoCapa) continue
         entradas.push({

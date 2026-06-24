@@ -7,6 +7,7 @@
     "capa": { "type": "media", "multiple": false, "required": false, "allowedTypes": ["images"] },
     "ir_para_timeline": { "type": "boolean", "default": false },
     "ancora_id": { "type": "string" },
-    "imagem_timeline": { "type": "media", "multiple": false, "required": false, "allowedTypes": ["images"] }
+    "imagem_timeline": { "type": "media", "multiple": false, "required": false, "allowedTypes": ["images"] },
+    "visivel": { "type": "boolean", "default": true }
   }
 }

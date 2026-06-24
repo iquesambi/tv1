@@ -7,6 +7,7 @@
     "timeline": { "type": "boolean", "default": false },
     "timeline_nome": { "type": "string" },
     "timeline_data": { "type": "date" },
-    "timeline_capa": { "type": "media", "multiple": false, "allowedTypes": ["images"] }
+    "timeline_capa": { "type": "media", "multiple": false, "allowedTypes": ["images"] },
+    "visivel": { "type": "boolean", "default": true }
   }
 }
