@@ -82,7 +82,7 @@ async function construirEntradas() {
       label,
       ordemSub,
       data:          c.Data ? new Date(c.Data) : new Date(0),
-      nome:          c.titulo,
+      nome:          c.titulo_timeline || c.titulo,
       capa:          c.imagem_timeline || c.imagem_capa,
       href:          clienteSlug && caseSlug ? `/${clienteSlug}/${caseSlug}` : `/${caseSlug}`,
       agenciaLogo:   c.agencia?.logo ?? null,
@@ -118,7 +118,7 @@ async function construirEntradas() {
           label,
           ordemSub,
           data:          bloco.Data ? new Date(bloco.Data) : (c.Data ? new Date(c.Data) : new Date(0)),
-          nome:          bloco.titulo,
+          nome:          bloco.titulo_timeline || bloco.titulo,
           capa:          blocoCapa,
           href:          clienteSlug && caseSlug
             ? `/${clienteSlug}/${caseSlug}#${bloco.ancora_id}`

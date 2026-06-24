@@ -15,6 +15,9 @@
       "type": "string",
       "required": true
     },
+    "titulo_timeline": {
+      "type": "string"
+    },
     "slug": {
       "type": "uid",
       "targetField": "titulo",

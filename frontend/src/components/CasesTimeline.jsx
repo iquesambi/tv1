@@ -26,7 +26,7 @@ function montarEntradas(cases, tipoResolvido) {
           id:          `${c.id}-main`,
           label:       c.Data ? new Date(c.Data).getFullYear() : null,
           data:        c.Data ? new Date(c.Data) : new Date(0),
-          nome:        c.titulo || '',
+          nome:        c.titulo_timeline || c.titulo || '',
           capa:        imgTimeline,
           href:        clienteSlug && caseSlug ? `/${clienteSlug}/${caseSlug}` : `/${caseSlug ?? ''}`,
           clicavel:    c.clicavel !== 'não clicável',
@@ -42,7 +42,7 @@ function montarEntradas(cases, tipoResolvido) {
             id:          `${c.id}-${bloco.ancora_id}`,
             label:       blocoData ? new Date(blocoData).getFullYear() : null,
             data:        blocoData ? new Date(blocoData) : new Date(0),
-            nome:        bloco.titulo || '',
+            nome:        bloco.titulo_timeline || bloco.titulo || '',
             capa:        blocoCapa,
             href:        clienteSlug && caseSlug
               ? `/${clienteSlug}/${caseSlug}#${bloco.ancora_id}`
@@ -83,7 +83,7 @@ function montarEntradas(cases, tipoResolvido) {
         ? (c.Data ? new Date(c.Data).getFullYear() : null)
         : (c.sub_especialidade?.nome || ''),
       data:        c.Data ? new Date(c.Data) : new Date(0),
-      nome:        c.titulo,
+      nome:        c.titulo_timeline || c.titulo,
       capa:        c.imagem_timeline || c.imagem_capa,
       href:        clienteSlug && caseSlug ? `/${clienteSlug}/${caseSlug}` : `/${caseSlug}`,
       clicavel:    c.clicavel !== 'não clicável',
@@ -119,7 +119,7 @@ function montarEntradas(cases, tipoResolvido) {
             ? blocoData.getFullYear()
             : (c.sub_especialidade?.nome || ''),
           data:        blocoData,
-          nome:        bloco.titulo,
+          nome:        bloco.titulo_timeline || bloco.titulo,
           capa:        blocoCapa,
           href:        clienteSlug && caseSlug
             ? `/${clienteSlug}/${caseSlug}#${bloco.ancora_id}`
