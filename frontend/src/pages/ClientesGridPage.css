@@ -7,6 +7,8 @@
   height: 100vh;
   overflow: hidden;
   position: relative;
+  display: flex;
+  flex-direction: column;
 }
 
 .clientes-grid-page .page-header {
@@ -23,15 +25,12 @@
 /* ── MAIN ─────────────────────────────── */
 
 .clientes-grid-main {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  left: 0;
-  right: 0;
-  padding: 0 80px;
+  margin: auto 0;
+  padding: 24px 80px;
   display: flex;
   flex-direction: column;
-  gap: 56px;
+  gap: var(--row-gap, 56px);
+  min-height: 0;
 }
 
 /* ── LINHA ────────────────────────────── */
@@ -50,7 +49,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 72px;
+  height: var(--item-h, 72px);
   transition: opacity 0.2s ease;
   text-decoration: none;
 }

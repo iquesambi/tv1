@@ -75,23 +75,28 @@ async function construirEntradas() {
     }
     const ordemSub = c.sub_especialidade?.ordem ?? 9999
     const label    = c.sub_especialidade?.nome || secaoLabel
-    entradas.push({
-      id:            `${c.id}-main`,
-      ancora,
-      subEspAncora:  c.sub_especialidade?.slug || null,
-      label,
-      ordemSub,
-      data:          c.Data ? new Date(c.Data) : new Date(0),
-      nome:          c.titulo_timeline || c.titulo,
-      capa:          c.imagem_timeline || c.imagem_capa,
-      href:          clienteSlug && caseSlug ? `/${clienteSlug}/${caseSlug}` : `/${caseSlug}`,
-      agenciaLogo:   c.agencia?.logo ?? null,
-      agenciaNome:   c.agencia?.nome ?? null,
-    })
+    const capaPrincipal = c.imagem_timeline || c.imagem_capa
+    if (capaPrincipal) {
+      entradas.push({
+        id:            `${c.id}-main`,
+        ancora,
+        subEspAncora:  c.sub_especialidade?.slug || null,
+        label,
+        ordemSub,
+        data:          c.Data ? new Date(c.Data) : new Date(0),
+        nome:          c.titulo_timeline || c.titulo,
+        capa:          capaPrincipal,
+        href:          clienteSlug && caseSlug ? `/${clienteSlug}/${caseSlug}` : `/${caseSlug}`,
+        agenciaLogo:   c.agencia?.logo ?? null,
+        agenciaNome:   c.agencia?.nome ?? null,
+      })
+    }
     // Subtítulos/subcases com dados próprios de timeline aparecem como
     // entradas adicionais, na mesma categoria (especialidade) do case-pai.
     for (const bloco of c.blocos ?? []) {
       if (bloco.__component === 'blocks.subtitulo' && bloco.timeline && bloco.timeline_data && bloco.visivel !== false) {
+        const subtituloCapa = bloco.timeline_capa || c.imagem_capa
+        if (!subtituloCapa) continue
         entradas.push({
           id:            `${c.id}-sub-${bloco.id}`,
           ancora,
@@ -100,7 +105,7 @@ async function construirEntradas() {
           ordemSub,
           data:          new Date(bloco.timeline_data),
           nome:          bloco.timeline_nome || bloco.texto,
-          capa:          bloco.timeline_capa || c.imagem_capa,
+          capa:          subtituloCapa,
           href:          clienteSlug && caseSlug
             ? `/${clienteSlug}/${caseSlug}#${bloco.ancora_id ?? ''}`
             : `/${caseSlug}#${bloco.ancora_id ?? ''}`,

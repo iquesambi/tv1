@@ -1,8 +1,12 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import axios from 'axios'
 import { useGoTo } from '../transition.jsx'
 import PageHeader from '../components/PageHeader.jsx'
 import './ClientesGridPage.css'
+
+const BASE_ITEM_H = 72
+const BASE_ROW_GAP = 56
+const MIN_SCALE = 0.45
 
 const STRAPI = 'https://tv1-53ev.onrender.com'
 const api = (path) => axios.get(`${STRAPI}/api/${path}`).then(r => r.data.data).catch(() => null)
@@ -28,13 +32,26 @@ function logoImgStyle(logo, escala = 1) {
 export default function ClientesGridPage() {
   const [clientes, setClientes] = useState(null)
   const [logo, setLogo]         = useState(null)
+  const [vh, setVh]             = useState(() => window.innerHeight)
+  const headerRef = useRef(null)
+  const [headerH, setHeaderH] = useState(0)
   const goTo = useGoTo()
 
   useEffect(() => {
-    api('clientes?sort=nome:asc&populate[logo]=true&populate[cases][fields][0]=id').then(setClientes)
+    api('clientes?sort=nome:asc&populate[logo]=true&populate[cases][fields][0]=id&pagination[pageSize]=200').then(setClientes)
     api('logo-site?populate=logo').then(setLogo)
     document.body.classList.remove('scroll-locked')
   }, [])
+
+  useEffect(() => {
+    const onResize = () => setVh(window.innerHeight)
+    window.addEventListener('resize', onResize)
+    return () => window.removeEventListener('resize', onResize)
+  }, [])
+
+  useEffect(() => {
+    if (headerRef.current) setHeaderH(headerRef.current.getBoundingClientRect().height)
+  }, [clientes, vh])
 
   if (!clientes) return (
     <div className="clientes-grid-page clientes-grid-page--loading">
@@ -56,24 +73,35 @@ export default function ClientesGridPage() {
     idx += size
   }
 
+  // Reduz o tamanho dos logos/espaçamento entre linhas pra caber tudo na
+  // tela sem scroll, quando o número de linhas exige mais altura que a
+  // disponível (header + paddings descontados).
+  const disponivel  = Math.max(0, vh - headerH - 48)
+  const alturaNatural = numRows * BASE_ITEM_H + (numRows - 1) * BASE_ROW_GAP
+  const escalaLinha = headerH ? Math.max(MIN_SCALE, Math.min(1, disponivel / alturaNatural)) : 1
+  const itemH  = Math.round(BASE_ITEM_H * escalaLinha)
+  const rowGap = Math.round(BASE_ROW_GAP * escalaLinha)
+
   return (
     <div className="clientes-grid-page">
-      <PageHeader
-        logoUrl={mediaUrl(logo?.logo)}
-        label="Clientes"
-        onLogoClick={() => goTo('/')}
-        mobileMenuLogo={logo?.logo}
-      />
+      <div ref={headerRef}>
+        <PageHeader
+          logoUrl={mediaUrl(logo?.logo)}
+          label="Clientes"
+          onLogoClick={() => goTo('/')}
+          mobileMenuLogo={logo?.logo}
+        />
+      </div>
 
       <h1 className="clientes-grid-titulo-mobile">Clientes</h1>
 
-      <main className="clientes-grid-main">
+      <main className="clientes-grid-main" style={{ '--row-gap': `${rowGap}px`, '--item-h': `${itemH}px` }}>
         {rows.map((row, r) => (
           <div key={r} className="clientes-grid-row">
             {row.map((c, j) => {
               const temCase = c.cases?.length > 0
               const inner = c.logo
-                ? <img src={mediaUrl(c.logo)} alt={c.nome} style={logoImgStyle(c.logo, (c.escala_logo || 1) * 1.2)} />
+                ? <img src={mediaUrl(c.logo)} alt={c.nome} style={logoImgStyle(c.logo, (c.escala_logo || 1) * 1.2 * escalaLinha)} />
                 : <span className="clientes-grid-fallback">{c.nome}</span>
               return temCase ? (
                 <a key={j} href={`/${c.slug}`} className="clientes-grid-item" onClick={e => { e.preventDefault(); goTo(`/${c.slug}`) }}>

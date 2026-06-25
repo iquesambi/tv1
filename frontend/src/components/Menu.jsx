@@ -203,6 +203,15 @@ function submenuFontSizeFor(vw) {
 const MAX_NATURAL = 20
 const TARGET_H    = 21.6
 
+// Ajuste visual fino: a wordmark do x.lab tem o "x" (elemento dominante)
+// ocupando só a parte de baixo do SVG (as hastes do "l"/"b" sobem até o
+// topo, deixando espaço vazio acima do "x"), então o centro ótico fica
+// mais baixo que o centro geométrico da caixa — empurra alguns px pra cima
+// pra compensar.
+function logoNudgeY(nome) {
+  return nome === 'x.lab' ? -3 : 0
+}
+
 function AgenciaLogos({ agencias, className, goTo }) {
   return (
     <div className={className}>
@@ -214,7 +223,8 @@ function AgenciaLogos({ agencias, className, goTo }) {
         const url = a.url_externa || null
         const isInterno = url?.startsWith('/')
         const novaAba = !isInterno && a.abrir_nova_aba !== false
-        const img = <img src={mediaUrl(a.logo)} alt={a.nome} style={{ height: renderH, width: renderW }} />
+        const nudge = logoNudgeY(a.nome)
+        const img = <img src={mediaUrl(a.logo)} alt={a.nome} style={{ height: renderH, width: renderW, transform: nudge ? `translateY(${nudge}px)` : undefined }} />
         return url ? (
           <a
             key={i}
@@ -936,7 +946,7 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
             <div className="home__menu-mobile__marcas">
               {agencias?.filter(a => a.logo).map((a, i) => (
                 <a key={i} href={externalUrl(a.url_externa)} target={!a.url_externa?.startsWith('/') && a.abrir_nova_aba !== false ? '_blank' : undefined} rel={!a.url_externa?.startsWith('/') && a.abrir_nova_aba !== false ? 'noreferrer' : undefined} onClick={a.url_externa?.startsWith('/') ? (e) => { e.preventDefault(); goTo(a.url_externa) } : undefined}>
-                  <img src={mediaUrl(a.logo)} alt={a.nome} />
+                  <img src={mediaUrl(a.logo)} alt={a.nome} style={logoNudgeY(a.nome) ? { transform: `translateY(${logoNudgeY(a.nome)}px)` } : undefined} />
                 </a>
               ))}
             </div>
@@ -1006,7 +1016,7 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
           <div className="home__menu-mobile__marcas">
             {agencias?.filter(a => a.logo).map((a, i) => (
               <a key={i} href={externalUrl(a.url_externa)} target={a.abrir_nova_aba !== false ? '_blank' : undefined} rel={a.abrir_nova_aba !== false ? 'noreferrer' : undefined}>
-                <img src={mediaUrl(a.logo)} alt={a.nome} />
+                <img src={mediaUrl(a.logo)} alt={a.nome} style={logoNudgeY(a.nome) ? { transform: `translateY(${logoNudgeY(a.nome)}px)` } : undefined} />
               </a>
             ))}
           </div>

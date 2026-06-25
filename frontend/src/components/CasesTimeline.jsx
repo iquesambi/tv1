@@ -77,22 +77,27 @@ function montarEntradas(cases, tipoResolvido) {
     const clienteSlug = c.cliente?.slug
     const caseSlug    = c.slug
     const ordemSub    = c.sub_especialidade?.ordem ?? 9999
-    entradas.push({
-      id:          `${c.id}-main`,
-      label:       tipoResolvido === 'marca'
-        ? (c.Data ? new Date(c.Data).getFullYear() : null)
-        : (c.sub_especialidade?.nome || ''),
-      data:        c.Data ? new Date(c.Data) : new Date(0),
-      nome:        c.titulo_timeline || c.titulo,
-      capa:        c.imagem_timeline || c.imagem_capa,
-      href:        clienteSlug && caseSlug ? `/${clienteSlug}/${caseSlug}` : `/${caseSlug}`,
-      clicavel:    c.clicavel !== 'não clicável',
-      agenciaLogo: c.agencia?.logo ?? null,
-      agenciaNome: c.agencia?.nome ?? null,
-      ordemSub,
-    })
+    const capaPrincipal = c.imagem_timeline || c.imagem_capa
+    if (capaPrincipal) {
+      entradas.push({
+        id:          `${c.id}-main`,
+        label:       tipoResolvido === 'marca'
+          ? (c.Data ? new Date(c.Data).getFullYear() : null)
+          : (c.sub_especialidade?.nome || ''),
+        data:        c.Data ? new Date(c.Data) : new Date(0),
+        nome:        c.titulo_timeline || c.titulo,
+        capa:        capaPrincipal,
+        href:        clienteSlug && caseSlug ? `/${clienteSlug}/${caseSlug}` : `/${caseSlug}`,
+        clicavel:    c.clicavel !== 'não clicável',
+        agenciaLogo: c.agencia?.logo ?? null,
+        agenciaNome: c.agencia?.nome ?? null,
+        ordemSub,
+      })
+    }
     for (const bloco of c.blocos ?? []) {
       if (bloco.__component === 'blocks.subtitulo' && bloco.timeline && bloco.timeline_data && bloco.visivel !== false) {
+        const subtituloCapa = bloco.timeline_capa || c.imagem_capa
+        if (!subtituloCapa) continue
         entradas.push({
           id:          `${c.id}-sub-${bloco.id}`,
           label:       tipoResolvido === 'marca'
@@ -100,7 +105,7 @@ function montarEntradas(cases, tipoResolvido) {
             : (c.sub_especialidade?.nome || ''),
           data:        new Date(bloco.timeline_data),
           nome:        bloco.timeline_nome || bloco.texto,
-          capa:        bloco.timeline_capa || c.imagem_capa,
+          capa:        subtituloCapa,
           href:        clienteSlug && caseSlug
             ? `/${clienteSlug}/${caseSlug}#${bloco.ancora_id ?? ''}`
             : `/${caseSlug}#${bloco.ancora_id ?? ''}`,
