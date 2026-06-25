@@ -338,7 +338,7 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
     api('redes-sociais?populate[redes][populate]=icone').then(setRedes)
     api('quarenta-anos?populate=imagem').then(r => { if (isHome) setQA(r); else setQA(r) })
     api('pessoas?filters[ativo][$eq]=true&populate=foto&sort=ordem').then(setEquipe)
-    api('clientes?sort=nome:asc&populate[logo]=true&populate[cases][fields][0]=id').then(data => {
+    api('clientes?sort=posicao:asc,nome:asc&populate[logo]=true&populate[cases][fields][0]=id').then(data => {
       setClientes(data)
       // Pré-carrega logos para evitar flash na abertura do submenu
       if (Array.isArray(data)) {

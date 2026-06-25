@@ -42,6 +42,11 @@
       "default": 1,
       "min": 0.3,
       "max": 3
+    },
+    "posicao": {
+      "type": "integer",
+      "default": 9999,
+      "min": 1
     }
   }
 }
