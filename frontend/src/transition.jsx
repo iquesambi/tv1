@@ -30,6 +30,10 @@ export function TransitionProvider({ children }) {
     setAtiva(true)
     timer.current = setTimeout(() => {
       navigate(path, state ? { state } : undefined)
+      // Sem isso, navegar pra uma rota que já é a atual (ex: clicar em
+      // "Pessoas" estando em /pessoas) não remonta a página e a posição de
+      // scroll antiga fica — o usuário espera voltar pro topo.
+      window.scrollTo(0, 0)
       setAtiva(false)
       if (onNavigated) onNavigated()
     }, 560)
@@ -90,6 +94,9 @@ export function TransitionProvider({ children }) {
             if (e.target.currentTime >= 4.9) {
               e.target.pause()
               navigate('/quarenta-anos')
+              // Clicar na câmera estando já em /quarenta-anos não remonta a
+              // página — sem isso, ficava na mesma posição de scroll antiga.
+              window.scrollTo(0, 0)
               const remove = () => {
                 window.removeEventListener('qa-page-ready', remove)
                 clearTimeout(fallback)

@@ -87,7 +87,6 @@ export default function ClientesGridPage() {
       <div ref={headerRef}>
         <PageHeader
           logoUrl={mediaUrl(logo?.logo)}
-          label="Clientes"
           onLogoClick={() => goTo('/')}
           mobileMenuLogo={logo?.logo}
         />
@@ -101,7 +100,11 @@ export default function ClientesGridPage() {
             {row.map((c, j) => {
               const temCase = c.cases?.length > 0
               const inner = c.logo
-                ? <img src={mediaUrl(c.logo)} alt={c.nome} style={logoImgStyle(c.logo, (c.escala_logo || 1) * 1.2 * escalaLinha)} />
+                ? <img
+                    src={mediaUrl(c.logo)}
+                    alt={c.nome}
+                    style={{ ...logoImgStyle(c.logo, (c.escala_logo || 1) * 1.2 * escalaLinha), '--logo-escala-mobile': c.escala_logo_mobile || 1 }}
+                  />
                 : <span className="clientes-grid-fallback">{c.nome}</span>
               return temCase ? (
                 <a key={j} href={`/${c.slug}`} className="clientes-grid-item" onClick={e => { e.preventDefault(); goTo(`/${c.slug}`) }}>

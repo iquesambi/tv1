@@ -542,6 +542,15 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
 
   const isMobile = () => window.innerWidth <= 768
 
+  // No rodapé (!isHome), o submenu assume que a página já está scrollada até
+  // o fim — abrir com a página no meio causa o overlay sobrepondo o conteúdo
+  // acima do rodapé. Garante o scroll completo antes de abrir.
+  const abrirSubmenu = (i) => {
+    if (!isHome) window.scrollTo(0, document.body.scrollHeight)
+    setAberto(i)
+    setHoveredSub(null)
+  }
+
   const handleLink = (e, i, link) => {
     e.preventDefault()
     e.stopPropagation()
@@ -558,7 +567,10 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
 
     if (isMobile()) {
       if (link.url && link.url !== '#') { goTo(link.url); return }
-      if (sublinks.length > 0) { setAberto(aberto === i ? null : i); setHoveredSub(null) }
+      if (sublinks.length > 0) {
+        if (aberto === i) { setAberto(null); setHoveredSub(null) }
+        else abrirSubmenu(i)
+      }
       return
     }
     // Desktop: sem sublinks → navega direto; com sublinks → toggle submenu
@@ -567,7 +579,7 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
       return
     }
     if (aberto === i) { setAberto(null); setHoveredSub(null) }
-    else { setAberto(i); setHoveredSub(null) }
+    else abrirSubmenu(i)
   }
 
   // Renderização do submenu — compartilhada (já usa classes home__submenu em ambos os contextos)
@@ -639,7 +651,7 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
                       onClick={handleSubClick({ url: `/${c.slug}` })}
                     >
                       {c.logo
-                        ? <img src={mediaUrl(c.logo)} alt={c.nome} style={logoImgStyle(c.logo, c.escala_logo)} />
+                        ? <img src={mediaUrl(c.logo)} alt={c.nome} style={{ ...logoImgStyle(c.logo, c.escala_logo), '--logo-escala-mobile': c.escala_logo_mobile || 1 }} />
                         : <span className="home__submenu-logo-fallback">{c.nome}</span>
                       }
                     </a>
@@ -649,7 +661,7 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
                       className="home__submenu-logo-item home__submenu-logo-item--sem-case"
                     >
                       {c.logo
-                        ? <img src={mediaUrl(c.logo)} alt={c.nome} style={logoImgStyle(c.logo, c.escala_logo)} />
+                        ? <img src={mediaUrl(c.logo)} alt={c.nome} style={{ ...logoImgStyle(c.logo, c.escala_logo), '--logo-escala-mobile': c.escala_logo_mobile || 1 }} />
                         : <span className="home__submenu-logo-fallback">{c.nome}</span>
                       }
                     </div>

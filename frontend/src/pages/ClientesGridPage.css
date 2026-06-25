@@ -129,8 +129,8 @@ a.clientes-grid-item:hover {
   }
 
   .clientes-grid-item img {
-    max-height: 26px !important;
-    max-width: 80px !important;
+    max-height: calc(26px * var(--logo-escala-mobile, 1)) !important;
+    max-width: calc(80px * var(--logo-escala-mobile, 1)) !important;
     width: auto !important;
     height: auto !important;
   }

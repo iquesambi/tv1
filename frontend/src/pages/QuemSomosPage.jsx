@@ -84,7 +84,6 @@ export default function QuemSomosPage() {
       <div className="qs-dobra">
         <PageHeader
           logoUrl={mediaUrl(logo?.logo)}
-          label="Quem somos"
           onLogoClick={() => footerRef.current?.scrollIntoView({ behavior: 'smooth' })}
           mobileMenuLogo={logo?.logo}
         />

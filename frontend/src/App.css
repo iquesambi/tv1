@@ -69,6 +69,15 @@ body.camera-ativa .footer-branco > * {
   transition: opacity 0.2s ease;
 }
 
+/* O .footer-branco fica transparente, mas o fundo branco da PÁGINA em volta
+   dele (case-page, cases-timeline, clientes-grid-page, etc.) continua opaco
+   e cobre o preto do body. Toda página é filha direta de #root (ao lado do
+   vídeo e da cartela de transição), então isso cobre qualquer página atual
+   ou futura sem precisar remendar o CSS de cada uma. */
+body.camera-ativa #root > *:not(.cartela):not(.camera-overlay-video) {
+  background: transparent !important;
+}
+
 /* ── BACKGROUND POR LINK ──────────────── */
 
 .home__bg {
@@ -852,7 +861,7 @@ body.camera-ativa .footer-branco > * {
 
   .home__submenu-logo-item img {
     max-width: 80%;
-    max-height: 32px !important;
+    max-height: calc(32px * var(--logo-escala-mobile, 1)) !important;
     height: auto !important;
     width: auto;
     object-fit: contain;

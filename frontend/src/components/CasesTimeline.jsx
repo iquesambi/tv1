@@ -581,10 +581,17 @@ export default function CasesTimeline({
         sets.forEach(s => { s.style.width = `${currentOneSet}px` })
         const firstSetCards = cards.slice(0, n)
         const grupos = gruposDeLabels(entradas)
+        // .timeline__labels-track começa mais pra direita que .cliente-track
+        // (padding-left do .timeline__labels-viewport, que os cards não têm)
+        // — sem compensar isso, os labels ficam sempre alguns px à direita
+        // do card que deveriam centralizar. Os dois rects já refletem o
+        // transform atual, então a diferença cancela o scroll e sobra só o
+        // offset estrutural.
+        const offsetPx = timelineTrackRef.current.getBoundingClientRect().left - track.getBoundingClientRect().left
         setLabels(grupos.map(g => {
           const card   = firstSetCards[g.indices[0]]
           const center = card ? card.offsetLeft + card.offsetWidth / 2 : 0
-          return { label: g.label, pos: (center / currentOneSet) * 100, cardIdx: g.indices[0] }
+          return { label: g.label, pos: ((center - offsetPx) / currentOneSet) * 100, cardIdx: g.indices[0] }
         }))
       } else if (!usaCarrossel) {
         const grupos = gruposDeLabels(entradas)
