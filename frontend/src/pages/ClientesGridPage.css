@@ -111,7 +111,7 @@ a.clientes-grid-item:hover {
     flex: 1;
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    align-content: center;
+    align-content: start;
     justify-content: center;
     justify-items: center;
     gap: 36px 12px;
