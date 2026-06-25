@@ -92,8 +92,6 @@ export default function ClientesGridPage() {
         />
       </div>
 
-      <h1 className="clientes-grid-titulo-mobile">Clientes</h1>
-
       <main className="clientes-grid-main" style={{ '--row-gap': `${rowGap}px`, '--item-h': `${itemH}px` }}>
         {rows.map((row, r) => (
           <div key={r} className="clientes-grid-row">
