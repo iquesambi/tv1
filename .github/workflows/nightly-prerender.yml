@@ -5,6 +5,13 @@ on:
     - cron: '0 2 * * *'
   workflow_dispatch:
 
+# Garante que só um deploy roda por vez — disparos manuais em sequência rápida
+# criavam versões concorrentes que disputavam pra "liberar" no canal live,
+# causando o erro "supplied version is the current active version".
+concurrency:
+  group: firebase-hosting-deploy
+  cancel-in-progress: false
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
