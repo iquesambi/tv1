@@ -16,7 +16,6 @@ import OutrosAssuntosPage from './pages/OutrosAssuntosPage.jsx'
 import QuemSomosPage from './pages/QuemSomosPage.jsx'
 import SejaClientePage from './pages/SejaClientePage.jsx'
 import ClientesGridPage from './pages/ClientesGridPage.jsx'
-import TesteDeployPage from './pages/TesteDeployPage.jsx'
 import { TransitionProvider } from './transition.jsx'
 
 createRoot(document.getElementById('root')).render(
@@ -36,7 +35,6 @@ createRoot(document.getElementById('root')).render(
           <Route path="/quarenta-anos" element={<QuarentaAnosPage />} />
           <Route path="/cases" element={<CasesPage />} />
           <Route path="/cases/:especialidade" element={<EspecialidadePage />} />
-          <Route path="/teste-deploy" element={<TesteDeployPage />} />
           <Route path="/:slug" element={<SlugRouter />} />
           <Route path="/:slug/:case" element={<CasePage />} />
         </Routes>
