@@ -154,8 +154,10 @@ export default function QuarentaAnosPage() {
         </div>
       </section>
 
-      {/* CASES */}
-      <CasesTimeline conteudo="quarentaAnos" contexto="pagina" tema="escuro" proporcaoNatural />
+      {/* CASES — escondida quando "mostrar_timeline" está desligado no CMS */}
+      {data?.mostrar_timeline !== false && (
+        <CasesTimeline conteudo="quarentaAnos" contexto="pagina" tema="escuro" proporcaoNatural />
+      )}
 
       <Menu />
 
