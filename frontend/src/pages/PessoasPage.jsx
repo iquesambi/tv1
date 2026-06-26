@@ -11,6 +11,22 @@ const mediaUrl = (obj) => !obj?.url ? null : obj.url.startsWith("http") ? obj.ur
 
 const LS_KEY = 'tv1-pessoas'
 
+// O CMS aceita o enquadramento da foto em português; o CSS object-position
+// só entende os termos em inglês. Traduz aqui pra não depender de quem
+// preenche o campo lembrar de escrever em inglês.
+const OBJECT_POSITION_MAP = {
+  topo: 'top',
+  base: 'bottom',
+  centro: 'center',
+  esquerda: 'left',
+  direita: 'right',
+}
+const objectPositionFor = (valor) => {
+  if (!valor) return 'center'
+  const chave = valor.trim().toLowerCase()
+  return OBJECT_POSITION_MAP[chave] ?? valor
+}
+
 export const slugify = (str) => str.toLowerCase()
   .normalize('NFD').replace(/[̀-ͯ]/g, '')
   .replace(/[^a-z0-9]+/g, '-')
@@ -98,7 +114,7 @@ export default function PessoasPage() {
             >
               {foto && (
                 <div className="pessoa-foto pessoa-foto--landscape">
-                  <img src={mediaUrl(foto)} alt={m.nome} style={{ objectPosition: m.posicao_foto ?? 'center' }} />
+                  <img src={mediaUrl(foto)} alt={m.nome} style={{ objectPosition: objectPositionFor(m.posicao_foto) }} />
                 </div>
               )}
               <div className="pessoa-texto">
