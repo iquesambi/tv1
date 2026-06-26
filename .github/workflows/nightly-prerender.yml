@@ -22,6 +22,12 @@ jobs:
       - name: Build frontend
         run: cd frontend && npm run build
 
+      - name: Debug - show service account email (temporary, safe to remove)
+        run: |
+          echo "${{ secrets.FIREBASE_SERVICE_ACCOUNT_TV1_SITE }}" > /tmp/sa.json
+          node -e "console.log('client_email:', JSON.parse(require('fs').readFileSync('/tmp/sa.json','utf8')).client_email)"
+          rm /tmp/sa.json
+
       - name: Deploy to Firebase
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
