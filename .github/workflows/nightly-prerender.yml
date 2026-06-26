@@ -29,11 +29,30 @@ jobs:
       - name: Build frontend
         run: cd frontend && npm run build
 
+      # Deploy direto pelo CLI em vez da action wrapper. A rede do runner às
+      # vezes derruba a conexão ("premature close error") e o firebase-tools
+      # repete o POST que publica a versão. A 1ª tentativa já publicou com
+      # sucesso, então a repetição falha com "is the current active version"
+      # (HTTP 400) — um erro benigno que fazia o deploy aparecer como falho
+      # mesmo tendo dado certo. Aqui tratamos esse caso específico como sucesso.
+      - name: Write service account key
+        run: printf '%s' '${{ secrets.FIREBASE_SERVICE_ACCOUNT_TV1_SITE }}' > "$RUNNER_TEMP/firebase-sa.json"
+
       - name: Deploy to Firebase
-        uses: FirebaseExtended/action-hosting-deploy@v0
-        with:
-          repoToken: ${{ secrets.GITHUB_TOKEN }}
-          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_TV1_SITE }}
-          projectId: tv1-site
-          channelId: live
-          entryPoint: ./frontend
+        working-directory: ./frontend
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ runner.temp }}/firebase-sa.json
+        run: |
+          set +e
+          OUTPUT=$(npx firebase-tools@latest deploy --only hosting --project tv1-site 2>&1)
+          CODE=$?
+          echo "$OUTPUT"
+          if [ $CODE -ne 0 ] && echo "$OUTPUT" | grep -q "is the current active version"; then
+            echo "::notice::A versão já foi publicada com sucesso (erro benigno de repetição). Tratando como sucesso."
+            exit 0
+          fi
+          exit $CODE
+
+      - name: Remove service account key
+        if: always()
+        run: rm -f "$RUNNER_TEMP/firebase-sa.json"
