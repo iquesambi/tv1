@@ -38,6 +38,18 @@
       "default": 1,
       "min": 1
     },
+    "escala_logo": {
+      "type": "decimal",
+      "default": 1,
+      "min": 0.3,
+      "max": 3
+    },
+    "escala_logo_mobile": {
+      "type": "decimal",
+      "default": 1,
+      "min": 0.3,
+      "max": 3
+    },
     "cases": {
       "type": "relation",
       "relation": "oneToMany",

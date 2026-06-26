@@ -218,8 +218,9 @@ function AgenciaLogos({ agencias, className, goTo }) {
       {agencias?.filter(a => a.logo).map((a, i) => {
         const naturalH = a.logo.height || 17
         const naturalW = a.logo.width  || 60
-        const renderH  = Math.round(naturalH * (TARGET_H / MAX_NATURAL))
-        const renderW  = Math.round(naturalW * (TARGET_H / MAX_NATURAL))
+        const escala   = Math.max(0.3, Math.min(3, a.escala_logo || 1))
+        const renderH  = Math.round(naturalH * (TARGET_H / MAX_NATURAL) * escala)
+        const renderW  = Math.round(naturalW * (TARGET_H / MAX_NATURAL) * escala)
         const url = a.url_externa || null
         const isInterno = url?.startsWith('/')
         const novaAba = !isInterno && a.abrir_nova_aba !== false
@@ -958,7 +959,7 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
             <div className="home__menu-mobile__marcas">
               {agencias?.filter(a => a.logo).map((a, i) => (
                 <a key={i} href={externalUrl(a.url_externa)} target={!a.url_externa?.startsWith('/') && a.abrir_nova_aba !== false ? '_blank' : undefined} rel={!a.url_externa?.startsWith('/') && a.abrir_nova_aba !== false ? 'noreferrer' : undefined} onClick={a.url_externa?.startsWith('/') ? (e) => { e.preventDefault(); goTo(a.url_externa) } : undefined}>
-                  <img src={mediaUrl(a.logo)} alt={a.nome} style={logoNudgeY(a.nome) ? { transform: `translateY(${logoNudgeY(a.nome)}px)` } : undefined} />
+                  <img src={mediaUrl(a.logo)} alt={a.nome} style={{ '--logo-escala-mobile': a.escala_logo_mobile || 1, transform: logoNudgeY(a.nome) ? `translateY(${logoNudgeY(a.nome)}px)` : undefined }} />
                 </a>
               ))}
             </div>
@@ -1028,7 +1029,7 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
           <div className="home__menu-mobile__marcas">
             {agencias?.filter(a => a.logo).map((a, i) => (
               <a key={i} href={externalUrl(a.url_externa)} target={a.abrir_nova_aba !== false ? '_blank' : undefined} rel={a.abrir_nova_aba !== false ? 'noreferrer' : undefined}>
-                <img src={mediaUrl(a.logo)} alt={a.nome} style={logoNudgeY(a.nome) ? { transform: `translateY(${logoNudgeY(a.nome)}px)` } : undefined} />
+                <img src={mediaUrl(a.logo)} alt={a.nome} style={{ '--logo-escala-mobile': a.escala_logo_mobile || 1, transform: logoNudgeY(a.nome) ? `translateY(${logoNudgeY(a.nome)}px)` : undefined }} />
               </a>
             ))}
           </div>

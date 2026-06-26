@@ -613,7 +613,7 @@ body.camera-ativa #root > *:not(.cartela):not(.camera-overlay-video) {
 }
 
 .home__menu-mobile__marcas img {
-  height: 16px;
+  height: calc(16px * var(--logo-escala-mobile, 1));
   width: auto;
   max-width: 90%;
   object-fit: contain;
@@ -819,7 +819,7 @@ body.camera-ativa #root > *:not(.cartela):not(.camera-overlay-video) {
   }
 
   .home__marcas-mobile .home__menu-mobile__marcas img {
-    height: 14px;
+    height: calc(14px * var(--logo-escala-mobile, 1));
   }
 
   /* Câmera: contain no mobile pra não cortar */
