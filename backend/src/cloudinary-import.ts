@@ -31,6 +31,16 @@ function nomeFor(publicId: string, format: string) {
   return `${ultimo}.${format}`;
 }
 
+// O Strapi gera variações de tamanho de cada imagem e sobe cada uma como um
+// recurso separado no Cloudinary, com o public_id prefixado. Essas NÃO são
+// arquivos originais — na Media Library elas vivem dentro do campo `formats`
+// do original. Então ignoramos no import e podemos limpar as que já entraram.
+const PREFIXOS_VARIANTE = ['thumbnail_', 'small_', 'medium_', 'large_'];
+function ehVariante(publicId: string) {
+  const ultimo = (publicId.split('/').pop() || publicId).toLowerCase();
+  return PREFIXOS_VARIANTE.some((p) => ultimo.startsWith(p));
+}
+
 export async function importarCloudinary(ctx: any) {
   const tokenEsperado = process.env.CLOUDINARY_IMPORT_TOKEN;
 
@@ -44,6 +54,20 @@ export async function importarCloudinary(ctx: any) {
   }
 
   try {
+    // Modo limpeza: remove (só do Strapi, não do Cloudinary) as entradas de
+    // variação que entraram por engano. Uso: ...&modo=limpar-variantes
+    if (ctx.query.modo === 'limpar-variantes') {
+      let removidos = 0;
+      for (const p of PREFIXOS_VARIANTE) {
+        const r = await strapi.db
+          .query('plugin::upload.file')
+          .deleteMany({ where: { hash: { $startsWith: p } } });
+        removidos += r?.count ?? 0;
+      }
+      ctx.body = { modo: 'limpar-variantes', removidos };
+      return;
+    }
+
     cloudinary.config({
       cloud_name: process.env.CLOUDINARY_NAME,
       api_key: process.env.CLOUDINARY_KEY,
@@ -79,9 +103,14 @@ export async function importarCloudinary(ctx: any) {
     // 3. cria os que faltam
     let importados = 0;
     let pulados = 0;
+    let variantes = 0;
     const erros: string[] = [];
 
     for (const r of recursos) {
+      if (ehVariante(r.public_id)) {
+        variantes++;
+        continue;
+      }
       if (jaImportados.has(r.public_id)) {
         pulados++;
         continue;
@@ -117,6 +146,7 @@ export async function importarCloudinary(ctx: any) {
       total_no_cloudinary: recursos.length,
       importados,
       ja_existiam: pulados,
+      variantes_ignoradas: variantes,
       erros,
     };
   } catch (e: any) {
