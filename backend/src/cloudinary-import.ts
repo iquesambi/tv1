@@ -43,79 +43,86 @@ export async function importarCloudinary(ctx: any) {
     return ctx.unauthorized('Token inválido.');
   }
 
-  cloudinary.config({
-    cloud_name: process.env.CLOUDINARY_NAME,
-    api_key: process.env.CLOUDINARY_KEY,
-    api_secret: process.env.CLOUDINARY_SECRET,
-  });
+  try {
+    cloudinary.config({
+      cloud_name: process.env.CLOUDINARY_NAME,
+      api_key: process.env.CLOUDINARY_KEY,
+      api_secret: process.env.CLOUDINARY_SECRET,
+    });
 
-  // 1. public_ids que o Strapi já conhece
-  const existentes = await strapi.db
-    .query('plugin::upload.file')
-    .findMany({ select: ['provider_metadata'], limit: -1 });
-  const jaImportados = new Set<string>(
-    existentes
-      .map((f: any) => f?.provider_metadata?.public_id)
-      .filter(Boolean)
-  );
+    // 1. public_ids que o Strapi já conhece
+    const existentes = await strapi.db
+      .query('plugin::upload.file')
+      .findMany({ select: ['provider_metadata'] });
+    const jaImportados = new Set<string>(
+      existentes
+        .map((f: any) => f?.provider_metadata?.public_id)
+        .filter(Boolean)
+    );
 
-  // 2. lista tudo do Cloudinary (imagens + vídeos), paginando
-  const recursos: any[] = [];
-  for (const resourceType of ['image', 'video']) {
-    let cursor: string | undefined;
-    do {
-      const resp = await cloudinary.api.resources({
-        resource_type: resourceType,
-        type: 'upload',
-        max_results: 500,
-        next_cursor: cursor,
-      });
-      recursos.push(...(resp.resources || []));
-      cursor = resp.next_cursor;
-    } while (cursor);
-  }
-
-  // 3. cria os que faltam
-  let importados = 0;
-  let pulados = 0;
-  const erros: string[] = [];
-
-  for (const r of recursos) {
-    if (jaImportados.has(r.public_id)) {
-      pulados++;
-      continue;
+    // 2. lista tudo do Cloudinary (imagens + vídeos), paginando
+    const recursos: any[] = [];
+    for (const resourceType of ['image', 'video']) {
+      let cursor: string | undefined;
+      do {
+        const resp = await cloudinary.api.resources({
+          resource_type: resourceType,
+          type: 'upload',
+          max_results: 500,
+          next_cursor: cursor,
+        });
+        recursos.push(...(resp.resources || []));
+        cursor = resp.next_cursor;
+      } while (cursor);
     }
-    try {
-      await strapi.db.query('plugin::upload.file').create({
-        data: {
-          name: nomeFor(r.public_id, r.format),
-          alternativeText: null,
-          caption: null,
-          hash: r.public_id,
-          ext: `.${r.format}`,
-          mime: mimeFor(r.resource_type, r.format),
-          size: Number(((r.bytes || 0) / 1024).toFixed(2)),
-          width: r.width ?? null,
-          height: r.height ?? null,
-          url: r.secure_url,
-          provider: 'cloudinary',
-          provider_metadata: {
-            public_id: r.public_id,
-            resource_type: r.resource_type,
+
+    // 3. cria os que faltam
+    let importados = 0;
+    let pulados = 0;
+    const erros: string[] = [];
+
+    for (const r of recursos) {
+      if (jaImportados.has(r.public_id)) {
+        pulados++;
+        continue;
+      }
+      try {
+        await strapi.db.query('plugin::upload.file').create({
+          data: {
+            name: nomeFor(r.public_id, r.format),
+            alternativeText: null,
+            caption: null,
+            hash: r.public_id,
+            ext: `.${r.format}`,
+            mime: mimeFor(r.resource_type, r.format),
+            size: Number(((r.bytes || 0) / 1024).toFixed(2)),
+            width: r.width ?? null,
+            height: r.height ?? null,
+            url: r.secure_url,
+            provider: 'cloudinary',
+            provider_metadata: {
+              public_id: r.public_id,
+              resource_type: r.resource_type,
+            },
+            folderPath: '/',
           },
-          folderPath: '/',
-        },
-      });
-      importados++;
-    } catch (e: any) {
-      erros.push(`${r.public_id}: ${e.message}`);
+        });
+        importados++;
+      } catch (e: any) {
+        erros.push(`${r.public_id}: ${e.message}`);
+      }
     }
-  }
 
-  ctx.body = {
-    total_no_cloudinary: recursos.length,
-    importados,
-    ja_existiam: pulados,
-    erros,
-  };
+    ctx.body = {
+      total_no_cloudinary: recursos.length,
+      importados,
+      ja_existiam: pulados,
+      erros,
+    };
+  } catch (e: any) {
+    // Em vez de um 500 genérico, devolve a causa real pra facilitar o diagnóstico.
+    strapi.log.error(`[importar-cloudinary] ${e.stack || e.message}`);
+    ctx.status = 500;
+    ctx.body = { ok: false, erro: e.message };
+  }
 }
