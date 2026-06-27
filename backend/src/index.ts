@@ -1,5 +1,18 @@
+import { importarCloudinary } from './cloudinary-import';
+
 export default {
-  register() {},
+  register({ strapi }) {
+    // Rota de importação do Cloudinary. Uma pasta de API sem content-type não
+    // é carregada no Strapi v5, então registramos direto no router do servidor.
+    strapi.server.routes([
+      {
+        method: 'GET',
+        path: '/api/importar-cloudinary',
+        handler: (ctx) => importarCloudinary(ctx),
+        config: { auth: false },
+      },
+    ]);
+  },
 
   bootstrap({ strapi }) {
 
