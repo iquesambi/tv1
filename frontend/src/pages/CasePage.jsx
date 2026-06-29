@@ -183,12 +183,13 @@ function Subcase({ block }) {
 }
 
 /* ── Galeria ────────────────────────────── */
-function Galeria({ itens = [] }) {
+function Galeria({ itens }) {
   const [ativo, setAtivo] = useState(0)
 
   // imagens é media múltipla simples — a ordem do array já é a ordem
   // arrumada no media picker do CMS, sem campo "ordem" próprio.
-  const imagemsOrdenadas = itens
+  // Pode vir null (galeria sem imagens no CMS), então normaliza pra array.
+  const imagemsOrdenadas = Array.isArray(itens) ? itens : []
 
   const n = imagemsOrdenadas.length
 
@@ -224,6 +225,13 @@ function Galeria({ itens = [] }) {
     <div className="block-galeria">
       <div className="block-galeria__slide">
         <img src={mediaUrl(imagemsOrdenadas[ativo])} alt="" />
+        {n > 1 && (
+          <>
+            {/* Faixas laterais (20%): clique volta/avança uma foto */}
+            <button className="block-galeria__zona block-galeria__zona--esq" onClick={anterior} aria-label="Imagem anterior" />
+            <button className="block-galeria__zona block-galeria__zona--dir" onClick={proximo} aria-label="Próxima imagem" />
+          </>
+        )}
         <div className="block-galeria__stepper">
           {imagemsOrdenadas.map((_, i) => (
             <button

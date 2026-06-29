@@ -480,6 +480,21 @@
 .block-galeria__prev { left: 24px; }
 .block-galeria__next { right: 24px; }
 
+/* Faixas laterais clicáveis (20% de cada lado): volta/avança uma foto */
+.block-galeria__zona {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 20%;
+  border: none;
+  background: transparent;
+  padding: 0;
+  z-index: 2;
+}
+/* hotspot no centro da seta (22 27 = metade do 44x50) */
+.block-galeria__zona--esq { left: 0;  cursor: url('/galeria-seta-esq.svg') 22 27, pointer; }
+.block-galeria__zona--dir { right: 0; cursor: url('/galeria-seta-dir.svg') 22 27, pointer; }
+
 .block-galeria__prev:hover,
 .block-galeria__next:hover {
   background: rgba(0, 0, 0, 0.6);
@@ -531,7 +546,6 @@
 
   .case-hero__content {
     width: 100%;
-    min-height: 100vh;
     height: auto;
     padding: 20px 20px 36px;
     gap: 0;
