@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom'
 import axios from 'axios'
 import { useGoTo, useStartCamera, useCameraAtiva } from '../transition.jsx'
 import { CAMERA_START_TIME } from '../cameraConfig.js'
+import { prefetchCases, casesAnchorDisponivel } from '../pages/CasesPage.jsx'
 import '../App.css'
 import './Menu.css'
 
@@ -331,6 +332,9 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
 
   // Fetch de dados
   useEffect(() => {
+    // Aquece o cache de cases pra já saber, no primeiro clique, quais
+    // especialidades têm case (e bloquear o clique nas vazias).
+    prefetchCases()
     api('navigation?populate[links][populate][sublinks][populate]=*').then(setNav)
     api('logo-site?populate=logo').then(setLogo)
     api('agencias?populate=*&sort=posicao:asc').then(data =>
@@ -607,6 +611,10 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
       // O campo `url` do sublink fica como fallback pra outros menus.
       const isCases = (link.label ?? '').toLowerCase() === 'cases' || link.url === '/cases'
       const ancora = sub.especialidade?.slug || sub.ancora || sub.slug
+      // Especialidade sem nenhum case na timeline (ex: tecnologia) não leva a
+      // lugar nenhum. Só bloqueia quando o cache já confirmou que está vazia;
+      // se ainda não carregou (null), navega normal pra não travar à toa.
+      if (isCases && ancora && casesAnchorDisponivel(ancora) === false) return
       let target = isCases && ancora ? `/cases#${ancora}` : sub.url
       if (!target) return
       goTo(target)

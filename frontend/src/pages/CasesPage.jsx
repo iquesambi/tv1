@@ -20,6 +20,15 @@ export function prefetchCases() {
   return prefetchPromise
 }
 
+// Diz se uma âncora (slug de especialidade/sub) tem ao menos um case na
+// timeline unificada. Retorna true/false quando o cache já carregou, ou null
+// se ainda não sabemos (cache não montado) — nesse caso quem chama decide o
+// fallback. Só conta cases que de fato aparecem (com imagem).
+export function casesAnchorDisponivel(ancora) {
+  if (!anchorMapCache) return null
+  return Boolean(anchorMapCache[ancora])
+}
+
 async function construirEntradas() {
   const nav = await api('navigation?populate[links][populate][sublinks][populate]=*')
   const linkCases = (nav?.links ?? []).find(
