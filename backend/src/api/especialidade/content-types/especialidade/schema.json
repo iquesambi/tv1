@@ -21,7 +21,7 @@
     },
     "cases": {
       "type": "relation",
-      "relation": "oneToMany",
+      "relation": "manyToMany",
       "target": "api::case.case",
       "mappedBy": "especialidade"
     },

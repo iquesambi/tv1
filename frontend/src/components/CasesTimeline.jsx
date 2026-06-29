@@ -13,8 +13,17 @@ const ALTURAS = [460, 340, 400, 310, 380]
 const alturaParaIdx = (idx) => ALTURAS[idx % ALTURAS.length]
 
 /* ── monta entradas ── */
-function montarEntradas(cases, tipoResolvido) {
+// `slug` é a especialidade da página (só usado no modo 'especialidade').
+function montarEntradas(cases, tipoResolvido, slug = null) {
   const entradas = []
+  // especialidade/sub viraram relações múltiplas — helpers pra normalizar.
+  const subDoCase = (c) => {
+    const subs = Array.isArray(c.sub_especialidade) ? c.sub_especialidade : (c.sub_especialidade ? [c.sub_especialidade] : [])
+    if (tipoResolvido === 'especialidade' && slug) {
+      return subs.find(s => s?.especialidade?.slug === slug) || subs[0] || null
+    }
+    return subs[0] || null
+  }
 
   if (tipoResolvido === 'quarentaAnos') {
     for (const c of cases) {
@@ -76,14 +85,15 @@ function montarEntradas(cases, tipoResolvido) {
   for (const c of cases) {
     const clienteSlug = c.cliente?.slug
     const caseSlug    = c.slug
-    const ordemSub    = c.sub_especialidade?.ordem ?? 9999
+    const sub         = subDoCase(c)
+    const ordemSub    = sub?.ordem ?? 9999
     const capaPrincipal = c.imagem_timeline || c.imagem_capa
     if (capaPrincipal) {
       entradas.push({
         id:          `${c.id}-main`,
         label:       tipoResolvido === 'marca'
           ? (c.Data ? new Date(c.Data).getFullYear() : null)
-          : (c.sub_especialidade?.nome || ''),
+          : (sub?.nome || ''),
         data:        c.Data ? new Date(c.Data) : new Date(0),
         nome:        c.titulo_timeline || c.titulo,
         capa:        capaPrincipal,
@@ -102,7 +112,7 @@ function montarEntradas(cases, tipoResolvido) {
           id:          `${c.id}-sub-${bloco.id}`,
           label:       tipoResolvido === 'marca'
             ? new Date(bloco.timeline_data).getFullYear()
-            : (c.sub_especialidade?.nome || ''),
+            : (sub?.nome || ''),
           data:        new Date(bloco.timeline_data),
           nome:        bloco.timeline_nome || bloco.texto,
           capa:        subtituloCapa,
@@ -122,7 +132,7 @@ function montarEntradas(cases, tipoResolvido) {
           id:          `${c.id}-sub-${bloco.id}`,
           label:       tipoResolvido === 'marca'
             ? blocoData.getFullYear()
-            : (c.sub_especialidade?.nome || ''),
+            : (sub?.nome || ''),
           data:        blocoData,
           nome:        bloco.titulo_timeline || bloco.titulo,
           capa:        blocoCapa,
@@ -141,7 +151,7 @@ function montarEntradas(cases, tipoResolvido) {
           id:          `${c.id}-sub-${bloco.id}`,
           label:       tipoResolvido === 'marca'
             ? (c.Data ? new Date(c.Data).getFullYear() : null)
-            : (c.sub_especialidade?.nome || ''),
+            : (sub?.nome || ''),
           data:        c.Data ? new Date(c.Data) : new Date(0),
           nome:        bloco.titulo,
           capa:        videoCapa,
@@ -394,14 +404,14 @@ export default function CasesTimeline({
       `${STRAPI}/api/cases?${filtro}` +
       `&populate[cliente]=true` +
       `&populate[especialidade]=true` +
-      `&populate[sub_especialidade]=true` +
+      `&populate[sub_especialidade][populate][especialidade]=true` +
       `&populate[imagem_capa]=true` +
       `&populate[imagem_timeline]=true` +
       `&populate[blocos][populate]=*` +
       `&sort=Data:desc`
     )
       .then(r => {
-        const novas = montarEntradas(r.data.data ?? [], tipoResolvido)
+        const novas = montarEntradas(r.data.data ?? [], tipoResolvido, slug)
         setEntradas(novas)
         const urls = novas.map(e => mediaUrl(e.capa)).filter(Boolean)
         try { localStorage.setItem(`tv1-cases-${tipoResolvido}-${slug}`, JSON.stringify(urls)) } catch {}

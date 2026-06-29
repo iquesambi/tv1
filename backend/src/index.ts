@@ -1,14 +1,21 @@
 import { importarCloudinary } from './cloudinary-import';
+import { restaurarEspecialidades } from './restore-especialidades';
 
 export default {
   register({ strapi }) {
-    // Rota de importação do Cloudinary. Uma pasta de API sem content-type não
-    // é carregada no Strapi v5, então registramos direto no router do servidor.
+    // Uma pasta de API sem content-type não é carregada no Strapi v5, então
+    // registramos as rotas utilitárias direto no router do servidor.
     strapi.server.routes([
       {
         method: 'GET',
         path: '/api/importar-cloudinary',
         handler: (ctx) => importarCloudinary(ctx),
+        config: { auth: false },
+      },
+      {
+        method: 'GET',
+        path: '/api/restaurar-especialidades',
+        handler: (ctx) => restaurarEspecialidades(ctx),
         config: { auth: false },
       },
     ]);

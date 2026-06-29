@@ -65,13 +65,13 @@
     },
     "especialidade": {
       "type": "relation",
-      "relation": "manyToOne",
+      "relation": "manyToMany",
       "target": "api::especialidade.especialidade",
       "inversedBy": "cases"
     },
     "sub_especialidade": {
       "type": "relation",
-      "relation": "manyToOne",
+      "relation": "manyToMany",
       "target": "api::sub-especialidade.sub-especialidade",
       "inversedBy": "cases"
     },

@@ -60,7 +60,7 @@ async function construirEntradas() {
   const queries = [
     axios.get(
       `${STRAPI}/api/cases?${slugFilters}` +
-      `&populate[especialidade]=true&populate[sub_especialidade]=true&populate[cliente]=true&populate[agencia]=true` +
+      `&populate[especialidade]=true&populate[sub_especialidade][populate][especialidade]=true&populate[cliente]=true&populate[agencia]=true` +
       `&populate[imagem_capa]=true&populate[imagem_timeline]=true` +
       `&populate[blocos][populate]=*` +
       `&pagination[pageSize]=200&sort=Data:desc`
@@ -74,91 +74,89 @@ async function construirEntradas() {
   for (const c of cases) {
     const clienteSlug = c.cliente?.slug
     const caseSlug    = c.slug
-    let ancora = ''
-    let secaoLabel = ''
-    const especialidadeSlug = c.especialidade?.slug
-    if (especialidadeSlug && especialidadeSlugs.has(especialidadeSlug)) {
-      ancora = especialidadeSlug
-      const sec = secoes.find(s => s.slug === especialidadeSlug)
-      secaoLabel = sec?.label || c.especialidade?.nome || ''
-    }
-    const ordemSub = c.sub_especialidade?.ordem ?? 9999
-    const label    = c.sub_especialidade?.nome || secaoLabel
     const capaPrincipal = c.imagem_timeline || c.imagem_capa
-    if (capaPrincipal) {
-      entradas.push({
-        id:            `${c.id}-main`,
-        ancora,
-        subEspAncora:  c.sub_especialidade?.slug || null,
-        label,
-        ordemSub,
-        data:          c.Data ? new Date(c.Data) : new Date(0),
-        nome:          c.titulo_timeline || c.titulo,
-        capa:          capaPrincipal,
-        href:          clienteSlug && caseSlug ? `/${clienteSlug}/${caseSlug}` : `/${caseSlug}`,
-        agenciaLogo:   c.agencia?.logo ?? null,
-        agenciaNome:   c.agencia?.nome ?? null,
-      })
-    }
-    // Subtítulos/subcases com dados próprios de timeline aparecem como
-    // entradas adicionais, na mesma categoria (especialidade) do case-pai.
-    for (const bloco of c.blocos ?? []) {
-      if (bloco.__component === 'blocks.subtitulo' && bloco.timeline && bloco.timeline_data && bloco.visivel !== false) {
-        const subtituloCapa = bloco.timeline_capa || c.imagem_capa
-        if (!subtituloCapa) continue
+    // especialidade/sub agora são relações múltiplas (arrays). Cada
+    // especialidade do menu vira um "contexto": o case aparece uma vez em
+    // cada seção das tags que tiver.
+    const esps = (Array.isArray(c.especialidade) ? c.especialidade : (c.especialidade ? [c.especialidade] : []))
+      .filter(e => e?.slug && especialidadeSlugs.has(e.slug))
+    const subs = Array.isArray(c.sub_especialidade) ? c.sub_especialidade : (c.sub_especialidade ? [c.sub_especialidade] : [])
+    const contextos = esps.map(e => {
+      const sec = secoes.find(s => s.slug === e.slug)
+      // sub que pertence a ESTA especialidade (cada sub tem 1 especialidade-pai)
+      const sub = subs.find(s => s?.especialidade?.slug === e.slug) || null
+      return {
+        ancora:       e.slug,
+        subEspAncora: sub?.slug || null,
+        ordemSub:     sub?.ordem ?? 9999,
+        label:        sub?.nome || sec?.label || e.nome || '',
+      }
+    })
+
+    for (const ctx of contextos) {
+      const meta = {
+        ancora:       ctx.ancora,
+        subEspAncora: ctx.subEspAncora,
+        label:        ctx.label,
+        ordemSub:     ctx.ordemSub,
+        agenciaLogo:  c.agencia?.logo ?? null,
+        agenciaNome:  c.agencia?.nome ?? null,
+      }
+      if (capaPrincipal) {
         entradas.push({
-          id:            `${c.id}-sub-${bloco.id}`,
-          ancora,
-          subEspAncora:  c.sub_especialidade?.slug || null,
-          label,
-          ordemSub,
-          data:          new Date(bloco.timeline_data),
-          nome:          bloco.timeline_nome || bloco.texto,
-          capa:          subtituloCapa,
-          href:          clienteSlug && caseSlug
-            ? `/${clienteSlug}/${caseSlug}#${bloco.ancora_id ?? ''}`
-            : `/${caseSlug}#${bloco.ancora_id ?? ''}`,
-          agenciaLogo:   c.agencia?.logo ?? null,
-          agenciaNome:   c.agencia?.nome ?? null,
+          id:   `${c.id}-${ctx.ancora}-main`,
+          ...meta,
+          data: c.Data ? new Date(c.Data) : new Date(0),
+          nome: c.titulo_timeline || c.titulo,
+          capa: capaPrincipal,
+          href: clienteSlug && caseSlug ? `/${clienteSlug}/${caseSlug}` : `/${caseSlug}`,
         })
       }
-      if (bloco.__component === 'blocks.subcase' && bloco.ancora_id && bloco.visivel !== false) {
-        const blocoCapa = bloco.imagem_timeline || bloco.imagem_capa
-        if (!blocoCapa) continue
-        entradas.push({
-          id:            `${c.id}-sub-${bloco.id}`,
-          ancora,
-          subEspAncora:  c.sub_especialidade?.slug || null,
-          label,
-          ordemSub,
-          data:          bloco.Data ? new Date(bloco.Data) : (c.Data ? new Date(c.Data) : new Date(0)),
-          nome:          bloco.titulo_timeline || bloco.titulo,
-          capa:          blocoCapa,
-          href:          clienteSlug && caseSlug
-            ? `/${clienteSlug}/${caseSlug}#${bloco.ancora_id}`
-            : `/${caseSlug}#${bloco.ancora_id}`,
-          agenciaLogo:   c.agencia?.logo ?? null,
-          agenciaNome:   c.agencia?.nome ?? null,
-        })
-      }
-      if (bloco.__component === 'blocks.video' && bloco.ir_para_timeline && bloco.ancora_id && bloco.visivel !== false) {
-        const videoCapa = bloco.imagem_timeline || bloco.capa
-        if (!videoCapa) continue
-        entradas.push({
-          id:            `${c.id}-sub-${bloco.id}`,
-          ancora,
-          subEspAncora:  c.sub_especialidade?.slug || null,
-          label,
-          ordemSub,
-          data:          c.Data ? new Date(c.Data) : new Date(0),
-          nome:          bloco.titulo,
-          capa:          videoCapa,
-          href:          clienteSlug && caseSlug
-            ? `/${clienteSlug}/${caseSlug}#${bloco.ancora_id}`
-            : `/${caseSlug}#${bloco.ancora_id}`,
-          agenciaLogo:   c.agencia?.logo ?? null,
-          agenciaNome:   c.agencia?.nome ?? null,
-        })
+      // Subtítulos/subcases/vídeos com dados próprios de timeline aparecem como
+      // entradas adicionais, na mesma seção (contexto) do case-pai.
+      for (const bloco of c.blocos ?? []) {
+        if (bloco.__component === 'blocks.subtitulo' && bloco.timeline && bloco.timeline_data && bloco.visivel !== false) {
+          const subtituloCapa = bloco.timeline_capa || c.imagem_capa
+          if (!subtituloCapa) continue
+          entradas.push({
+            id:   `${c.id}-${ctx.ancora}-sub-${bloco.id}`,
+            ...meta,
+            data: new Date(bloco.timeline_data),
+            nome: bloco.timeline_nome || bloco.texto,
+            capa: subtituloCapa,
+            href: clienteSlug && caseSlug
+              ? `/${clienteSlug}/${caseSlug}#${bloco.ancora_id ?? ''}`
+              : `/${caseSlug}#${bloco.ancora_id ?? ''}`,
+          })
+        }
+        if (bloco.__component === 'blocks.subcase' && bloco.ancora_id && bloco.visivel !== false) {
+          const blocoCapa = bloco.imagem_timeline || bloco.imagem_capa
+          if (!blocoCapa) continue
+          entradas.push({
+            id:   `${c.id}-${ctx.ancora}-sub-${bloco.id}`,
+            ...meta,
+            data: bloco.Data ? new Date(bloco.Data) : (c.Data ? new Date(c.Data) : new Date(0)),
+            nome: bloco.titulo_timeline || bloco.titulo,
+            capa: blocoCapa,
+            href: clienteSlug && caseSlug
+              ? `/${clienteSlug}/${caseSlug}#${bloco.ancora_id}`
+              : `/${caseSlug}#${bloco.ancora_id}`,
+          })
+        }
+        if (bloco.__component === 'blocks.video' && bloco.ir_para_timeline && bloco.ancora_id && bloco.visivel !== false) {
+          const videoCapa = bloco.imagem_timeline || bloco.capa
+          if (!videoCapa) continue
+          entradas.push({
+            id:   `${c.id}-${ctx.ancora}-sub-${bloco.id}`,
+            ...meta,
+            data: c.Data ? new Date(c.Data) : new Date(0),
+            nome: bloco.titulo,
+            capa: videoCapa,
+            href: clienteSlug && caseSlug
+              ? `/${clienteSlug}/${caseSlug}#${bloco.ancora_id}`
+              : `/${caseSlug}#${bloco.ancora_id}`,
+          })
+        }
       }
     }
   }

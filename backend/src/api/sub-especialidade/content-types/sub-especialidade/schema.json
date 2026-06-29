@@ -30,7 +30,7 @@
     },
     "cases": {
       "type": "relation",
-      "relation": "oneToMany",
+      "relation": "manyToMany",
       "target": "api::case.case",
       "mappedBy": "sub_especialidade"
     }
