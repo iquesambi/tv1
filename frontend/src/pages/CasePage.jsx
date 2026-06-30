@@ -342,9 +342,12 @@ export default function CasePage() {
   const caseSlug    = params.case ?? params.slug
 
   // Timeline unificada embaixo do case: usamos o mesmo cache da /cases.
-  const [entradasTimeline, setEntradasTimeline] = useState(() => getEntradasCache().entradas)
-  const [anchorMapTimeline, setAnchorMapTimeline] = useState(() => getEntradasCache().anchorMap ?? {})
+  const [entradasTimeline, setEntradasTimeline] = useState(null)
+  const [anchorMapTimeline, setAnchorMapTimeline] = useState({})
   const [initialEntryId, setInitialEntryId] = useState(null)
+  // Sempre false ao montar: o carrossel só renderiza quando entradas E
+  // entry-alvo estão prontos juntos no mesmo render, evitando double-init.
+  const [timelinePronta, setTimelinePronta] = useState(false)
 
   const [data, setData] = useState(null)
   const [logo, setLogo] = useState(null)
@@ -372,12 +375,23 @@ export default function CasePage() {
   // centralizar ao montar o carrossel embutido.
   useEffect(() => {
     const href = clienteSlug ? `/${clienteSlug}/${caseSlug}` : `/${caseSlug}`
+    // Se o cache já estava pronto ao montar, preenche agora; senão espera o fetch.
+    const { entradas: cached, anchorMap: cachedMap } = getEntradasCache()
+    if (cached) {
+      setEntradasTimeline(cached)
+      setAnchorMapTimeline(cachedMap ?? {})
+      const entrada = cached.find(e => e.href === href)
+      setInitialEntryId(entrada?.id ?? '')   // '' = sem alvo, mas pronta
+      setTimelinePronta(true)
+      return
+    }
     prefetchCases().then(() => {
       const { entradas, anchorMap } = getEntradasCache()
       setEntradasTimeline(entradas)
       setAnchorMapTimeline(anchorMap ?? {})
       const entrada = (entradas ?? []).find(e => e.href === href)
-      if (entrada) setInitialEntryId(entrada.id)
+      setInitialEntryId(entrada?.id ?? '')   // '' = sem alvo, mas pronta
+      setTimelinePronta(true)
     })
   }, [clienteSlug, caseSlug])
 
@@ -485,8 +499,10 @@ export default function CasePage() {
         <Block key={i} block={block} />
       ))}
 
-      {/* Timeline unificada completa — card deste case no centro */}
-      {entradasTimeline && (
+      {/* Timeline unificada completa — card deste case no centro.
+          Só monta quando prefetch + entry alvo estão prontos juntos,
+          para evitar a re-inicialização do carrossel que causava scroll bizarro. */}
+      {timelinePronta && entradasTimeline && (
         <div className="case-embedded-timeline">
           <CasesTimeline
             conteudo="unified"

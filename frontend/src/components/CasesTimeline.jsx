@@ -585,7 +585,7 @@ export default function CasesTimeline({
       // Se recebeu um entry pra centralizar ao montar (ex: timeline embutida
       // no case), aplica o alinhamento instantâneo logo aqui, quando os
       // firstSetCards já estão disponíveis — evita a race condition com eventos.
-      if (initialEntryId) {
+      if (initialEntryId && initialEntryId !== '') {
         const idx = entradas.findIndex(e => e.id === initialEntryId)
         if (idx >= 0 && cards[idx]) {
           const cardCenter = cards[idx].offsetLeft + cards[idx].offsetWidth / 2
