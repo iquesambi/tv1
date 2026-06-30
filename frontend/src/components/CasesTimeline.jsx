@@ -315,6 +315,7 @@ export default function CasesTimeline({
   navState = null,
   entradasPre = null,     // p/ modo unified: entradas já montadas pela página
   anchorMap   = null,     // p/ modo unified: slug -> entry id (rolagem por âncora)
+  initialEntryId = null,  // p/ modo unified embutido: centra neste entry ao montar
 }) {
   // Resolve tipo/conteudo
   const tipoResolvido = conteudo ?? (tipo === 'cliente' ? 'marca' : (tipo ?? 'marca'))
@@ -578,7 +579,22 @@ export default function CasesTimeline({
     container.addEventListener('touchend',   onTouchEnd,   { passive: true })
 
     const cards = Array.from(track.querySelectorAll('.cliente-card'))
-    if (usaCarrossel) { firstSetCardsRef.current = cards.slice(0, n); oneSetRef.current = oneSet }
+    if (usaCarrossel) {
+      firstSetCardsRef.current = cards.slice(0, n)
+      oneSetRef.current = oneSet
+      // Se recebeu um entry pra centralizar ao montar (ex: timeline embutida
+      // no case), aplica o alinhamento instantâneo logo aqui, quando os
+      // firstSetCards já estão disponíveis — evita a race condition com eventos.
+      if (initialEntryId) {
+        const idx = entradas.findIndex(e => e.id === initialEntryId)
+        if (idx >= 0 && cards[idx]) {
+          const cardCenter = cards[idx].offsetLeft + cards[idx].offsetWidth / 2
+          const base = container.clientWidth / 2 - oneSet - cardCenter
+          xRef.current.x = base + oneSet  // pega a cópia do meio do loop
+          xTargetRef.current = null
+        }
+      }
+    }
 
     const calcLabels = () => {
       if (usaCarrossel && timelineTrackRef.current) {
@@ -734,7 +750,7 @@ export default function CasesTimeline({
       cancelAnimationFrame(resizeRaf)
       resizeObserver.disconnect()
     }
-  }, [n, usaCarrossel, contexto])
+  }, [n, usaCarrossel, contexto, initialEntryId])
 
   if (carregando) return (
     <div className="cases-timeline cases-timeline--case" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>

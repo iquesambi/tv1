@@ -3,6 +3,7 @@ import { useParams, useLocation } from 'react-router-dom'
 import axios from 'axios'
 import Menu from '../components/Menu.jsx'
 import CasesTimeline from '../components/CasesTimeline.jsx'
+import { prefetchCases, getEntradasCache } from './CasesPage.jsx'
 import './CasePage.css'
 
 const STRAPI = 'https://tv1-53ev.onrender.com'
@@ -340,9 +341,11 @@ export default function CasePage() {
   const clienteSlug = params.case ? (params.cliente ?? params.slug) : null
   const caseSlug    = params.case ?? params.slug
 
-  // Origem da navegação: 'cliente' ou 'especialidade'
-  const navFrom  = location.state?.from ?? 'cliente'
-  const navSlug  = location.state?.slug ?? clienteSlug
+  // Timeline unificada embaixo do case: usamos o mesmo cache da /cases.
+  const [entradasTimeline, setEntradasTimeline] = useState(() => getEntradasCache().entradas)
+  const [anchorMapTimeline, setAnchorMapTimeline] = useState(() => getEntradasCache().anchorMap ?? {})
+  const [initialEntryId, setInitialEntryId] = useState(null)
+
   const [data, setData] = useState(null)
   const [logo, setLogo] = useState(null)
   const footerRef = useRef(null)
@@ -364,6 +367,19 @@ export default function CasePage() {
     axios.get(`${STRAPI}/api/logo-site?populate=logo`).then(r => setLogo(r.data.data)).catch(() => {})
     document.body.classList.remove('scroll-locked')
   }, [])
+
+  // Aquece o cache da timeline unificada e determina qual entry
+  // centralizar ao montar o carrossel embutido.
+  useEffect(() => {
+    const href = clienteSlug ? `/${clienteSlug}/${caseSlug}` : `/${caseSlug}`
+    prefetchCases().then(() => {
+      const { entradas, anchorMap } = getEntradasCache()
+      setEntradasTimeline(entradas)
+      setAnchorMapTimeline(anchorMap ?? {})
+      const entrada = (entradas ?? []).find(e => e.href === href)
+      if (entrada) setInitialEntryId(entrada.id)
+    })
+  }, [clienteSlug, caseSlug])
 
   useEffect(() => {
     axios
@@ -469,7 +485,19 @@ export default function CasePage() {
         <Block key={i} block={block} />
       ))}
 
-      {navSlug && <CasesTimeline tipo={navFrom} slug={navSlug} />}
+      {/* Timeline unificada completa — card deste case no centro */}
+      {entradasTimeline && (
+        <div className="case-embedded-timeline">
+          <CasesTimeline
+            conteudo="unified"
+            contexto="case"
+            tema="claro"
+            entradasPre={entradasTimeline}
+            anchorMap={anchorMapTimeline}
+            initialEntryId={initialEntryId}
+          />
+        </div>
+      )}
 
       <div ref={footerRef}><Menu /></div>
 

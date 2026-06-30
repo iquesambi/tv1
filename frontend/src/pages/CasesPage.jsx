@@ -29,6 +29,12 @@ export function casesAnchorDisponivel(ancora) {
   return Boolean(anchorMapCache[ancora])
 }
 
+// Retorna o cache já montado (ou null se ainda não carregou).
+// Usado por CasePage pra embutir a timeline unificada sem re-fetch.
+export function getEntradasCache() {
+  return { entradas: entradasCache, anchorMap: anchorMapCache }
+}
+
 async function construirEntradas() {
   const nav = await api('navigation?populate[links][populate][sublinks][populate]=*')
   const linkCases = (nav?.links ?? []).find(
