@@ -1,5 +1,6 @@
 import { importarCloudinary } from './cloudinary-import';
 import { restaurarEspecialidades } from './restore-especialidades';
+import { midiasNaoUsadas } from './midias-nao-usadas';
 
 export default {
   register({ strapi }) {
@@ -16,6 +17,12 @@ export default {
         method: 'GET',
         path: '/api/restaurar-especialidades',
         handler: (ctx) => restaurarEspecialidades(ctx),
+        config: { auth: false },
+      },
+      {
+        method: 'GET',
+        path: '/api/midias-nao-usadas',
+        handler: (ctx) => midiasNaoUsadas(ctx),
         config: { auth: false },
       },
     ]);
