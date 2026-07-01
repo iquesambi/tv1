@@ -19,6 +19,11 @@
       "type": "boolean",
       "default": true
     },
+    "mostrar_video": {
+      "type": "boolean",
+      "default": true,
+      "description": "Desligado: some a dobra do vídeo (hero) da página 40 anos."
+    },
     "imagem": {
       "type": "media",
       "multiple": false,

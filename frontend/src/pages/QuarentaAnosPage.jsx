@@ -55,28 +55,30 @@ export default function QuarentaAnosPage() {
   return (
     <div className="qa-page">
 
-      {/* HERO */}
-      <section ref={heroRef} className="qa-hero" onClick={() => data?.video_url && !playing && setPlaying(true)}>
-        <motion.div className="qa-hero__bg-wrap" style={{ y: heroBgY }}>
-          {playing && data?.video_url
-            ? <video ref={videoRef} className="qa-hero__bg" src={data.video_url} autoPlay playsInline />
-            : data?.video_capa
-            ? <img className="qa-hero__bg" src={mediaUrl(data.video_capa)} alt="" />
-            : null
-          }
-        </motion.div>
-        <div className="qa-hero__overlay" />
-        <div className="qa-hero__ui">
-          {!playing && data?.video_url && (
-            <button className="qa-hero__play" aria-label="Assistir vídeo">
-              <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="32" cy="32" r="30" fill="none" stroke="#fff" strokeWidth="1.5" />
-                <polygon points="26,20 26,44 46,32" fill="#fff" />
-              </svg>
-            </button>
-          )}
-        </div>
-      </section>
+      {/* HERO — escondida quando "mostrar_video" está desligado no CMS */}
+      {data?.mostrar_video !== false && (
+        <section ref={heroRef} className="qa-hero" onClick={() => data?.video_url && !playing && setPlaying(true)}>
+          <motion.div className="qa-hero__bg-wrap" style={{ y: heroBgY }}>
+            {playing && data?.video_url
+              ? <video ref={videoRef} className="qa-hero__bg" src={data.video_url} autoPlay playsInline />
+              : data?.video_capa
+              ? <img className="qa-hero__bg" src={mediaUrl(data.video_capa)} alt="" />
+              : null
+            }
+          </motion.div>
+          <div className="qa-hero__overlay" />
+          <div className="qa-hero__ui">
+            {!playing && data?.video_url && (
+              <button className="qa-hero__play" aria-label="Assistir vídeo">
+                <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="32" cy="32" r="30" fill="none" stroke="#fff" strokeWidth="1.5" />
+                  <polygon points="26,20 26,44 46,32" fill="#fff" />
+                </svg>
+              </button>
+            )}
+          </div>
+        </section>
+      )}
 
       {/* COMPOSIÇÃO */}
       <section ref={composicaoRef} className="qa-composicao">
