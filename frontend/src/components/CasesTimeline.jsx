@@ -39,8 +39,8 @@ function montarEntradas(cases, tipoResolvido, slug = null) {
           capa:        imgTimeline,
           href:        clienteSlug && caseSlug ? `/${clienteSlug}/${caseSlug}` : `/${caseSlug ?? ''}`,
           clicavel:    c.clicavel !== 'não clicável',
-          agenciaLogo: null,
-          agenciaNome: null,
+          agenciaLogo: c.agencia?.logo ?? null,
+          agenciaNome: c.agencia?.nome ?? null,
         })
       }
       for (const bloco of c.blocos ?? []) {
@@ -56,8 +56,8 @@ function montarEntradas(cases, tipoResolvido, slug = null) {
             href:        clienteSlug && caseSlug
               ? `/${clienteSlug}/${caseSlug}#${bloco.ancora_id}`
               : `/${caseSlug ?? ''}#${bloco.ancora_id}`,
-            agenciaLogo: null,
-            agenciaNome: null,
+            agenciaLogo: c.agencia?.logo ?? null,
+            agenciaNome: c.agencia?.nome ?? null,
           })
         }
         if (bloco.__component === 'blocks.video' && bloco.ir_para_timeline && bloco.ancora_id && bloco.visivel !== false) {
@@ -72,13 +72,13 @@ function montarEntradas(cases, tipoResolvido, slug = null) {
             href:        clienteSlug && caseSlug
               ? `/${clienteSlug}/${caseSlug}#${bloco.ancora_id}`
               : `/${caseSlug ?? ''}#${bloco.ancora_id}`,
-            agenciaLogo: null,
-            agenciaNome: null,
+            agenciaLogo: c.agencia?.logo ?? null,
+            agenciaNome: c.agencia?.nome ?? null,
           })
         }
       }
     }
-    return entradas.sort((a, b) => b.data - a.data)
+    return entradas.sort((a, b) => a.data - b.data)
   }
 
   // marca / especialidade
@@ -168,7 +168,7 @@ function montarEntradas(cases, tipoResolvido, slug = null) {
   // Para especialidade: agrupa por ordem da sub-especialidade, data desc dentro de cada grupo.
   // Para marca: ordena só por data desc.
   if (tipoResolvido === 'especialidade') {
-    entradas.sort((a, b) => a.ordemSub - b.ordemSub || a.data - b.data)
+    entradas.sort((a, b) => a.ordemSub - b.ordemSub || b.data - a.data)
   } else {
     entradas.sort((a, b) => b.data - a.data)
   }
@@ -385,6 +385,7 @@ export default function CasesTimeline({
         '?populate[imagem_capa]=true' +
         '&populate[imagem_timeline]=true' +
         '&populate[cliente]=true' +
+        '&populate[agencia]=true' +
         '&populate[blocos][populate]=*' +
         '&sort=Data:desc' +
         '&pagination[limit]=100'

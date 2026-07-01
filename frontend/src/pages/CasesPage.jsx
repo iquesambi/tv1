@@ -175,7 +175,7 @@ async function construirEntradas() {
     const ob = ordemSublink[b.ancora] ?? 9999
     if (oa !== ob) return oa - ob
     if (a.ordemSub !== b.ordemSub) return a.ordemSub - b.ordemSub
-    return a.data - b.data
+    return b.data - a.data
   })
   const map = {}
   // Âncora por sub-especialidade slug (ex: #ativacao)

@@ -15,6 +15,9 @@
       "type": "string",
       "required": true
     },
+    "titulo_timeline": {
+      "type": "string"
+    },
     "slug": {
       "type": "uid",
       "targetField": "titulo",
@@ -22,6 +25,12 @@
     },
     "Data": {
       "type": "date"
+    },
+    "breadcrumb": {
+      "type": "string"
+    },
+    "descricao": {
+      "type": "text"
     },
     "imagem_capa": {
       "type": "media",
@@ -46,6 +55,21 @@
       "type": "relation",
       "relation": "manyToOne",
       "target": "api::cliente.cliente"
+    },
+    "agencia": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::agencia.agencia"
+    },
+    "especialidade": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::especialidade.especialidade"
+    },
+    "sub_especialidade": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::sub-especialidade.sub-especialidade"
     },
     "blocos": {
       "type": "dynamiczone",
