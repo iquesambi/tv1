@@ -184,7 +184,7 @@ function Subcase({ block }) {
 }
 
 /* ── Galeria ────────────────────────────── */
-function Galeria({ itens }) {
+function Galeria({ itens, mostrarCompleta = false }) {
   const [ativo, setAtivo] = useState(0)
 
   // imagens é media múltipla simples — a ordem do array já é a ordem
@@ -224,7 +224,7 @@ function Galeria({ itens }) {
 
   return (
     <div className="block-galeria">
-      <div className="block-galeria__slide">
+      <div className={`block-galeria__slide${mostrarCompleta ? ' block-galeria__slide--completa' : ''}`}>
         <img src={mediaUrl(imagemsOrdenadas[ativo])} alt="" />
         {n > 1 && (
           <>
@@ -285,7 +285,7 @@ function Block({ block }) {
       )
 
     case 'blocks.galeria':
-      return <Galeria itens={block.imagens} />
+      return <Galeria itens={block.imagens} mostrarCompleta={block.mostrar_foto_completa} />
 
     case 'blocks.imagem-trio':
       return (

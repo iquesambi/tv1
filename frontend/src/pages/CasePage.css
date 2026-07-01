@@ -514,6 +514,22 @@
   display: block;
 }
 
+/* Toggle "mostrar foto completa": sem corte, altura 100vh, largura se
+   adapta à proporção da foto, com margem branca nas laterais. */
+.block-galeria__slide--completa {
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.block-galeria__slide--completa img {
+  width: auto;
+  height: 100%;
+  max-width: 100%;
+  object-fit: contain;
+}
+
 .block-galeria__prev,
 .block-galeria__next {
   position: absolute;

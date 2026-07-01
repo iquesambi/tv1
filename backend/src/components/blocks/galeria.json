@@ -8,6 +8,11 @@
       "required": false,
       "allowedTypes": ["images"]
     },
-    "visivel": { "type": "boolean", "default": true }
+    "visivel": { "type": "boolean", "default": true },
+    "mostrar_foto_completa": {
+      "type": "boolean",
+      "default": false,
+      "description": "Desligado: corta a foto em 100vh x 100vw. Ligado: mostra a foto inteira em 100vh, largura se adapta, com margem branca nas laterais."
+    }
   }
 }
