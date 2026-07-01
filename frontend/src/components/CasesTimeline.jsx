@@ -168,7 +168,7 @@ function montarEntradas(cases, tipoResolvido, slug = null) {
   // Para especialidade: agrupa por ordem da sub-especialidade, data desc dentro de cada grupo.
   // Para marca: ordena só por data desc.
   if (tipoResolvido === 'especialidade') {
-    entradas.sort((a, b) => a.ordemSub - b.ordemSub || b.data - a.data)
+    entradas.sort((a, b) => a.ordemSub - b.ordemSub || a.data - b.data)
   } else {
     entradas.sort((a, b) => b.data - a.data)
   }
@@ -434,17 +434,24 @@ export default function CasesTimeline({
     const container = viewportRef.current
     if (!container) return
     const fsc = firstSetCardsRef.current
-    // Avança pro primeiro card ainda não visto (seenLabelsRef já é mantido
-    // pelo tick()). Calcular "qual card estourou o viewport" via posição é
-    // ambíguo num carrossel em loop infinito — depois de avançar uma vez,
-    // a mesma posição corresponde a voltas diferentes do loop e a conta
-    // ficava presa sempre no mesmo card (ou oscilando entre dois).
+    const vw = container.clientWidth
+    const oneSet = oneSetRef.current
+    // Acha o card mais próximo da borda direita que ainda ultrapassa o viewport.
+    // Usa posição módulo (mesmo truque do tick) pra funcionar com qualquer
+    // posição do carrossel infinito — sem depender de seenLabelsRef, que é
+    // cumulativo e fica desatualizado quando a timeline abre centrada no meio.
+    let bestIdx = -1
+    let bestModLeft = Infinity
     for (let i = 0; i < fsc.length; i++) {
-      if (!seenLabelsRef.current.has(i)) {
-        handleLabelClick(i)
-        return
+      const card = fsc[i]
+      const modLeft  = ((card.offsetLeft + xRef.current.x) % oneSet + oneSet) % oneSet
+      const modRight = modLeft + card.offsetWidth
+      if (modRight > vw + 10 && modLeft < bestModLeft) {
+        bestModLeft = modLeft
+        bestIdx = i
       }
     }
+    if (bestIdx >= 0) handleLabelClick(bestIdx)
   }
 
   const handleLabelClick = (cardIdx) => {

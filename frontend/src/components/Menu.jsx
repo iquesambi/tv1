@@ -820,7 +820,7 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
       {contatoAberto && (
         <div className="home__nav-contato">
           <a href="/contato/seja-cliente" className="home__nav-link home__nav-link--contato" onClick={(e) => { e.preventDefault(); e.stopPropagation(); goTo('/contato/seja-cliente') }}>SEJA CLIENTE</a>
-          <a href="/contato/trabalhe-conosco" className="home__nav-link home__nav-link--contato" onClick={(e) => { e.preventDefault(); e.stopPropagation(); goTo('/contato/trabalhe-conosco') }}>TRABALHE CONOSCO</a>
+          <a href="/contato/trabalhe-conosco/formulario" className="home__nav-link home__nav-link--contato" onClick={(e) => { e.preventDefault(); e.stopPropagation(); goTo('/contato/trabalhe-conosco/formulario') }}>TRABALHE CONOSCO</a>
           <a href="/contato/outros-assuntos" className="home__nav-link home__nav-link--contato" onClick={(e) => { e.preventDefault(); e.stopPropagation(); goTo('/contato/outros-assuntos') }}>OUTROS ASSUNTOS</a>
         </div>
       )}
@@ -883,7 +883,7 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
                 </button>
                 <button
                   className="home__menu-mobile__nav-link"
-                  onClick={(e) => { e.preventDefault(); goTo('/contato/trabalhe-conosco'); setMenuMobile(false) }}
+                  onClick={(e) => { e.preventDefault(); goTo('/contato/trabalhe-conosco/formulario'); setMenuMobile(false) }}
                 >
                   Trabalhe conosco
                 </button>
@@ -1023,7 +1023,7 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
             </button>
             <button
               className="home__menu-mobile__nav-link"
-              onClick={(e) => { e.preventDefault(); goTo('/contato/trabalhe-conosco'); setMenuMobile(false) }}
+              onClick={(e) => { e.preventDefault(); goTo('/contato/trabalhe-conosco/formulario'); setMenuMobile(false) }}
             >
               Trabalhe conosco
             </button>

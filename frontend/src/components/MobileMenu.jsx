@@ -64,7 +64,7 @@ export default function MobileMenu({ logo, logoFiltro = 'brightness(0)' }) {
             <button className="mobile-menu__nav-link" onClick={() => { goTo('/contato'); setAberto(false) }}>
               Seja cliente
             </button>
-            <button className="mobile-menu__nav-link" onClick={() => { goTo('/contato/trabalhe-conosco'); setAberto(false) }}>
+            <button className="mobile-menu__nav-link" onClick={() => { goTo('/contato/trabalhe-conosco/formulario'); setAberto(false) }}>
               Trabalhe conosco
             </button>
             <button className="mobile-menu__nav-link" onClick={() => { goTo('/contato/outros-assuntos'); setAberto(false) }}>
