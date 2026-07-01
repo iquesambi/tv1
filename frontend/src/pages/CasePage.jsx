@@ -350,6 +350,7 @@ export default function CasePage() {
   const [timelinePronta, setTimelinePronta] = useState(false)
 
   const [data, setData] = useState(null)
+  const [is40Anos, setIs40Anos] = useState(false)
   const [logo, setLogo] = useState(null)
   const footerRef = useRef(null)
 
@@ -407,11 +408,11 @@ export default function CasePage() {
       .get(`${STRAPI}/api/cases${filtro}${populate}`)
       .then(r => {
         const encontrado = r.data.data?.[0] ?? null
-        if (encontrado) { setData(encontrado); return }
+        if (encontrado) { setData(encontrado); setIs40Anos(false); return }
         // Não achou em cases normais — pode ser um case histórico (40 anos)
         return axios
           .get(`${STRAPI}/api/cases-quarenta-anos${filtro}${populate}`)
-          .then(r2 => setData(r2.data.data?.[0] ?? null))
+          .then(r2 => { setData(r2.data.data?.[0] ?? null); setIs40Anos(true) })
       })
       .catch(() => {})
   }, [clienteSlug, caseSlug])
@@ -506,10 +507,23 @@ export default function CasePage() {
         <Block key={i} block={block} />
       ))}
 
+      {/* Case histórico (40 anos): mostra a timeline de 40 anos, centrada
+          neste case, em vez da timeline unificada por especialidade. */}
+      {is40Anos && (
+        <div className="case-embedded-timeline">
+          <CasesTimeline
+            conteudo="quarentaAnos"
+            contexto="case"
+            tema="claro"
+            activeHref={clienteSlug ? `/${clienteSlug}/${caseSlug}` : `/${caseSlug}`}
+          />
+        </div>
+      )}
+
       {/* Timeline unificada completa — card deste case no centro.
           Só monta quando prefetch + entry alvo estão prontos juntos,
           para evitar a re-inicialização do carrossel que causava scroll bizarro. */}
-      {timelinePronta && entradasTimeline && (
+      {!is40Anos && timelinePronta && entradasTimeline && (
         <div className="case-embedded-timeline">
           <CasesTimeline
             conteudo="unified"
