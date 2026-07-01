@@ -314,6 +314,7 @@
   font-family: 'Gilroy', sans-serif;
   font-size: 16px;
   font-weight: 500;
+  line-height: 1; /* sem isso, a altura padrão da fonte passava dos 28px do viewport e cortava a base dos números */
   text-transform: uppercase;
   color: #000001;
   white-space: nowrap;
