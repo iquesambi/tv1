@@ -316,7 +316,6 @@ export default function CasesTimeline({
   entradasPre = null,     // p/ modo unified: entradas já montadas pela página
   anchorMap   = null,     // p/ modo unified: slug -> entry id (rolagem por âncora)
   initialEntryId = null,  // p/ modo unified embutido: centra neste entry ao montar
-  activeHref  = null,     // p/ modo quarentaAnos embutido: acha e centra o entry com esse href
 }) {
   // Resolve tipo/conteudo
   const tipoResolvido = conteudo ?? (tipo === 'cliente' ? 'marca' : (tipo ?? 'marca'))
@@ -326,9 +325,6 @@ export default function CasesTimeline({
   const [entradas, setEntradas] = useState([])
   const [carregando, setCarregando] = useState(true)
   const [logo, setLogo]         = useState(null)
-  // Achado automaticamente no fetch de quarentaAnos quando activeHref é passado
-  const [entryAtivoAuto, setEntryAtivoAuto] = useState(null)
-  const initialEntryEfetivo = initialEntryId ?? entryAtivoAuto
 
   const viewportRef      = useRef(null)
   const trackRef         = useRef(null)
@@ -394,13 +390,8 @@ export default function CasesTimeline({
         '&sort=Data:desc' +
         '&pagination[limit]=100'
       ).then(data => {
-        const novas = montarEntradas(data ?? [], 'quarentaAnos')
-        setEntradas(novas)
+        setEntradas(montarEntradas(data ?? [], 'quarentaAnos'))
         setCarregando(false)
-        if (activeHref) {
-          const ativo = novas.find(e => e.href === activeHref)
-          setEntryAtivoAuto(ativo?.id ?? null)
-        }
       })
       return
     }
@@ -602,8 +593,8 @@ export default function CasesTimeline({
       // Se recebeu um entry pra centralizar ao montar (ex: timeline embutida
       // no case), aplica o alinhamento instantâneo logo aqui, quando os
       // firstSetCards já estão disponíveis — evita a race condition com eventos.
-      if (initialEntryEfetivo && initialEntryEfetivo !== '') {
-        const idx = entradas.findIndex(e => e.id === initialEntryEfetivo)
+      if (initialEntryId && initialEntryId !== '') {
+        const idx = entradas.findIndex(e => e.id === initialEntryId)
         if (idx >= 0 && cards[idx]) {
           const cardCenter = cards[idx].offsetLeft + cards[idx].offsetWidth / 2
           const base = container.clientWidth / 2 - oneSet - cardCenter
@@ -767,7 +758,7 @@ export default function CasesTimeline({
       cancelAnimationFrame(resizeRaf)
       resizeObserver.disconnect()
     }
-  }, [n, usaCarrossel, contexto, initialEntryEfetivo])
+  }, [n, usaCarrossel, contexto, initialEntryId])
 
   if (carregando) return (
     <div className="cases-timeline cases-timeline--case" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>

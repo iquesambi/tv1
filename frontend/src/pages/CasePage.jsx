@@ -507,15 +507,16 @@ export default function CasePage() {
         <Block key={i} block={block} />
       ))}
 
-      {/* Case histórico (40 anos): mostra a timeline de 40 anos, centrada
-          neste case, em vez da timeline unificada por especialidade. */}
+      {/* Case histórico (40 anos): mostra a timeline de 40 anos, em vez da
+          timeline unificada por especialidade. Sempre começa alinhada em
+          1997 (o mais antigo) — sem centralizar no case ativo, que num
+          carrossel infinito faria cases mais novos aparecerem "antes" dele. */}
       {is40Anos && (
         <div className="case-embedded-timeline">
           <CasesTimeline
             conteudo="quarentaAnos"
             contexto="case"
             tema="claro"
-            activeHref={clienteSlug ? `/${clienteSlug}/${caseSlug}` : `/${caseSlug}`}
           />
         </div>
       )}
