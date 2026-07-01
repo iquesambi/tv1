@@ -354,6 +354,62 @@
   display: block;
 }
 
+/* FOTO COM BIG NUMBER */
+
+.block-foto-big-number {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.block-foto-big-number img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.block-foto-big-number::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(270deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0) 61%);
+  pointer-events: none;
+}
+
+.block-foto-big-number__numbers {
+  position: absolute;
+  top: 50%;
+  right: 48px;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 3;
+  text-align: right;
+}
+
+.block-foto-big-number__number-item {
+  display: flex;
+  flex-direction: column;
+  color: #fff;
+}
+
+.block-foto-big-number__numero {
+  font-size: 90px;
+  font-weight: 900;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.block-foto-big-number__descricao {
+  font-size: 25px;
+  font-weight: 900;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
 /* BIG NUMBERS */
 
 .block-big-numbers {
@@ -690,6 +746,26 @@
   }
 
   .block-trio__descricao {
+    font-size: 16px;
+    line-height: 1.4;
+  }
+
+  /* ── Foto com Big Number ── */
+  .block-foto-big-number__numbers {
+    position: absolute;
+    top: unset;
+    bottom: 48px;
+    right: 16px;
+    transform: none;
+    text-align: right;
+  }
+
+  .block-foto-big-number__numero {
+    font-size: 56px;
+    line-height: 1;
+  }
+
+  .block-foto-big-number__descricao {
     font-size: 16px;
     line-height: 1.4;
   }

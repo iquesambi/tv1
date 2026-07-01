@@ -85,7 +85,8 @@
         "blocks.galeria",
         "blocks.imagem-trio",
         "blocks.video",
-        "blocks.big-numbers"
+        "blocks.big-numbers",
+        "blocks.foto-big-number"
       ]
     }
   }

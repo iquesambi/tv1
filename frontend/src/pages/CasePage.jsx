@@ -315,6 +315,23 @@ function Block({ block }) {
     case 'blocks.video':
       return <Video block={block} />
 
+    case 'blocks.foto-big-number':
+      return (
+        <div className="block-foto-big-number">
+          <img src={mediaUrl(block.imagem)} alt="" />
+          {block.numeros?.length > 0 && (
+            <div className="block-foto-big-number__numbers">
+              {block.numeros.map((item, i) => (
+                <div key={i} className="block-foto-big-number__number-item">
+                  <span className="block-foto-big-number__numero">{item.numero}</span>
+                  <span className="block-foto-big-number__descricao">{item.descricao}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )
+
     case 'blocks.big-numbers':
       return (
         <div className="block-big-numbers">
@@ -427,6 +444,7 @@ export default function CasePage() {
         if (b.__component === 'blocks.subcase')       return [mediaUrl(b.imagem_capa)]
         if (b.__component === 'blocks.video')         return [mediaUrl(b.capa)]
         if (b.__component === 'blocks.imagem-trio')   return [mediaUrl(b.imagem_1), mediaUrl(b.imagem_2), mediaUrl(b.imagem_3)]
+        if (b.__component === 'blocks.foto-big-number') return [mediaUrl(b.imagem)]
         if (b.__component === 'blocks.galeria')       return (b.imagens ?? []).map(mediaUrl)
         return []
       }),

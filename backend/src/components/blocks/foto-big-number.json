@@ -1,0 +1,14 @@
+{
+  "collectionName": "components_blocks_foto_big_numbers",
+  "info": { "displayName": "Foto com Big Number", "icon": "picture" },
+  "attributes": {
+    "imagem": { "type": "media", "multiple": false, "required": true, "allowedTypes": ["images"] },
+    "numeros": {
+      "type": "component",
+      "component": "blocks.big-number-item",
+      "repeatable": true,
+      "max": 4
+    },
+    "visivel": { "type": "boolean", "default": true }
+  }
+}
