@@ -12,15 +12,17 @@ export default function SlugRouter() {
   const [tipo, setTipo] = useState(null)
 
   useEffect(() => {
-    // Verifica em paralelo: especialidade, cliente e case sem cliente
+    // Verifica em paralelo: especialidade, cliente, case sem cliente e case 40 anos sem cliente
     Promise.all([
       axios.get(`${STRAPI}/api/especialidades?filters[slug][$eq]=${slug}&fields=slug`).catch(() => null),
       axios.get(`${STRAPI}/api/clientes?filters[slug][$eq]=${slug}&fields=slug`).catch(() => null),
       axios.get(`${STRAPI}/api/cases?filters[slug][$eq]=${slug}&filters[cliente][id][$null]=true&fields=slug`).catch(() => null),
-    ]).then(([espRes, cliRes, caseRes]) => {
-      if (espRes?.data?.data?.length > 0)  return setTipo('especialidade')
-      if (cliRes?.data?.data?.length > 0)  return setTipo('cliente')
-      if (caseRes?.data?.data?.length > 0) return setTipo('case')
+      axios.get(`${STRAPI}/api/cases-quarenta-anos?filters[slug][$eq]=${slug}&filters[cliente][id][$null]=true&fields=slug`).catch(() => null),
+    ]).then(([espRes, cliRes, caseRes, case40Res]) => {
+      if (espRes?.data?.data?.length > 0)   return setTipo('especialidade')
+      if (cliRes?.data?.data?.length > 0)   return setTipo('cliente')
+      if (caseRes?.data?.data?.length > 0)  return setTipo('case')
+      if (case40Res?.data?.data?.length > 0) return setTipo('case')
       setTipo('cliente') // fallback
     })
   }, [slug])

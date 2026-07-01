@@ -396,16 +396,23 @@ export default function CasePage() {
   }, [clienteSlug, caseSlug])
 
   useEffect(() => {
+    const populate =
+      `&populate[cliente]=true` +
+      `&populate[imagem_capa]=true` +
+      `&populate[blocos][populate]=*`
+    const filtro =
+      `?filters[slug][$eq]=${caseSlug}` +
+      (clienteSlug ? `&filters[cliente][slug][$eq]=${clienteSlug}` : '')
     axios
-      .get(
-        `${STRAPI}/api/cases` +
-        `?filters[slug][$eq]=${caseSlug}` +
-        (clienteSlug ? `&filters[cliente][slug][$eq]=${clienteSlug}` : '') +
-        `&populate[cliente]=true` +
-        `&populate[imagem_capa]=true` +
-        `&populate[blocos][populate]=*`
-      )
-      .then(r => setData(r.data.data?.[0] ?? null))
+      .get(`${STRAPI}/api/cases${filtro}${populate}`)
+      .then(r => {
+        const encontrado = r.data.data?.[0] ?? null
+        if (encontrado) { setData(encontrado); return }
+        // Não achou em cases normais — pode ser um case histórico (40 anos)
+        return axios
+          .get(`${STRAPI}/api/cases-quarenta-anos${filtro}${populate}`)
+          .then(r2 => setData(r2.data.data?.[0] ?? null))
+      })
       .catch(() => {})
   }, [clienteSlug, caseSlug])
 
