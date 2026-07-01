@@ -527,11 +527,18 @@ export default function CasesTimeline({
     let tilt = 0
     let raf
 
+    // Enquanto o usuário não interage, o modo quarentaAnos reaplica a
+    // centralização do primeiro card sempre que o layout for recalculado
+    // (ver calcLabels) — sem isso, imagens/fontes carregando depois do
+    // posicionamento inicial podiam deslocar os cards e o "1997" saía
+    // do centro sem nunca ser corrigido de volta.
+    let usuarioInteragiu = false
+
     // Drag com mouse
     let isDragging = false
     let dragStartX = 0
     let dragMoved  = false
-    const onMouseDown  = (e) => { isDragging = true; dragMoved = false; dragStartX = e.clientX; container.style.cursor = 'grabbing' }
+    const onMouseDown  = (e) => { isDragging = true; dragMoved = false; dragStartX = e.clientX; usuarioInteragiu = true; container.style.cursor = 'grabbing' }
     const onMouseMove  = (e) => {
       if (!isDragging || !usaCarrossel) return
       const delta = e.clientX - dragStartX
@@ -558,6 +565,7 @@ export default function CasesTimeline({
       touchStartY = e.touches[0].clientY
       touchDir    = null
       touchMoved  = false
+      usuarioInteragiu = true
     }
     const onTouchMove = (e) => {
       if (!usaCarrossel) return
@@ -601,6 +609,13 @@ export default function CasesTimeline({
           xRef.current.x = base + oneSet  // pega a cópia do meio do loop
           xTargetRef.current = null
         }
+      } else if (tipoResolvido === 'quarentaAnos' && cards[0]) {
+        // Sem entry pra centralizar (carregamento padrão): centraliza o
+        // primeiro case (o mais antigo) na tela, em vez de deixá-lo colado
+        // na borda esquerda.
+        const cardCenter = cards[0].offsetLeft + cards[0].offsetWidth / 2
+        xRef.current.x = container.clientWidth / 2 - oneSet - cardCenter
+        xTargetRef.current = null
       }
     }
 
@@ -614,6 +629,17 @@ export default function CasesTimeline({
         const sets = timelineTrackRef.current.querySelectorAll('.timeline__labels-set')
         sets.forEach(s => { s.style.width = `${currentOneSet}px` })
         const firstSetCards = cards.slice(0, n)
+
+        // Reaplica a centralização do primeiro card (quarentaAnos, sem
+        // interação do usuário ainda) usando as medidas atuais — o layout
+        // pode ter mudado desde o posicionamento inicial (imagens/fontes
+        // carregando), deixando o "1997" deslocado do centro sem correção.
+        if (tipoResolvido === 'quarentaAnos' && !initialEntryId && !usuarioInteragiu && firstSetCards[0]) {
+          const cardCenter = firstSetCards[0].offsetLeft + firstSetCards[0].offsetWidth / 2
+          xRef.current.x = container.clientWidth / 2 - currentOneSet - cardCenter
+          xTargetRef.current = null
+        }
+
         const grupos = gruposDeLabels(entradas)
         // .timeline__labels-track começa mais pra direita que .cliente-track
         // (padding-left do .timeline__labels-viewport, que os cards não têm)
@@ -678,12 +704,14 @@ export default function CasesTimeline({
         const delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY
         xRef.current.x -= delta
         tiltDeltaRef.current = -delta * 4
+        usuarioInteragiu = true
       } else {
         // quarentaAnos ou embutido: só scroll horizontal move a timeline
         if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
           e.preventDefault()
           xRef.current.x -= e.deltaX
           tiltDeltaRef.current = -e.deltaX * 4
+          usuarioInteragiu = true
         }
       }
     }
