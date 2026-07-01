@@ -610,11 +610,9 @@ export default function CasesTimeline({
           xTargetRef.current = null
         }
       } else if (tipoResolvido === 'quarentaAnos' && cards[0]) {
-        // Sem entry pra centralizar (carregamento padrão): centraliza o
-        // primeiro case (o mais antigo) na tela, em vez de deixá-lo colado
-        // na borda esquerda.
-        const cardCenter = cards[0].offsetLeft + cards[0].offsetWidth / 2
-        xRef.current.x = container.clientWidth / 2 - oneSet - cardCenter
+        // Sem entry pra centralizar (carregamento padrão): alinha o
+        // primeiro case (o mais antigo) na borda esquerda da tela.
+        xRef.current.x = -oneSet - cards[0].offsetLeft
         xTargetRef.current = null
       }
     }
@@ -630,13 +628,12 @@ export default function CasesTimeline({
         sets.forEach(s => { s.style.width = `${currentOneSet}px` })
         const firstSetCards = cards.slice(0, n)
 
-        // Reaplica a centralização do primeiro card (quarentaAnos, sem
-        // interação do usuário ainda) usando as medidas atuais — o layout
-        // pode ter mudado desde o posicionamento inicial (imagens/fontes
-        // carregando), deixando o "1997" deslocado do centro sem correção.
+        // Reaplica o alinhamento à esquerda do primeiro card (quarentaAnos,
+        // sem interação do usuário ainda) usando as medidas atuais — o
+        // layout pode ter mudado desde o posicionamento inicial
+        // (imagens/fontes carregando), deixando o "1997" deslocado sem correção.
         if (tipoResolvido === 'quarentaAnos' && !initialEntryId && !usuarioInteragiu && firstSetCards[0]) {
-          const cardCenter = firstSetCards[0].offsetLeft + firstSetCards[0].offsetWidth / 2
-          xRef.current.x = container.clientWidth / 2 - currentOneSet - cardCenter
+          xRef.current.x = -currentOneSet - firstSetCards[0].offsetLeft
           xTargetRef.current = null
         }
 
