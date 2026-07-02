@@ -9,7 +9,7 @@
       "type": "component",
       "component": "blocks.big-number-item",
       "repeatable": true,
-      "max": 4
+      "max": 6
     },
     "visivel": { "type": "boolean", "default": true }
   }
