@@ -1,6 +1,7 @@
 import { importarCloudinary } from './cloudinary-import';
 import { restaurarEspecialidades } from './restore-especialidades';
 import { midiasNaoUsadas } from './midias-nao-usadas';
+import { backfillClienteVisivel } from './backfill-cliente-visivel';
 
 export default {
   register({ strapi }) {
@@ -23,6 +24,12 @@ export default {
         method: 'GET',
         path: '/api/midias-nao-usadas',
         handler: (ctx) => midiasNaoUsadas(ctx),
+        config: { auth: false },
+      },
+      {
+        method: 'GET',
+        path: '/api/backfill-cliente-visivel',
+        handler: (ctx) => backfillClienteVisivel(ctx),
         config: { auth: false },
       },
     ]);
