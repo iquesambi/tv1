@@ -608,6 +608,32 @@ export interface ApiClienteCliente extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiEraEra extends Struct.CollectionTypeSchema {
+  collectionName: 'eras';
+  info: {
+    displayName: 'Era (40 anos)';
+    pluralName: 'eras';
+    singularName: 'era';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    ano: Schema.Attribute.Integer & Schema.Attribute.Required;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<'oneToMany', 'api::era.era'> &
+      Schema.Attribute.Private;
+    nome: Schema.Attribute.String & Schema.Attribute.Required;
+    publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiEspecialidadeEspecialidade
   extends Struct.CollectionTypeSchema {
   collectionName: 'especialidades';
@@ -1448,6 +1474,7 @@ declare module '@strapi/strapi' {
       'api::case-quarenta-anos.case-quarenta-anos': ApiCaseQuarentaAnosCaseQuarentaAnos;
       'api::configuracoes-email.configuracoes-email': ApiConfiguracoesEmailConfiguracoesEmail;
       'api::cliente.cliente': ApiClienteCliente;
+      'api::era.era': ApiEraEra;
       'api::especialidade.especialidade': ApiEspecialidadeEspecialidade;
       'api::logo-site.logo-site': ApiLogoSiteLogoSite;
       'api::navigation.navigation': ApiNavigationNavigation;
