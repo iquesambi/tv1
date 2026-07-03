@@ -47,6 +47,11 @@
       "type": "integer",
       "default": 9999,
       "min": 1
+    },
+    "visivel": {
+      "type": "boolean",
+      "default": true,
+      "description": "Desligado: esconde o cliente do site (grid de clientes, menu, footer)."
     }
   }
 }

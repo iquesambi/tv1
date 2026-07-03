@@ -38,7 +38,7 @@ export default function ClientesGridPage() {
   const goTo = useGoTo()
 
   useEffect(() => {
-    api('clientes?sort=posicao:asc,nome:asc&populate[logo]=true&populate[cases][fields][0]=id&pagination[pageSize]=200').then(setClientes)
+    api('clientes?filters[visivel][$ne]=false&sort=posicao:asc,nome:asc&populate[logo]=true&populate[cases][fields][0]=id&pagination[pageSize]=200').then(setClientes)
     api('logo-site?populate=logo').then(setLogo)
     document.body.classList.remove('scroll-locked')
   }, [])
