@@ -1,0 +1,23 @@
+{
+  "kind": "collectionType",
+  "collectionName": "eras",
+  "info": {
+    "singularName": "era",
+    "pluralName": "eras",
+    "displayName": "Era (40 anos)"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "nome": {
+      "type": "string",
+      "required": true
+    },
+    "ano": {
+      "type": "integer",
+      "required": true,
+      "description": "Ano do case sobre o qual o nome da era vai centralizar na timeline."
+    }
+  }
+}

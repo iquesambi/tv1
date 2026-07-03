@@ -290,7 +290,11 @@
   margin-top: 18px;
   padding-left: 24px;
   box-sizing: border-box;
-  overflow: hidden;
+  /* Só corta na horizontal (necessário pro carrossel infinito) — cortar
+     também na vertical arriscava cortar a base dos números quando a
+     métrica da fonte variava um pouco entre navegadores/telas. */
+  overflow-x: hidden;
+  overflow-y: visible;
 }
 
 /* Track triplicado dos labels - se move com translateX */
@@ -327,6 +331,42 @@
 
 .timeline__label--clicavel:hover {
   opacity: 0.5;
+}
+
+/* ── ERAS (acima da timeline, ex: "40 anos") ── */
+
+.timeline__eras-viewport {
+  position: relative;
+  height: 28px;
+  padding-left: 24px;
+  box-sizing: border-box;
+  overflow-x: hidden;
+  overflow-y: visible;
+}
+
+.timeline__eras-track {
+  display: flex;
+  height: 100%;
+  will-change: transform;
+}
+
+.timeline__eras-set {
+  flex: 0 0 auto;
+  position: relative;
+  height: 100%;
+}
+
+.timeline__era {
+  position: absolute;
+  transform: translateX(-50%);
+  top: 0;
+  font-family: 'Gilroy', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1;
+  text-transform: uppercase;
+  color: #000001;
+  white-space: nowrap;
 }
 
 /* ── LOADING ──────────────────────────── */

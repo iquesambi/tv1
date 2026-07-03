@@ -223,7 +223,7 @@ function CaseCard({ entrada, idx, carousel, proporcaoNatural = false, maxImageHe
 }
 
 /* ── Timeline bar ── */
-function TimelineBar({ labels, xRef, tiltDeltaRef, timelineTrackRef, usaCarrossel, onLabelClick, arrowRef, onArrowClick }) {
+function TimelineBar({ labels, xRef, tiltDeltaRef, timelineTrackRef, usaCarrossel, onLabelClick, arrowRef, onArrowClick, eras, erasTrackRef }) {
   const isDragging = useRef(false)
   const dragStart  = useRef(0)
 
@@ -252,6 +252,19 @@ function TimelineBar({ labels, xRef, tiltDeltaRef, timelineTrackRef, usaCarrosse
         onMouseDown={e => { isDragging.current = true; dragStart.current = e.clientX; e.preventDefault() }}
       >
         <div className="timeline__inner">
+          {eras?.length > 0 && (
+            <div className="timeline__eras-viewport">
+              <div className="timeline__eras-track" ref={erasTrackRef}>
+                {[0, 1, 2].map(setIdx => (
+                  <div className="timeline__eras-set" key={setIdx}>
+                    {eras.map((e, i) => (
+                      <div key={i} className="timeline__era" style={{ left: `${e.pos}%` }}>{e.nome}</div>
+                    ))}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
           <div className="timeline__ticks">
             {Array.from({ length: 120 }).map((_, i) => <div key={i} className="timeline__tick" />)}
           </div>
@@ -329,6 +342,7 @@ export default function CasesTimeline({
   const viewportRef      = useRef(null)
   const trackRef         = useRef(null)
   const timelineTrackRef = useRef(null)
+  const erasTrackRef     = useRef(null)
   const xRef             = useRef({ x: 0 })
   const xTargetRef       = useRef(null)
   const firstSetCardsRef = useRef([])
@@ -339,6 +353,22 @@ export default function CasesTimeline({
   const labelsRef        = useRef([])
   const [labels, setLabels]   = useState([])
   const [vpHeight, setVpHeight] = useState(null)
+  const [erasRaw, setErasRaw] = useState([])
+
+  // Nomes de era (CMS) — só no modo quarentaAnos
+  useEffect(() => {
+    if (tipoResolvido !== 'quarentaAnos') return
+    apiGet('eras?sort=ano:asc&pagination[pageSize]=100').then(data => setErasRaw(Array.isArray(data) ? data : []))
+  }, [tipoResolvido])
+
+  // Posição de cada era = posição do label do ano correspondente (já
+  // calculada em calcLabels a partir do mesmo agrupamento por ano).
+  const eras = erasRaw
+    .map(e => {
+      const match = labels.find(l => l.label === String(e.ano))
+      return match ? { nome: e.nome, pos: match.pos } : null
+    })
+    .filter(Boolean)
 
   // Logo para contexto 'pagina' (não quarentaAnos)
   useEffect(() => {
@@ -626,6 +656,10 @@ export default function CasesTimeline({
         oneSetRef.current = currentOneSet
         const sets = timelineTrackRef.current.querySelectorAll('.timeline__labels-set')
         sets.forEach(s => { s.style.width = `${currentOneSet}px` })
+        if (erasTrackRef.current) {
+          const erasSets = erasTrackRef.current.querySelectorAll('.timeline__eras-set')
+          erasSets.forEach(s => { s.style.width = `${currentOneSet}px` })
+        }
         const firstSetCards = cards.slice(0, n)
 
         // Reaplica o alinhamento à esquerda do primeiro card (quarentaAnos,
@@ -733,6 +767,7 @@ export default function CasesTimeline({
         if (xRef.current.x > 0)       xRef.current.x -= os
         track.style.transform = `translateX(${xRef.current.x}px)`
         if (timelineTrackRef.current) timelineTrackRef.current.style.transform = `translateX(${xRef.current.x}px)`
+        if (erasTrackRef.current) erasTrackRef.current.style.transform = `translateX(${xRef.current.x}px)`
       }
       const vw = container.clientWidth
       cards.forEach(card => {
@@ -859,6 +894,8 @@ export default function CasesTimeline({
         onLabelClick={handleAlignLeft}
         arrowRef={arrowRef}
         onArrowClick={handleNextArrow}
+        eras={eras}
+        erasTrackRef={erasTrackRef}
       />
 
     </div>

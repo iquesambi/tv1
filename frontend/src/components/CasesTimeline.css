@@ -64,6 +64,14 @@
   font-weight: 500;
 }
 
+/* Eras: branco + PP Hatton itálico, mesma família visual dos labels */
+.cases-timeline--escuro .timeline__era {
+  color: #fff;
+  font-family: 'PP Hatton', serif;
+  font-style: italic;
+  font-weight: 500;
+}
+
 /* ── HEADER ───────────────────────────── */
 
 .cases-timeline__header {
@@ -123,6 +131,8 @@
 .timeline__bar,
 .timeline__labels-track,
 .timeline__label,
+.timeline__eras-track,
+.timeline__era,
 .timeline__tick {
   cursor: grab;
 }
@@ -130,6 +140,8 @@
 .cases-timeline:active .timeline__bar,
 .cases-timeline:active .timeline__labels-track,
 .cases-timeline:active .timeline__label,
+.cases-timeline:active .timeline__eras-track,
+.cases-timeline:active .timeline__era,
 .cases-timeline:active .timeline__tick {
   cursor: grabbing;
 }
