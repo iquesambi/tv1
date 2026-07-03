@@ -338,6 +338,10 @@
 .timeline__eras-viewport {
   position: relative;
   height: 28px;
+  /* Folga acima: sem isso, o texto ficava colado no topo do .timeline__inner
+     (que tem overflow:hidden) e acentos como o de "Í" — que em fontes
+     itálicas costumam desenhar acima da métrica normal — ficavam cortados. */
+  margin-top: 16px;
   padding-left: 24px;
   box-sizing: border-box;
   overflow-x: hidden;
