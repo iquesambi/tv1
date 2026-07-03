@@ -250,6 +250,12 @@
   z-index: 2;
 }
 
+/* Com a régua de eras acima dos ticks (margin-top:16 + height:28 = 44px),
+   a seta precisa descer o mesmo tanto pra continuar alinhada com os labels. */
+.timeline--com-eras .timeline__next-arrow {
+  top: 98px;
+}
+
 .cases-timeline--escuro .timeline__next-arrow {
   background: linear-gradient(to right, rgba(0,0,1,0) 0%, #000001 65%, #000001 100%);
   color: #fff;

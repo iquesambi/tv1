@@ -248,7 +248,7 @@ function TimelineBar({ labels, xRef, tiltDeltaRef, timelineTrackRef, usaCarrosse
   if (usaCarrossel) {
     return (
       <div
-        className="timeline timeline--carousel"
+        className={`timeline timeline--carousel${eras?.length > 0 ? ' timeline--com-eras' : ''}`}
         onMouseDown={e => { isDragging.current = true; dragStart.current = e.clientX; e.preventDefault() }}
       >
         <div className="timeline__inner">
