@@ -64,12 +64,9 @@
   font-weight: 500;
 }
 
-/* Eras: branco + PP Hatton itálico, mesma família visual dos labels */
+/* Eras: branco, mantém Gilroy (diferente do label, que usa PP Hatton) */
 .cases-timeline--escuro .timeline__era {
   color: #fff;
-  font-family: 'PP Hatton', serif;
-  font-style: italic;
-  font-weight: 500;
 }
 
 /* ── HEADER ───────────────────────────── */
