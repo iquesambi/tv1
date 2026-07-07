@@ -9,6 +9,18 @@ const STRAPI = 'https://tv1-53ev.onrender.com'
 const apiGet = (path) => axios.get(`${STRAPI}/api/${path}`).then(r => r.data.data).catch(() => null)
 const mediaUrl = (obj) => !obj?.url ? null : obj.url.startsWith("http") ? obj.url : `${STRAPI}${obj.url}`
 
+// Card da timeline mostra no máximo ~380px de largura (clamp no CSS) — pedir
+// a imagem original inteira (várias vezes maior, sem redimensionar) só pra
+// exibir nesse tamanho é desperdício de banda. Insere uma transformação do
+// Cloudinary direto na URL (sem precisar reprocessar nada no CMS): largura
+// máxima cobrindo até uma tela retina (2x), qualidade e formato automáticos.
+const CAPA_LARGURA = 800
+const capaUrl = (obj) => {
+  const url = mediaUrl(obj)
+  if (!url || !url.includes('res.cloudinary.com') || !url.includes('/upload/')) return url
+  return url.replace('/upload/', `/upload/w_${CAPA_LARGURA},q_auto,f_auto/`)
+}
+
 const ALTURAS = [460, 340, 400, 310, 380]
 const alturaParaIdx = (idx) => ALTURAS[idx % ALTURAS.length]
 
@@ -188,13 +200,18 @@ function gruposDeLabels(entradas) {
 }
 
 /* ── Card ── */
-function CaseCard({ entrada, idx, carousel, proporcaoNatural = false, maxImageHeight = null, navState = null }) {
+function CaseCard({ entrada, idx, carousel, proporcaoNatural = false, maxImageHeight = null, navState = null, carregarImagem = true }) {
   const goTo = useGoTo()
 
   const cardStyle = proporcaoNatural
     ? { alignSelf: 'center', height: 'fit-content', background: 'transparent' }
     : carousel ? { height: alturaParaIdx(idx) } : undefined
 
+  // aspectRatio reserva o espaço da imagem mesmo antes dela carregar (janela
+  // de lazy loading) — sem isso o card colapsaria pra altura 0 até a hora
+  // de baixar a imagem, causando pulo de layout quando ela finalmente entra
+  // na janela visível.
+  const { width: capaW, height: capaH } = entrada.capa ?? {}
   const imgStyle = proporcaoNatural
     ? {
         display: 'block',
@@ -202,6 +219,7 @@ function CaseCard({ entrada, idx, carousel, proporcaoNatural = false, maxImageHe
         height: 'auto',
         maxHeight: maxImageHeight ? `${maxImageHeight}px` : '70vh',
         objectFit: 'fill',
+        aspectRatio: capaW && capaH ? `${capaW} / ${capaH}` : undefined,
       }
     : undefined
 
@@ -210,10 +228,11 @@ function CaseCard({ entrada, idx, carousel, proporcaoNatural = false, maxImageHe
     <div
       className={['cliente-card', 'cliente-card--ativo', carousel ? 'cliente-card--carousel' : '', !clickable ? 'cliente-card--sem-link' : ''].join(' ')}
       style={cardStyle}
+      data-idx={idx}
       onClick={clickable ? () => goTo(entrada.href, null, navState) : undefined}
     >
       {entrada.capa && (
-        <img src={mediaUrl(entrada.capa)} alt={entrada.nome} className="cliente-card__img" style={imgStyle} />
+        <img src={carregarImagem ? capaUrl(entrada.capa) : undefined} alt={entrada.nome} className="cliente-card__img" style={imgStyle} loading="lazy" />
       )}
       <div className="cliente-card__overlay">
         <h3 className="cliente-card__titulo">{entrada.nome}</h3>
@@ -354,6 +373,13 @@ export default function CasesTimeline({
   const [labels, setLabels]   = useState([])
   const [vpHeight, setVpHeight] = useState(null)
   const [erasRaw, setErasRaw] = useState([])
+
+  // Janela de lazy loading: só os cards visíveis + 20% de buffer pra cada
+  // lado têm a imagem carregada; os demais só carregam quando entram nessa
+  // janela (arrastando/scrollando). Uma vez carregado, o índice nunca sai
+  // do set — evita recarregar/piscar imagem ao ir e voltar.
+  const loadedIndicesRef = useRef(new Set())
+  const [, setLoadedVersion] = useState(0) // só pra forçar re-render quando a janela muda
 
   // Nomes de era (CMS) — só no modo quarentaAnos
   useEffect(() => {
@@ -647,6 +673,63 @@ export default function CasesTimeline({
       }
     }
 
+    // Acha o intervalo de índices (0..n-1) atualmente visível (parcial ou
+    // totalmente) no viewport, dada a posição atual do carrossel.
+    const intervaloVisivel = () => {
+      const fsc = firstSetCardsRef.current
+      const os  = oneSetRef.current
+      const vw  = container.clientWidth
+      let minVis = null, maxVis = null
+      fsc.forEach((card, i) => {
+        const left  = ((card.offsetLeft + xRef.current.x) % os + os) % os
+        const right = left + card.offsetWidth
+        if (right > -1 && left < vw + 1) {
+          if (minVis === null || i < minVis) minVis = i
+          if (maxVis === null || i > maxVis) maxVis = i
+        }
+      })
+      return minVis === null ? null : [minVis, maxVis]
+    }
+
+    // Lazy loading: os cards visíveis carregam a imagem na hora (nunca
+    // esperam surgir na tela — funciona como uma rede de segurança pra
+    // garantir que o que já está sendo mostrado nunca fique em branco).
+    const marcarVisiveisComoCarregados = () => {
+      if (!usaCarrossel) return
+      const intervalo = intervaloVisivel()
+      if (!intervalo) return
+      let mudou = false
+      for (let i = intervalo[0]; i <= intervalo[1]; i++) {
+        if (!loadedIndicesRef.current.has(i)) { loadedIndicesRef.current.add(i); mudou = true }
+      }
+      if (mudou) setLoadedVersion(v => v + 1)
+    }
+    marcarVisiveisComoCarregados()
+
+    // Continua carregando as próximas em segundo plano (não espera o
+    // usuário arrastar até lá) — assim que as visíveis terminam, já puxa
+    // pra frente e pra trás, um pouco de cada vez, até cobrir tudo. Isso
+    // evita o "branco" de esperar a imagem aparecer só quando o card já
+    // estava na tela.
+    let backgroundTimer = null
+    if (usaCarrossel && n > 0) {
+      const intervaloInicial = intervaloVisivel()
+      const centro = intervaloInicial ? Math.round((intervaloInicial[0] + intervaloInicial[1]) / 2) : 0
+      let raio = 1
+      const expandir = () => {
+        let mudou = false
+        const de  = Math.max(0, centro - raio)
+        const ate = Math.min(n - 1, centro + raio)
+        for (let i = de; i <= ate; i++) {
+          if (!loadedIndicesRef.current.has(i)) { loadedIndicesRef.current.add(i); mudou = true }
+        }
+        if (mudou) setLoadedVersion(v => v + 1)
+        raio += 2
+        if (de > 0 || ate < n - 1) backgroundTimer = setTimeout(expandir, 120)
+      }
+      backgroundTimer = setTimeout(expandir, 120)
+    }
+
     const calcLabels = () => {
       if (usaCarrossel && timelineTrackRef.current) {
         // Recalcula oneSet do estado atual do DOM — pode ter mudado depois que
@@ -747,7 +830,11 @@ export default function CasesTimeline({
       }
     }
 
+    let frameCount = 0
     const tick = () => {
+      // A cada ~12 frames (uns 200ms) — não precisa checar toda hora,
+      // arrastar/animar não move o suficiente pra mudar a janela frame a frame.
+      if (++frameCount % 12 === 0) marcarVisiveisComoCarregados()
       if (xTargetRef.current !== null) {
         const diff = xTargetRef.current - xRef.current.x
         if (Math.abs(diff) < 1) { xRef.current.x = xTargetRef.current; xTargetRef.current = null }
@@ -817,6 +904,7 @@ export default function CasesTimeline({
       cancelAnimationFrame(raf)
       cancelAnimationFrame(resizeRaf)
       resizeObserver.disconnect()
+      clearTimeout(backgroundTimer)
     }
   }, [n, usaCarrossel, contexto, initialEntryId])
 
@@ -875,7 +963,7 @@ export default function CasesTimeline({
       {usaCarrossel ? (
         <div className="cliente-viewport" ref={viewportRef}>
           <div className="cliente-track" ref={trackRef}>
-            {triplicadas.map(e => <CaseCard key={e._key} entrada={e} idx={e._idx} carousel proporcaoNatural={proporcaoNatural} maxImageHeight={vpHeight} navState={navState} />)}
+            {triplicadas.map(e => <CaseCard key={e._key} entrada={e} idx={e._idx} carousel proporcaoNatural={proporcaoNatural} maxImageHeight={vpHeight} navState={navState} carregarImagem={loadedIndicesRef.current.has(e._idx)} />)}
           </div>
         </div>
       ) : (
