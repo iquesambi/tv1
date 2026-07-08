@@ -148,35 +148,34 @@ const externalUrl = (url) => {
 // Em dev (sem build) ficam null e o fetch normal é usado
 const _pf = window.__TV1_DATA__ ?? {}
 
+// Cache em memória compartilhado entre TODAS as instâncias do Menu (a home
+// e o rodapé de toda outra página usam o mesmo componente) — sem isso, cada
+// montagem refazia as mesmas 7 chamadas de API do zero, mesmo que os dados
+// já tivessem sido buscados segundos antes numa página anterior da mesma
+// sessão. Uma vez buscado, fica válido até a aba recarregar.
+let _menuDataCache   = null
+let _menuDataPromise = null
+function fetchMenuData() {
+  if (_menuDataCache) return Promise.resolve(_menuDataCache)
+  if (_menuDataPromise) return _menuDataPromise
+  _menuDataPromise = Promise.all([
+    api('navigation?populate[links][populate][sublinks][populate]=*'),
+    api('logo-site?populate=logo'),
+    api('agencias?populate=*&sort=posicao:asc'),
+    api('redes-sociais?populate[redes][populate]=icone'),
+    api('quarenta-anos?populate=imagem'),
+  ]).then(([nav, logo, agenciasRaw, redes, quarentaAnos]) => {
+    const agencias = Array.isArray(agenciasRaw)
+      ? agenciasRaw.map(a => ({ ...a, logo: a.Logo ?? a.logo, nome: a.Nome ?? a.nome, slug: a.Slug ?? a.slug }))
+      : []
+    _menuDataCache = { nav, logo, agencias, redes, quarentaAnos }
+    return _menuDataCache
+  }).catch(() => { _menuDataPromise = null; return null })
+  return _menuDataPromise
+}
+
 const SUBMENU_VISIBLE = 7
 
-// Normalização óptica de logos:
-// - height explícito (não max-height) para SVGs serem corretamente constrangidos
-// - logos quadrados/circulares recebem MAIS altura (círculo de 50px ≈ texto de 38px em peso visual)
-// - logos horizontais muito largos recebem menos altura para não dominar
-// aspect ≤ 1  → 50px   (VW, Bayer, Shell)
-// aspect = 2  → 44px   (McDonald's, NU)
-// aspect ≥ 3  → 38px, mas capped pelo max-width 130px
-const LOGO_MAX_W = 130
-
-function logoImgStyle(logo, escala = 1) {
-  const aspect = (logo?.width && logo?.height) ? logo.width / logo.height : 1.8
-  const scale  = Math.max(0.3, Math.min(3, escala || 1))   // clamp seguro
-
-  // Portrait (escudos, empilhados — WB, GWM): normaliza por largura-alvo
-  if (aspect < 1) {
-    const targetW = Math.round(75 * scale)
-    const h = Math.min(Math.round(88 * scale), Math.round(targetW / aspect))
-    return { height: h, width: targetW }
-  }
-
-  // Landscape/quadrados: teto 44px, redução começa cedo (aspect > 1)
-  const t = Math.min(Math.max(aspect - 1, 0) / 2.5, 1)
-  let h = Math.max(Math.round((44 - t * 10) * scale), aspect > 2.8 ? 26 : 21)
-  let w = Math.round(h * aspect)
-  if (w > LOGO_MAX_W) { w = LOGO_MAX_W; h = Math.round(w / aspect) }
-  return { height: h, width: w }
-}
 const WIN_PAD  = 48
 
 // Fonte do nav principal — fonte única de verdade, espelha exatamente o
@@ -254,8 +253,6 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
   const [logo, setLogo]             = useState(isHome ? (_pf.logo ?? null) : null)
   const [agencias, setAgencias]     = useState(isHome ? (_pf.agencias ?? null) : null)
   const [redes, setRedes]           = useState(isHome ? (_pf.redes ?? null) : null)
-  const [equipe, setEquipe]         = useState(null)
-  const [clientes, setClientes]     = useState(null)
   const [aberto, setAberto]         = useState(null)
   const [hoveredSub, setHoveredSub] = useState(null)
   const [activeSubIdx, setActiveSubIdx] = useState(0)
@@ -319,39 +316,20 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
   const links = nav?.links ?? []
 
   // Sublinks dinâmicos
-  const getSublinks = (link) => {
-    if (link.url === '/clientes') {
-      return (clientes ?? []).map(c => ({
-        label: c.nome,
-        url: `/${c.slug}`,
-        imagem_hover: link.imagem_hover ?? null,
-      }))
-    }
-    return link.sublinks ?? []
-  }
+  const getSublinks = (link) => link.sublinks ?? []
 
   // Fetch de dados
   useEffect(() => {
     // Aquece o cache de cases pra já saber, no primeiro clique, quais
     // especialidades têm case (e bloquear o clique nas vazias).
     prefetchCases()
-    api('navigation?populate[links][populate][sublinks][populate]=*').then(setNav)
-    api('logo-site?populate=logo').then(setLogo)
-    api('agencias?populate=*&sort=posicao:asc').then(data =>
-      setAgencias(Array.isArray(data) ? data.map(a => ({ ...a, logo: a.Logo ?? a.logo, nome: a.Nome ?? a.nome, slug: a.Slug ?? a.slug })) : [])
-    )
-    api('redes-sociais?populate[redes][populate]=icone').then(setRedes)
-    api('quarenta-anos?populate=imagem').then(r => { if (isHome) setQA(r); else setQA(r) })
-    api('pessoas?filters[ativo][$eq]=true&populate=foto&sort=ordem').then(setEquipe)
-    api('clientes?filters[visivel][$ne]=false&sort=posicao:asc,nome:asc&populate[logo]=true&populate[cases][fields][0]=id').then(data => {
-      setClientes(data)
-      // Pré-carrega logos para evitar flash na abertura do submenu
-      if (Array.isArray(data)) {
-        data.forEach(c => {
-          const url = mediaUrl(c.logo)
-          if (url) { const img = new Image(); img.src = url }
-        })
-      }
+    fetchMenuData().then(d => {
+      if (!d) return
+      setNav(d.nav)
+      setLogo(d.logo)
+      setAgencias(d.agencias)
+      setRedes(d.redes)
+      setQA(d.quarentaAnos)
     })
 
     if (isHome) {
@@ -483,7 +461,7 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
 
     window.addEventListener('wheel', onWheel, { passive: false })
     return () => window.removeEventListener('wheel', onWheel)
-  }, [aberto, links, equipe, clientes])
+  }, [aberto, links])
 
   // Touch scroll para roleta no mobile
   useEffect(() => {
@@ -543,7 +521,7 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
       window.removeEventListener('touchmove', onTouchMove)
       window.removeEventListener('touchend', onTouchEnd)
     }
-  }, [aberto, links, equipe, clientes])
+  }, [aberto, links])
 
   const isMobile = () => window.innerWidth <= 768
 
@@ -593,10 +571,9 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
     if (isHome && contatoAberto) return null
 
     const link = links[aberto]
-    const isClientes = link && (link.url?.includes('clientes') || link.label?.toLowerCase().includes('clientes'))
     const isPessoas  = link && (link.url?.includes('pessoas') || link.label?.toLowerCase().includes('pessoas'))
     const sublinks = link ? getSublinks(link) : []
-    if (!isClientes && sublinks.length === 0) return null
+    if (sublinks.length === 0) return null
 
     const vw = viewport.w
     const vh = viewport.h
@@ -623,65 +600,6 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
     const N           = links.length
     const navFontSize = navFontSizeFor(vw, vh, N)
     const navItemH    = navFontSize * navLineHeightRatio(vw)
-    const itemCenterY = vh * 0.47 + (aberto - (N - 1) / 2) * navItemH
-    const itemBottomY = itemCenterY + navItemH / 2
-
-    // Grid de logos para Clientes — layout intercalado (7, 6, 7, 6...)
-    if (isClientes && clientes?.length) {
-      // Divide em linhas alternando 7 e 6 itens
-      const logoRows = []
-      let idx = 0, rowIdx = 0
-      while (idx < clientes.length) {
-        const size = rowIdx % 2 === 0 ? 7 : 6
-        logoRows.push(clientes.slice(idx, idx + size))
-        idx += size
-        rowIdx++
-      }
-
-      const numRows = logoRows.length
-      const estimatedGridH = numRows * 56 + (numRows - 1) * 32 + 80 // itens + gaps + padding
-      // Centraliza verticalmente no viewport
-      const gridTop = Math.min(
-        Math.max((vh - estimatedGridH) / 2, vh * 0.25),
-        vh - estimatedGridH - 48
-      )
-      return (
-        <div className="home__submenu" onClick={e => e.stopPropagation()}>
-          <div className="home__submenu-logos" style={{ top: gridTop }}>
-            {logoRows.map((row, r) => (
-              <div key={r} className="home__submenu-logos__row">
-                {row.map((c, j) => {
-                  const temCase = c.cases?.length > 0
-                  return temCase ? (
-                    <a
-                      key={j}
-                      href={`/${c.slug}`}
-                      className="home__submenu-logo-item"
-                      onClick={handleSubClick({ url: `/${c.slug}` })}
-                    >
-                      {c.logo
-                        ? <img src={mediaUrl(c.logo)} alt={c.nome} style={{ ...logoImgStyle(c.logo, c.escala_logo), '--logo-escala-mobile': c.escala_logo_mobile || 1 }} />
-                        : <span className="home__submenu-logo-fallback">{c.nome}</span>
-                      }
-                    </a>
-                  ) : (
-                    <div
-                      key={j}
-                      className="home__submenu-logo-item home__submenu-logo-item--sem-case"
-                    >
-                      {c.logo
-                        ? <img src={mediaUrl(c.logo)} alt={c.nome} style={{ ...logoImgStyle(c.logo, c.escala_logo), '--logo-escala-mobile': c.escala_logo_mobile || 1 }} />
-                        : <span className="home__submenu-logo-fallback">{c.nome}</span>
-                      }
-                    </div>
-                  )
-                })}
-              </div>
-            ))}
-          </div>
-        </div>
-      )
-    }
 
     if (isRoleta) {
       const offset     = Math.max(0, Math.min(activeSubIdx, sublinks.length - 1))
