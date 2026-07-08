@@ -40,7 +40,7 @@ async function main() {
 
   // ── Coleta URLs de imagens críticas ──────────────────────────────
   const imageUrls = new Set()
-  const add = (obj) => obj?.url && imageUrls.add(`${STRAPI}${obj.url}`)
+  const add = (obj) => obj?.url && imageUrls.add(obj.url.startsWith('http') ? obj.url : `${STRAPI}${obj.url}`)
 
   add(logo?.logo)
   add(quarentaAnos?.imagem)
