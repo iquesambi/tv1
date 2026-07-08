@@ -361,7 +361,19 @@ function Block({ block }) {
 }
 
 /* ── Página ─────────────────────────────── */
+// Trocar de um case pro outro mantém o mesmo componente montado (só os
+// params da rota mudam), então sem isso o "data" antigo (com a imagem
+// antiga) continuava na tela até o novo fetch terminar. O key força um
+// remount completo a cada troca de case, reaparecendo o spinner até
+// título, descrição e imagem de capa do novo case estarem prontos.
 export default function CasePage() {
+  const params = useParams()
+  const clienteSlug = params.case ? (params.cliente ?? params.slug) : null
+  const caseSlug    = params.case ?? params.slug
+  return <CasePageInner key={`${clienteSlug ?? ''}/${caseSlug}`} />
+}
+
+function CasePageInner() {
   const params = useParams()
   const location = useLocation()
   // Se veio por /:slug/:case → clienteSlug + caseSlug normais
