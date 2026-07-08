@@ -446,6 +446,24 @@ export interface ApiAgenciaAgencia extends Struct.CollectionTypeSchema {
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    escala_logo: Schema.Attribute.Decimal &
+      Schema.Attribute.SetMinMax<
+        {
+          max: 3;
+          min: 0.3;
+        },
+        number
+      > &
+      Schema.Attribute.DefaultTo<1>;
+    escala_logo_mobile: Schema.Attribute.Decimal &
+      Schema.Attribute.SetMinMax<
+        {
+          max: 3;
+          min: 0.3;
+        },
+        number
+      > &
+      Schema.Attribute.DefaultTo<1>;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
@@ -471,6 +489,69 @@ export interface ApiAgenciaAgencia extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiCaseQuarentaAnosCaseQuarentaAnos
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'case_quarenta_anos';
+  info: {
+    displayName: 'Cases 40 Anos';
+    pluralName: 'cases-quarenta-anos';
+    singularName: 'case-quarenta-anos';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    agencia: Schema.Attribute.Relation<'manyToOne', 'api::agencia.agencia'>;
+    blocos: Schema.Attribute.DynamicZone<
+      [
+        'blocks.subtitulo',
+        'blocks.subcase',
+        'blocks.texto',
+        'blocks.imagem-simples',
+        'blocks.galeria',
+        'blocks.imagem-trio',
+        'blocks.video',
+        'blocks.big-numbers',
+        'blocks.foto-big-number',
+      ]
+    >;
+    breadcrumb: Schema.Attribute.String;
+    clicavel: Schema.Attribute.Enumeration<
+      ['clic\u00E1vel', 'n\u00E3o clic\u00E1vel']
+    > &
+      Schema.Attribute.DefaultTo<'clic\u00E1vel'>;
+    cliente: Schema.Attribute.Relation<'manyToOne', 'api::cliente.cliente'>;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    Data: Schema.Attribute.Date;
+    descricao: Schema.Attribute.Text;
+    especialidade: Schema.Attribute.Relation<
+      'manyToMany',
+      'api::especialidade.especialidade'
+    >;
+    imagem_capa: Schema.Attribute.Media<'images'>;
+    imagem_timeline: Schema.Attribute.Media<'images'>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::case-quarenta-anos.case-quarenta-anos'
+    > &
+      Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
+    slug: Schema.Attribute.UID<'titulo'> & Schema.Attribute.Required;
+    sub_especialidade: Schema.Attribute.Relation<
+      'manyToMany',
+      'api::sub-especialidade.sub-especialidade'
+    >;
+    titulo: Schema.Attribute.String & Schema.Attribute.Required;
+    titulo_timeline: Schema.Attribute.String;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiCaseCase extends Struct.CollectionTypeSchema {
   collectionName: 'cases';
   info: {
@@ -493,11 +574,14 @@ export interface ApiCaseCase extends Struct.CollectionTypeSchema {
         'blocks.imagem-trio',
         'blocks.video',
         'blocks.big-numbers',
+        'blocks.foto-big-number',
       ]
     >;
     breadcrumb: Schema.Attribute.String;
-    clicavel: Schema.Attribute.Enumeration<['clicável', 'não clicável']> &
-      Schema.Attribute.DefaultTo<'clicável'>;
+    clicavel: Schema.Attribute.Enumeration<
+      ['clic\u00E1vel', 'n\u00E3o clic\u00E1vel']
+    > &
+      Schema.Attribute.DefaultTo<'clic\u00E1vel'>;
     cliente: Schema.Attribute.Relation<'manyToOne', 'api::cliente.cliente'>;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
@@ -505,7 +589,7 @@ export interface ApiCaseCase extends Struct.CollectionTypeSchema {
     Data: Schema.Attribute.Date;
     descricao: Schema.Attribute.Text;
     especialidade: Schema.Attribute.Relation<
-      'manyToOne',
+      'manyToMany',
       'api::especialidade.especialidade'
     >;
     imagem_capa: Schema.Attribute.Media<'images'>;
@@ -516,52 +600,11 @@ export interface ApiCaseCase extends Struct.CollectionTypeSchema {
     publishedAt: Schema.Attribute.DateTime;
     slug: Schema.Attribute.UID<'titulo'> & Schema.Attribute.Required;
     sub_especialidade: Schema.Attribute.Relation<
-      'manyToOne',
+      'manyToMany',
       'api::sub-especialidade.sub-especialidade'
     >;
     titulo: Schema.Attribute.String & Schema.Attribute.Required;
-    updatedAt: Schema.Attribute.DateTime;
-    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
-      Schema.Attribute.Private;
-  };
-}
-
-export interface ApiCaseQuarentaAnosCaseQuarentaAnos extends Struct.CollectionTypeSchema {
-  collectionName: 'case_quarenta_anos';
-  info: {
-    displayName: 'Cases 40 Anos';
-    pluralName: 'cases-quarenta-anos';
-    singularName: 'case-quarenta-anos';
-  };
-  options: {
-    draftAndPublish: true;
-  };
-  attributes: {
-    blocos: Schema.Attribute.DynamicZone<
-      [
-        'blocks.subtitulo',
-        'blocks.subcase',
-        'blocks.texto',
-        'blocks.imagem-simples',
-        'blocks.galeria',
-        'blocks.imagem-trio',
-        'blocks.video',
-        'blocks.big-numbers',
-      ]
-    >;
-    clicavel: Schema.Attribute.Enumeration<['clicável', 'não clicável']> &
-      Schema.Attribute.DefaultTo<'clicável'>;
-    cliente: Schema.Attribute.Relation<'manyToOne', 'api::cliente.cliente'>;
-    createdAt: Schema.Attribute.DateTime;
-    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
-      Schema.Attribute.Private;
-    Data: Schema.Attribute.Date;
-    imagem_capa: Schema.Attribute.Media<'images'>;
-    imagem_timeline: Schema.Attribute.Media<'images'>;
-    locale: Schema.Attribute.String & Schema.Attribute.Private;
-    publishedAt: Schema.Attribute.DateTime;
-    slug: Schema.Attribute.UID<'titulo'> & Schema.Attribute.Required;
-    titulo: Schema.Attribute.String & Schema.Attribute.Required;
+    titulo_timeline: Schema.Attribute.String;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -592,6 +635,15 @@ export interface ApiClienteCliente extends Struct.CollectionTypeSchema {
         number
       > &
       Schema.Attribute.DefaultTo<1>;
+    escala_logo_mobile: Schema.Attribute.Decimal &
+      Schema.Attribute.SetMinMax<
+        {
+          max: 3;
+          min: 0.3;
+        },
+        number
+      > &
+      Schema.Attribute.DefaultTo<1>;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
@@ -600,8 +652,50 @@ export interface ApiClienteCliente extends Struct.CollectionTypeSchema {
       Schema.Attribute.Private;
     logo: Schema.Attribute.Media<'images'>;
     nome: Schema.Attribute.String & Schema.Attribute.Required;
+    posicao: Schema.Attribute.Integer &
+      Schema.Attribute.SetMinMax<
+        {
+          min: 1;
+        },
+        number
+      > &
+      Schema.Attribute.DefaultTo<9999>;
     publishedAt: Schema.Attribute.DateTime;
     slug: Schema.Attribute.UID<'nome'> & Schema.Attribute.Required;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    visivel: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
+  };
+}
+
+export interface ApiConfiguracoesEmailConfiguracoesEmail
+  extends Struct.SingleTypeSchema {
+  collectionName: 'configuracoes_emails';
+  info: {
+    displayName: 'Configura\u00E7\u00F5es de Email';
+    pluralName: 'configuracoes-emails';
+    singularName: 'configuracoes-email';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    email_outros_assuntos: Schema.Attribute.Text;
+    email_remetente: Schema.Attribute.String &
+      Schema.Attribute.DefaultTo<'noreply@tv1.com.br'>;
+    email_seja_cliente: Schema.Attribute.Text;
+    email_trabalhe_conosco: Schema.Attribute.Text;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::configuracoes-email.configuracoes-email'
+    > &
+      Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -646,7 +740,7 @@ export interface ApiEspecialidadeEspecialidade
     draftAndPublish: true;
   };
   attributes: {
-    cases: Schema.Attribute.Relation<'oneToMany', 'api::case.case'>;
+    cases: Schema.Attribute.Relation<'manyToMany', 'api::case.case'>;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -758,6 +852,8 @@ export interface ApiPessoaPessoa extends Struct.CollectionTypeSchema {
       Schema.Attribute.Private;
     nome: Schema.Attribute.String & Schema.Attribute.Required;
     ordem: Schema.Attribute.Integer & Schema.Attribute.DefaultTo<0>;
+    posicao_foto: Schema.Attribute.Enumeration<['topo', 'centro', 'baixo']> &
+      Schema.Attribute.DefaultTo<'centro'>;
     publishedAt: Schema.Attribute.DateTime;
     slug: Schema.Attribute.UID<'nome'> & Schema.Attribute.Required;
     updatedAt: Schema.Attribute.DateTime;
@@ -793,6 +889,9 @@ export interface ApiQuarentaAnosQuarentaAnos extends Struct.SingleTypeSchema {
       'api::quarenta-anos.quarenta-anos'
     > &
       Schema.Attribute.Private;
+    mostrar_timeline: Schema.Attribute.Boolean &
+      Schema.Attribute.DefaultTo<true>;
+    mostrar_video: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
     publishedAt: Schema.Attribute.DateTime;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
@@ -878,7 +977,7 @@ export interface ApiSubEspecialidadeSubEspecialidade
     draftAndPublish: true;
   };
   attributes: {
-    cases: Schema.Attribute.Relation<'oneToMany', 'api::case.case'>;
+    cases: Schema.Attribute.Relation<'manyToMany', 'api::case.case'>;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -893,34 +992,10 @@ export interface ApiSubEspecialidadeSubEspecialidade
     > &
       Schema.Attribute.Private;
     nome: Schema.Attribute.String & Schema.Attribute.Required;
+    ordem: Schema.Attribute.Integer;
     publishedAt: Schema.Attribute.DateTime;
     slug: Schema.Attribute.UID<'nome'> & Schema.Attribute.Required;
     updatedAt: Schema.Attribute.DateTime;
-    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
-      Schema.Attribute.Private;
-  };
-}
-
-export interface ApiConfiguracoesEmailConfiguracoesEmail
-  extends Struct.SingleTypeSchema {
-  collectionName: 'configuracoes_emails';
-  info: {
-    displayName: 'Configurações de Email';
-    pluralName: 'configuracoes-emails';
-    singularName: 'configuracoes-email';
-  };
-  options: {
-    draftAndPublish: false;
-  };
-  attributes: {
-    email_seja_cliente: Schema.Attribute.Text;
-    email_trabalhe_conosco: Schema.Attribute.Text;
-    email_outros_assuntos: Schema.Attribute.Text;
-    email_remetente: Schema.Attribute.String;
-    createdAt: Schema.Attribute.DateTime;
-    updatedAt: Schema.Attribute.DateTime;
-    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
-      Schema.Attribute.Private;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
   };
@@ -1470,10 +1545,10 @@ declare module '@strapi/strapi' {
       'admin::transfer-token-permission': AdminTransferTokenPermission;
       'admin::user': AdminUser;
       'api::agencia.agencia': ApiAgenciaAgencia;
-      'api::case.case': ApiCaseCase;
       'api::case-quarenta-anos.case-quarenta-anos': ApiCaseQuarentaAnosCaseQuarentaAnos;
-      'api::configuracoes-email.configuracoes-email': ApiConfiguracoesEmailConfiguracoesEmail;
+      'api::case.case': ApiCaseCase;
       'api::cliente.cliente': ApiClienteCliente;
+      'api::configuracoes-email.configuracoes-email': ApiConfiguracoesEmailConfiguracoesEmail;
       'api::era.era': ApiEraEra;
       'api::especialidade.especialidade': ApiEspecialidadeEspecialidade;
       'api::logo-site.logo-site': ApiLogoSiteLogoSite;

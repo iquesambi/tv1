@@ -27,6 +27,26 @@ export interface BlocksBigNumbers extends Struct.ComponentSchema {
         },
         number
       >;
+    visivel: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
+  };
+}
+
+export interface BlocksFotoBigNumber extends Struct.ComponentSchema {
+  collectionName: 'components_blocks_foto_big_numbers';
+  info: {
+    displayName: 'Foto com Big Number';
+    icon: 'picture';
+  };
+  attributes: {
+    imagem: Schema.Attribute.Media<'images'> & Schema.Attribute.Required;
+    numeros: Schema.Attribute.Component<'blocks.big-number-item', true> &
+      Schema.Attribute.SetMinMax<
+        {
+          max: 6;
+        },
+        number
+      >;
+    visivel: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
   };
 }
 
@@ -38,6 +58,9 @@ export interface BlocksGaleria extends Struct.ComponentSchema {
   };
   attributes: {
     imagens: Schema.Attribute.Media<'images', true>;
+    mostrar_foto_completa: Schema.Attribute.Boolean &
+      Schema.Attribute.DefaultTo<false>;
+    visivel: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
   };
 }
 
@@ -62,6 +85,7 @@ export interface BlocksImagemSimples extends Struct.ComponentSchema {
   attributes: {
     imagem: Schema.Attribute.Media<'images'> & Schema.Attribute.Required;
     legenda: Schema.Attribute.String;
+    visivel: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
   };
 }
 
@@ -78,10 +102,11 @@ export interface BlocksImagemTrio extends Struct.ComponentSchema {
     numeros: Schema.Attribute.Component<'blocks.big-number-item', true> &
       Schema.Attribute.SetMinMax<
         {
-          max: 4;
+          max: 6;
         },
         number
       >;
+    visivel: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
   };
 }
 
@@ -93,10 +118,14 @@ export interface BlocksSubcase extends Struct.ComponentSchema {
   };
   attributes: {
     ancora_id: Schema.Attribute.String;
+    Data: Schema.Attribute.Date;
     descricao: Schema.Attribute.Text;
-    imagem: Schema.Attribute.Media<'images'>;
-    subtitulo: Schema.Attribute.String;
+    imagem_capa: Schema.Attribute.Media<'images'>;
+    imagem_timeline: Schema.Attribute.Media<'images'>;
     titulo: Schema.Attribute.String & Schema.Attribute.Required;
+    titulo_timeline: Schema.Attribute.String;
+    video_url: Schema.Attribute.String;
+    visivel: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
   };
 }
 
@@ -113,6 +142,7 @@ export interface BlocksSubtitulo extends Struct.ComponentSchema {
     timeline_capa: Schema.Attribute.Media<'images'>;
     timeline_data: Schema.Attribute.Date;
     timeline_nome: Schema.Attribute.String;
+    visivel: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
   };
 }
 
@@ -124,6 +154,7 @@ export interface BlocksTexto extends Struct.ComponentSchema {
   };
   attributes: {
     conteudo: Schema.Attribute.RichText & Schema.Attribute.Required;
+    visivel: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
   };
 }
 
@@ -134,8 +165,14 @@ export interface BlocksVideo extends Struct.ComponentSchema {
     icon: 'play';
   };
   attributes: {
-    capa: Schema.Attribute.Media<'images'> & Schema.Attribute.Required;
+    ancora_id: Schema.Attribute.String;
+    capa: Schema.Attribute.Media<'images'>;
+    imagem_timeline: Schema.Attribute.Media<'images'>;
+    ir_para_timeline: Schema.Attribute.Boolean &
+      Schema.Attribute.DefaultTo<false>;
+    titulo: Schema.Attribute.String;
     url: Schema.Attribute.String & Schema.Attribute.Required;
+    visivel: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
   };
 }
 
@@ -199,6 +236,7 @@ declare module '@strapi/strapi' {
     export interface ComponentSchemas {
       'blocks.big-number-item': BlocksBigNumberItem;
       'blocks.big-numbers': BlocksBigNumbers;
+      'blocks.foto-big-number': BlocksFotoBigNumber;
       'blocks.galeria': BlocksGaleria;
       'blocks.galeria-item': BlocksGaleriaItem;
       'blocks.imagem-simples': BlocksImagemSimples;

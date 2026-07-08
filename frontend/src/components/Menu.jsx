@@ -321,8 +321,14 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
   // Fetch de dados
   useEffect(() => {
     // Aquece o cache de cases pra já saber, no primeiro clique, quais
-    // especialidades têm case (e bloquear o clique nas vazias).
-    prefetchCases()
+    // especialidades têm case (e bloquear o clique nas vazias). É uma
+    // query pesada (populate profundo de blocos) — adiada pra rodar só
+    // quando a thread principal ficar ociosa, pra não competir por
+    // banda/conexões com o carregamento crítico da página.
+    const idle = window.requestIdleCallback ?? ((cb) => setTimeout(cb, 300))
+    const cancelIdle = window.cancelIdleCallback ?? clearTimeout
+    const idleId = idle(prefetchCases)
+
     fetchMenuData().then(d => {
       if (!d) return
       setNav(d.nav)
@@ -339,6 +345,8 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
         saved.forEach(url => { const i = new Image(); i.src = url })
       } catch {}
     }
+
+    return () => cancelIdle(idleId)
   }, [])
 
   // Fallback: garante que o preloader nunca trava se alguma API falhar

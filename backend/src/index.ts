@@ -2,6 +2,7 @@ import { importarCloudinary } from './cloudinary-import';
 import { restaurarEspecialidades } from './restore-especialidades';
 import { midiasNaoUsadas } from './midias-nao-usadas';
 import { backfillClienteVisivel } from './backfill-cliente-visivel';
+import { casesTimelineRoute, invalidarCasesTimelineCache } from './cases-timeline-cache';
 
 export default {
   register({ strapi }) {
@@ -32,10 +33,33 @@ export default {
         handler: (ctx) => backfillClienteVisivel(ctx),
         config: { auth: false },
       },
+      {
+        method: 'GET',
+        path: '/api/cases-timeline',
+        handler: (ctx) => casesTimelineRoute(ctx),
+        config: { auth: false },
+      },
     ]);
   },
 
   bootstrap({ strapi }) {
+
+    // Invalida o cache da timeline de /cases sempre que algo que ela usa
+    // muda — case, especialidade, sub-especialidade ou a navegação (que
+    // define quais especialidades aparecem e em que ordem). Automático,
+    // sem precisar de nenhuma ação manual no CMS: na próxima visita ao
+    // site, o cache é remontado do zero uma única vez.
+    strapi.db.lifecycles.subscribe({
+      models: [
+        'api::case.case',
+        'api::especialidade.especialidade',
+        'api::sub-especialidade.sub-especialidade',
+        'api::navigation.navigation',
+      ],
+      afterCreate() { invalidarCasesTimelineCache(); },
+      afterUpdate() { invalidarCasesTimelineCache(); },
+      afterDelete() { invalidarCasesTimelineCache(); },
+    });
 
     strapi.db.lifecycles.subscribe({
       models: ['api::especialidade.especialidade'],
