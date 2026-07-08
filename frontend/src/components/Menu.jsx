@@ -348,10 +348,18 @@ export default function Menu({ isHome = false, variant = 'claro', semMarcas = fa
     return () => clearTimeout(t)
   }, [])
 
-  // Preloader (home only)
+  // Preloader (home only) — só roda uma vez por montagem. Sem essa trava,
+  // a busca ao vivo (que roda em paralelo pra manter os dados atualizados,
+  // mesmo com o _pf embutido no HTML) troca nav/logo/agencias/redes por
+  // objetos novos assim que chega, e como esse efeito depende deles por
+  // referência, reiniciava a espera das imagens do zero — travando a tela
+  // de loading por mais um round-trip inteiro à toa.
+  const preloadIniciadoRef = useRef(false)
   useEffect(() => {
     if (!isHome) return
     if (!logo || !agencias || !redes || !nav) return
+    if (preloadIniciadoRef.current) return
+    preloadIniciadoRef.current = true
 
     const urls = [
       mediaUrl(logo?.logo),
