@@ -148,27 +148,30 @@ const externalUrl = (url) => {
 // Em dev (sem build) ficam null e o fetch normal é usado
 const _pf = window.__TV1_DATA__ ?? {}
 
+// Agência vem do Strapi com campos maiúsculos (Nome/Slug/Logo) — o resto do
+// componente espera minúsculo. Usado tanto pro embed de build quanto pro
+// fetch ao vivo, pra não duplicar a normalização em dois lugares.
+const normalizarAgencias = (arr) =>
+  Array.isArray(arr) ? arr.map(a => ({ ...a, logo: a.Logo ?? a.logo, nome: a.Nome ?? a.nome, slug: a.Slug ?? a.slug })) : []
+if (_pf.agencias) _pf.agencias = normalizarAgencias(_pf.agencias)
+
 // Cache em memória compartilhado entre TODAS as instâncias do Menu (a home
 // e o rodapé de toda outra página usam o mesmo componente) — sem isso, cada
-// montagem refazia as mesmas 7 chamadas de API do zero, mesmo que os dados
-// já tivessem sido buscados segundos antes numa página anterior da mesma
+// montagem refazia as mesmas chamadas de API do zero, mesmo que os dados já
+// tivessem sido buscados segundos antes numa página anterior da mesma
 // sessão. Uma vez buscado, fica válido até a aba recarregar.
+//
+// A busca em si é UMA chamada só (/api/menu-data) — o backend já junta
+// navegação + logo + agências + redes sociais + 40 anos e cacheia isso lá
+// (ver backend/src/menu-data-cache.ts), em vez de 5 chamadas separadas.
 let _menuDataCache   = null
 let _menuDataPromise = null
 function fetchMenuData() {
   if (_menuDataCache) return Promise.resolve(_menuDataCache)
   if (_menuDataPromise) return _menuDataPromise
-  _menuDataPromise = Promise.all([
-    api('navigation?populate[links][populate][sublinks][populate]=*'),
-    api('logo-site?populate=logo'),
-    api('agencias?populate=*&sort=posicao:asc'),
-    api('redes-sociais?populate[redes][populate]=icone'),
-    api('quarenta-anos?populate=imagem'),
-  ]).then(([nav, logo, agenciasRaw, redes, quarentaAnos]) => {
-    const agencias = Array.isArray(agenciasRaw)
-      ? agenciasRaw.map(a => ({ ...a, logo: a.Logo ?? a.logo, nome: a.Nome ?? a.nome, slug: a.Slug ?? a.slug }))
-      : []
-    _menuDataCache = { nav, logo, agencias, redes, quarentaAnos }
+  _menuDataPromise = api('menu-data').then(d => {
+    if (!d) throw new Error('menu-data vazio')
+    _menuDataCache = { nav: d.nav, logo: d.logo, agencias: normalizarAgencias(d.agencias), redes: d.redes, quarentaAnos: d.quarentaAnos }
     return _menuDataCache
   }).catch(() => { _menuDataPromise = null; return null })
   return _menuDataPromise

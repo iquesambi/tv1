@@ -31,7 +31,7 @@ async function main() {
   const [nav, logo, agencias, quarentaAnos, redes] = await Promise.all([
     get('navigation?populate[links][populate][0]=imagem_hover&populate[links][populate][sublinks][populate]=imagem_hover'),
     get('logo-site?populate=logo'),
-    get('agencias?populate=logo&sort=ordem:asc'),
+    get('agencias?populate=Logo&sort=posicao:asc'),
     get('quarenta-anos?populate=imagem'),
     get('redes-sociais?populate[redes][populate]=icone'),
   ])
@@ -44,7 +44,7 @@ async function main() {
 
   add(logo?.logo)
   add(quarentaAnos?.imagem)
-  for (const ag of agencias ?? []) add(ag.logo)
+  for (const ag of agencias ?? []) add(ag.Logo)
   for (const r of redes?.redes ?? []) add(r.icone)
   for (const link of nav?.links ?? []) {
     add(link.imagem_hover)

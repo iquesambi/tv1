@@ -3,6 +3,7 @@ import { restaurarEspecialidades } from './restore-especialidades';
 import { midiasNaoUsadas } from './midias-nao-usadas';
 import { backfillClienteVisivel } from './backfill-cliente-visivel';
 import { casesTimelineRoute, invalidarCasesTimelineCache } from './cases-timeline-cache';
+import { menuDataRoute, invalidarMenuDataCache } from './menu-data-cache';
 
 export default {
   register({ strapi }) {
@@ -39,6 +40,12 @@ export default {
         handler: (ctx) => casesTimelineRoute(ctx),
         config: { auth: false },
       },
+      {
+        method: 'GET',
+        path: '/api/menu-data',
+        handler: (ctx) => menuDataRoute(ctx),
+        config: { auth: false },
+      },
     ]);
   },
 
@@ -59,6 +66,22 @@ export default {
       afterCreate() { invalidarCasesTimelineCache(); },
       afterUpdate() { invalidarCasesTimelineCache(); },
       afterDelete() { invalidarCasesTimelineCache(); },
+    });
+
+    // Mesma ideia pro cache combinado do Menu (navegação, logo, agências,
+    // redes sociais, 40 anos) — invalida sozinho quando qualquer um desses
+    // muda no CMS.
+    strapi.db.lifecycles.subscribe({
+      models: [
+        'api::navigation.navigation',
+        'api::logo-site.logo-site',
+        'api::agencia.agencia',
+        'api::redes-sociais.redes-sociais',
+        'api::quarenta-anos.quarenta-anos',
+      ],
+      afterCreate() { invalidarMenuDataCache(); },
+      afterUpdate() { invalidarMenuDataCache(); },
+      afterDelete() { invalidarMenuDataCache(); },
     });
 
     strapi.db.lifecycles.subscribe({
