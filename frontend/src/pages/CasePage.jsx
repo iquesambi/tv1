@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback, useRef } from 'react'
 import { useParams, useLocation } from 'react-router-dom'
 import axios from 'axios'
-import Menu from '../components/Menu.jsx'
+import Menu, { fetchMenuData } from '../components/Menu.jsx'
 import CasesTimeline from '../components/CasesTimeline.jsx'
 import { prefetchCases, getEntradasCache } from './CasesPage.jsx'
 import './CasePage.css'
@@ -36,6 +36,17 @@ function textoParaHtml(texto) {
     .join('')
 }
 const mediaUrl = (obj) => !obj?.url ? null : obj.url.startsWith("http") ? obj.url : `${STRAPI}${obj.url}`
+
+// Imagens do case (capa, blocos) nunca renderizam maiores que o viewport,
+// mas várias vêm do CMS em resolução original de milhares de px — pede uma
+// versão redimensionada e com formato/qualidade automáticos (webp/avif
+// quando suportado) direto na URL do Cloudinary.
+const LARGURA_IMG = 1600
+const imgUrl = (obj) => {
+  const url = mediaUrl(obj)
+  if (!url || !url.includes('res.cloudinary.com') || !url.includes('/upload/')) return url
+  return url.replace('/upload/', `/upload/w_${LARGURA_IMG},q_auto,f_auto/`)
+}
 
 function isYoutube(url) {
   return url?.includes('youtube.com') || url?.includes('youtu.be')
@@ -117,7 +128,7 @@ function Video({ block }) {
       />
       {!aberto && (
         <>
-          <img src={block.capa ? mediaUrl(block.capa) : youtubeCapa(block.url)} alt={block.titulo ?? ''} className="block-video__capa" />
+          <img src={block.capa ? imgUrl(block.capa) : youtubeCapa(block.url)} alt={block.titulo ?? ''} className="block-video__capa" loading="lazy" />
           <div className="block-video__play">
             <svg className="block-video__play-btn" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
               <circle cx="32" cy="32" r="30" fill="none" stroke="#fff" strokeWidth="2" />
@@ -152,7 +163,7 @@ function Subcase({ block }) {
           className={`block-subcase__image${temVideo ? ' block-subcase__image--video' : ''}`}
           onClick={temVideo ? () => setTocando(true) : undefined}
         >
-          <img src={mediaUrl(block.imagem_capa)} alt={block.titulo} />
+          <img src={imgUrl(block.imagem_capa)} alt={block.titulo} loading="lazy" />
           {temVideo && (
             <div className="block-subcase__play">
               <svg className="block-subcase__play-btn" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
@@ -209,10 +220,10 @@ function Galeria({ itens, mostrarCompleta = false }) {
     return () => window.removeEventListener('keydown', onKey)
   }, [anterior, proximo])
 
-  // Preload de todas as imagens assim que a galeria monta
+  // Preload de todas as imagens (já redimensionadas) assim que a galeria monta
   useEffect(() => {
     imagemsOrdenadas.forEach(item => {
-      const url = mediaUrl(item)
+      const url = imgUrl(item)
       if (url) {
         const img = new Image()
         img.src = url
@@ -225,7 +236,7 @@ function Galeria({ itens, mostrarCompleta = false }) {
   return (
     <div className="block-galeria">
       <div className={`block-galeria__slide${mostrarCompleta ? ' block-galeria__slide--completa' : ''}`}>
-        <img src={mediaUrl(imagemsOrdenadas[ativo])} alt="" />
+        <img src={imgUrl(imagemsOrdenadas[ativo])} alt="" />
         {n > 1 && (
           <>
             {/* Faixas laterais (20%): clique volta/avança uma foto */}
@@ -279,7 +290,7 @@ function Block({ block }) {
     case 'blocks.imagem-simples':
       return (
         <figure className="block-imagem-simples">
-          <img src={mediaUrl(block.imagem)} alt={block.legenda ?? ''} />
+          <img src={imgUrl(block.imagem)} alt={block.legenda ?? ''} loading="lazy" />
           {block.legenda && <figcaption>{block.legenda}</figcaption>}
         </figure>
       )
@@ -291,10 +302,10 @@ function Block({ block }) {
       return (
         <div className="block-trio">
           <div className="block-trio__left">
-            <img src={mediaUrl(block.imagem_1)} alt="" />
+            <img src={imgUrl(block.imagem_1)} alt="" loading="lazy" />
           </div>
           <div className="block-trio__right">
-            <img src={mediaUrl(block.imagem_2)} alt="" />
+            <img src={imgUrl(block.imagem_2)} alt="" loading="lazy" />
             {block.numeros?.length > 0 && (
               <div className="block-trio__numbers">
                 {block.numeros.map((item, i) => (
@@ -307,7 +318,7 @@ function Block({ block }) {
             )}
           </div>
           <div className="block-trio__center">
-            <img src={mediaUrl(block.imagem_3)} alt="" />
+            <img src={imgUrl(block.imagem_3)} alt="" loading="lazy" />
           </div>
         </div>
       )
@@ -318,7 +329,7 @@ function Block({ block }) {
     case 'blocks.foto-big-number':
       return (
         <div className="block-foto-big-number">
-          <img src={mediaUrl(block.imagem)} alt="" />
+          <img src={imgUrl(block.imagem)} alt="" loading="lazy" />
           {block.numeros?.length > 0 && (
             <div className="block-foto-big-number__numbers">
               {block.numeros.map((item, i) => (
@@ -385,7 +396,8 @@ export default function CasePage() {
   }, [lsKey])
 
   useEffect(() => {
-    axios.get(`${STRAPI}/api/logo-site?populate=logo`).then(r => setLogo(r.data.data)).catch(() => {})
+    // Reaproveita o cache do Menu.jsx em vez de refazer o fetch do logo do site.
+    fetchMenuData().then(d => { if (d) setLogo(d.logo) })
     document.body.classList.remove('scroll-locked')
   }, [])
 
@@ -414,48 +426,48 @@ export default function CasePage() {
   }, [clienteSlug, caseSlug])
 
   useEffect(() => {
-    const populate =
-      `&populate[cliente]=true` +
-      `&populate[imagem_capa]=true` +
-      `&populate[blocos][populate]=*`
-    const filtro =
-      `?filters[slug][$eq]=${caseSlug}` +
-      (clienteSlug ? `&filters[cliente][slug][$eq]=${clienteSlug}` : '')
+    // Detalhe do case (com todos os blocos populados) vem cacheado no
+    // servidor por slug — evita repetir essa query pesada a cada visita.
+    const query =
+      `?slug=${encodeURIComponent(caseSlug)}` +
+      (clienteSlug ? `&cliente=${encodeURIComponent(clienteSlug)}` : '')
     axios
-      .get(`${STRAPI}/api/cases${filtro}${populate}`)
+      .get(`${STRAPI}/api/case-detail${query}`)
       .then(r => {
-        const encontrado = r.data.data?.[0] ?? null
-        if (encontrado) { setData(encontrado); setIs40Anos(false); return }
-        // Não achou em cases normais — pode ser um case histórico (40 anos)
-        return axios
-          .get(`${STRAPI}/api/cases-quarenta-anos${filtro}${populate}`)
-          .then(r2 => { setData(r2.data.data?.[0] ?? null); setIs40Anos(true) })
+        const resultado = r.data.data
+        setData(resultado?.data ?? null)
+        setIs40Anos(resultado?.is40Anos ?? false)
       })
       .catch(() => {})
   }, [clienteSlug, caseSlug])
 
-  // Quando data carrega: salva URLs no localStorage e aguarda hero carregar
+  // Quando data carrega: salva URLs (já redimensionadas) no localStorage
+  // pra pré-aquecer visitas futuras, e aguarda só a capa do hero — o resto
+  // dos blocos (galeria, trio, subcases...) carrega sozinho conforme a
+  // página rola (loading="lazy" nos <img>), sem travar a página inteira
+  // atrás de um spinner esperando cada imagem do case terminar.
   useEffect(() => {
     if (!data) return
     const urls = [
-      mediaUrl(data.imagem_capa),
+      imgUrl(data.imagem_capa),
       ...(data.blocos ?? []).flatMap(b => {
-        if (b.__component === 'blocks.imagem-simples') return [mediaUrl(b.imagem)]
-        if (b.__component === 'blocks.subcase')       return [mediaUrl(b.imagem_capa)]
-        if (b.__component === 'blocks.video')         return [mediaUrl(b.capa)]
-        if (b.__component === 'blocks.imagem-trio')   return [mediaUrl(b.imagem_1), mediaUrl(b.imagem_2), mediaUrl(b.imagem_3)]
-        if (b.__component === 'blocks.foto-big-number') return [mediaUrl(b.imagem)]
-        if (b.__component === 'blocks.galeria')       return (b.imagens ?? []).map(mediaUrl)
+        if (b.__component === 'blocks.imagem-simples') return [imgUrl(b.imagem)]
+        if (b.__component === 'blocks.subcase')       return [imgUrl(b.imagem_capa)]
+        if (b.__component === 'blocks.video')         return [imgUrl(b.capa)]
+        if (b.__component === 'blocks.imagem-trio')   return [imgUrl(b.imagem_1), imgUrl(b.imagem_2), imgUrl(b.imagem_3)]
+        if (b.__component === 'blocks.foto-big-number') return [imgUrl(b.imagem)]
+        if (b.__component === 'blocks.galeria')       return (b.imagens ?? []).map(imgUrl)
         return []
       }),
     ].filter(Boolean)
     try { localStorage.setItem(lsKey, JSON.stringify(urls)) } catch {}
     if (pronto) return
-    if (!urls.length) { setPronto(true); return }
-    const timeout = setTimeout(() => setPronto(true), 6000)
-    let count = 0
-    const done = () => { if (++count >= urls.length) { clearTimeout(timeout); setPronto(true) } }
-    urls.forEach(url => { const img = new Image(); img.onload = img.onerror = done; img.src = url })
+    const heroUrl = imgUrl(data.imagem_capa)
+    if (!heroUrl) { setPronto(true); return }
+    const timeout = setTimeout(() => setPronto(true), 3000)
+    const img = new Image()
+    img.onload = img.onerror = () => { clearTimeout(timeout); setPronto(true) }
+    img.src = heroUrl
     return () => clearTimeout(timeout)
   }, [data])
 
@@ -515,7 +527,7 @@ export default function CasePage() {
         </div>
         {data.imagem_capa && (
           <div className="case-hero__image">
-            <img src={mediaUrl(data.imagem_capa)} alt={data.titulo} />
+            <img src={imgUrl(data.imagem_capa)} alt={data.titulo} />
           </div>
         )}
       </section>

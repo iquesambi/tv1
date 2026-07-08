@@ -5,6 +5,7 @@ import { backfillClienteVisivel } from './backfill-cliente-visivel';
 import { casesTimelineRoute, invalidarCasesTimelineCache } from './cases-timeline-cache';
 import { menuDataRoute, invalidarMenuDataCache } from './menu-data-cache';
 import { clientesGridRoute, invalidarClientesGridCache } from './clientes-grid-cache';
+import { caseDetailRoute, invalidarCaseDetailCache } from './case-detail-cache';
 
 export default {
   register({ strapi }) {
@@ -53,6 +54,12 @@ export default {
         handler: (ctx) => clientesGridRoute(ctx),
         config: { auth: false },
       },
+      {
+        method: 'GET',
+        path: '/api/case-detail',
+        handler: (ctx) => caseDetailRoute(ctx),
+        config: { auth: false },
+      },
     ]);
   },
 
@@ -97,6 +104,14 @@ export default {
       afterCreate() { invalidarClientesGridCache(); },
       afterUpdate() { invalidarClientesGridCache(); },
       afterDelete() { invalidarClientesGridCache(); },
+    });
+
+    // Mesma ideia pro cache do detalhe de cada case (página /:cliente/:case).
+    strapi.db.lifecycles.subscribe({
+      models: ['api::case.case', 'api::case-quarenta-anos.case-quarenta-anos'],
+      afterCreate() { invalidarCaseDetailCache(); },
+      afterUpdate() { invalidarCaseDetailCache(); },
+      afterDelete() { invalidarCaseDetailCache(); },
     });
 
     strapi.db.lifecycles.subscribe({
