@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react'
-import axios from 'axios'
 import { useGoTo } from '../transition.jsx'
+import { fetchMenuData } from './Menu.jsx'
 import './MobileMenu.css'
 
 const STRAPI = 'https://tv1-53ev.onrender.com'
-const api = (path) => axios.get(`${STRAPI}/api/${path}`).then(r => r.data.data).catch(() => null)
 const mediaUrl = (obj) => !obj?.url ? null : obj.url.startsWith("http") ? obj.url : `${STRAPI}${obj.url}`
 const externalUrl = (url) => {
   if (!url) return '#'
@@ -23,8 +22,15 @@ export default function MobileMenu({ logo, logoFiltro = 'brightness(0)' }) {
   const goTo = useGoTo()
 
   useEffect(() => {
-    api('agencias?populate=*&sort=posicao:asc').then(setAgencias)
-    api('redes-sociais?populate[redes][populate]=icone').then(setRedes)
+    // Reaproveita o mesmo cache do Menu.jsx (navegação/logo/agências/redes/
+    // 40 anos) em vez de refazer as buscas de agências e redes sociais —
+    // esse componente monta em várias páginas (Clientes, Pessoas, Quem
+    // Somos, cabeçalhos de timeline) e cada uma duplicava esse trabalho.
+    fetchMenuData().then(d => {
+      if (!d) return
+      setAgencias(d.agencias)
+      setRedes(d.redes)
+    })
   }, [])
 
   return (

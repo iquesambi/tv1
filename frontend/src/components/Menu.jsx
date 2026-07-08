@@ -166,7 +166,7 @@ if (_pf.agencias) _pf.agencias = normalizarAgencias(_pf.agencias)
 // (ver backend/src/menu-data-cache.ts), em vez de 5 chamadas separadas.
 let _menuDataCache   = null
 let _menuDataPromise = null
-function fetchMenuData() {
+export function fetchMenuData() {
   if (_menuDataCache) return Promise.resolve(_menuDataCache)
   if (_menuDataPromise) return _menuDataPromise
   _menuDataPromise = api('menu-data').then(d => {

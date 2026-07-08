@@ -4,6 +4,7 @@ import { midiasNaoUsadas } from './midias-nao-usadas';
 import { backfillClienteVisivel } from './backfill-cliente-visivel';
 import { casesTimelineRoute, invalidarCasesTimelineCache } from './cases-timeline-cache';
 import { menuDataRoute, invalidarMenuDataCache } from './menu-data-cache';
+import { clientesGridRoute, invalidarClientesGridCache } from './clientes-grid-cache';
 
 export default {
   register({ strapi }) {
@@ -46,6 +47,12 @@ export default {
         handler: (ctx) => menuDataRoute(ctx),
         config: { auth: false },
       },
+      {
+        method: 'GET',
+        path: '/api/clientes-grid',
+        handler: (ctx) => clientesGridRoute(ctx),
+        config: { auth: false },
+      },
     ]);
   },
 
@@ -82,6 +89,14 @@ export default {
       afterCreate() { invalidarMenuDataCache(); },
       afterUpdate() { invalidarMenuDataCache(); },
       afterDelete() { invalidarMenuDataCache(); },
+    });
+
+    // Mesma ideia pro cache da grade de logos de /clientes.
+    strapi.db.lifecycles.subscribe({
+      models: ['api::cliente.cliente'],
+      afterCreate() { invalidarClientesGridCache(); },
+      afterUpdate() { invalidarClientesGridCache(); },
+      afterDelete() { invalidarClientesGridCache(); },
     });
 
     strapi.db.lifecycles.subscribe({

@@ -420,7 +420,8 @@ body.camera-ativa #root > *:not(.cartela):not(.camera-overlay-video) {
 }
 
 .home__nav-link--contato:hover {
-  color: #000001 !important;
+  color: #aaaaaa !important;
+  opacity: 0.45 !important;
 }
 
 /* Botão de contato sem estilo de link */

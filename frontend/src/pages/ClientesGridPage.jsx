@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import axios from 'axios'
 import { useGoTo } from '../transition.jsx'
+import { fetchMenuData } from '../components/Menu.jsx'
 import PageHeader from '../components/PageHeader.jsx'
 import './ClientesGridPage.css'
 
@@ -11,6 +12,33 @@ const MIN_SCALE = 0.45
 const STRAPI = 'https://tv1-53ev.onrender.com'
 const api = (path) => axios.get(`${STRAPI}/api/${path}`).then(r => r.data.data).catch(() => null)
 const mediaUrl = (obj) => !obj?.url ? null : obj.url.startsWith('http') ? obj.url : `${STRAPI}${obj.url}`
+
+// Logo nunca aparece com mais de ~156px na tela, mas muitos vêm em
+// resolução original de vários milhares de px (alguns com quase 200KB) —
+// pede uma versão redimensionada e com formato/qualidade automáticos
+// (webp/avif quando o navegador suporta) direto na URL do Cloudinary.
+const LOGO_LARGURA = 320
+const logoUrl = (obj) => {
+  const url = mediaUrl(obj)
+  if (!url || !url.includes('res.cloudinary.com') || !url.includes('/upload/')) return url
+  return url.replace('/upload/', `/upload/w_${LOGO_LARGURA},q_auto,f_auto/`)
+}
+
+// Cache em memória + dedupe da lista de clientes — sem isso, o StrictMode
+// do React (dev) dispara o efeito duas vezes e cada uma refaz a mesma
+// busca; revisitar /clientes na mesma sessão também refazia do zero. A
+// busca em si já vem pronta e cacheada do servidor (ver
+// backend/src/clientes-grid-cache.ts).
+let _clientesCache   = null
+let _clientesPromise = null
+function fetchClientesGrid() {
+  if (_clientesCache) return Promise.resolve(_clientesCache)
+  if (_clientesPromise) return _clientesPromise
+  _clientesPromise = api('clientes-grid')
+    .then(data => { _clientesCache = data; return data })
+    .catch(() => { _clientesPromise = null; return null })
+  return _clientesPromise
+}
 
 const LOGO_MAX_W = 156
 
@@ -38,8 +66,9 @@ export default function ClientesGridPage() {
   const goTo = useGoTo()
 
   useEffect(() => {
-    api('clientes?filters[visivel][$ne]=false&sort=posicao:asc,nome:asc&populate[logo]=true&populate[cases][fields][0]=id&pagination[pageSize]=200').then(setClientes)
-    api('logo-site?populate=logo').then(setLogo)
+    fetchClientesGrid().then(setClientes)
+    // Reaproveita o cache do Menu.jsx em vez de refazer o fetch do logo do site.
+    fetchMenuData().then(d => { if (d) setLogo(d.logo) })
     document.body.classList.remove('scroll-locked')
   }, [])
 
@@ -99,7 +128,7 @@ export default function ClientesGridPage() {
               const temCase = c.cases?.length > 0
               const inner = c.logo
                 ? <img
-                    src={mediaUrl(c.logo)}
+                    src={logoUrl(c.logo)}
                     alt={c.nome}
                     style={{ ...logoImgStyle(c.logo, (c.escala_logo || 1) * 1.2 * escalaLinha), '--logo-escala-mobile': c.escala_logo_mobile || 1 }}
                   />
