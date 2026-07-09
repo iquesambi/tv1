@@ -8,6 +8,33 @@ import './CasePage.css'
 
 const STRAPI = 'https://tv1-53ev.onrender.com'
 
+// Cache em memória + dedupe do detalhe de cada case — sem isso, o
+// StrictMode do React (dev) disparava o fetch duas vezes em paralelo, e
+// revisitar o mesmo case na mesma sessão refazia a busca do zero mesmo já
+// tendo os dados. A busca em si já vem cacheada do servidor (ver
+// backend/src/case-detail-cache.ts).
+const _caseDetailCache = new Map()
+const _caseDetailPromises = new Map()
+function fetchCaseDetail(clienteSlug, caseSlug) {
+  const key = `${clienteSlug ?? ''}/${caseSlug}`
+  if (_caseDetailCache.has(key)) return Promise.resolve(_caseDetailCache.get(key))
+  if (_caseDetailPromises.has(key)) return _caseDetailPromises.get(key)
+  const query =
+    `?slug=${encodeURIComponent(caseSlug)}` +
+    (clienteSlug ? `&cliente=${encodeURIComponent(clienteSlug)}` : '')
+  const promise = axios
+    .get(`${STRAPI}/api/case-detail${query}`)
+    .then(r => {
+      const resultado = r.data.data
+      _caseDetailCache.set(key, resultado)
+      _caseDetailPromises.delete(key)
+      return resultado
+    })
+    .catch(err => { _caseDetailPromises.delete(key); throw err })
+  _caseDetailPromises.set(key, promise)
+  return promise
+}
+
 const PALAVRAS_CURTAS = [
   'o','a','os','as','um','uma','uns','umas',
   'e','é','ou','mas','nem',
@@ -438,15 +465,8 @@ function CasePageInner() {
   }, [clienteSlug, caseSlug])
 
   useEffect(() => {
-    // Detalhe do case (com todos os blocos populados) vem cacheado no
-    // servidor por slug — evita repetir essa query pesada a cada visita.
-    const query =
-      `?slug=${encodeURIComponent(caseSlug)}` +
-      (clienteSlug ? `&cliente=${encodeURIComponent(clienteSlug)}` : '')
-    axios
-      .get(`${STRAPI}/api/case-detail${query}`)
-      .then(r => {
-        const resultado = r.data.data
+    fetchCaseDetail(clienteSlug, caseSlug)
+      .then(resultado => {
         setData(resultado?.data ?? null)
         setIs40Anos(resultado?.is40Anos ?? false)
       })
