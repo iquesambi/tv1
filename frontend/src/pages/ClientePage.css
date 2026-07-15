@@ -205,6 +205,14 @@
   will-change: transform;
 }
 
+/* proporcaoNatural (ex: cases históricos): as imagens vêm com proporção
+   própria — alturas bem diferentes entre si. Centralizar cada uma deixava
+   tudo flutuando desalinhado; alinhar pela base lê como um filme de
+   verdade, com as fotos "pousando" numa linha comum. */
+.cliente-track--proporcao-natural {
+  align-items: flex-end;
+}
+
 .cliente-card--carousel {
   width: clamp(220px, 26vw, 380px);
 }

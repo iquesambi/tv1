@@ -962,7 +962,7 @@ export default function CasesTimeline({
       {/* ── Cards ── */}
       {usaCarrossel ? (
         <div className="cliente-viewport" ref={viewportRef}>
-          <div className="cliente-track" ref={trackRef}>
+          <div className={`cliente-track${proporcaoNatural ? ' cliente-track--proporcao-natural' : ''}`} ref={trackRef}>
             {triplicadas.map(e => <CaseCard key={e._key} entrada={e} idx={e._idx} carousel proporcaoNatural={proporcaoNatural} maxImageHeight={vpHeight} navState={navState} carregarImagem={loadedIndicesRef.current.has(e._idx)} />)}
           </div>
         </div>
