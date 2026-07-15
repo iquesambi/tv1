@@ -563,9 +563,9 @@
   padding: 0;
   z-index: 2;
 }
-/* hotspot no centro da seta (22 27 = metade do 44x50) */
-.block-galeria__zona--esq { left: 0;  cursor: url('/galeria-seta-esq.svg') 22 27, pointer; }
-.block-galeria__zona--dir { right: 0; cursor: url('/galeria-seta-dir.svg') 22 27, pointer; }
+/* hotspot no centro da seta (13 15 = metade do 26.4x30) */
+.block-galeria__zona--esq { left: 0;  cursor: url('/galeria-seta-esq.svg') 13 15, pointer; }
+.block-galeria__zona--dir { right: 0; cursor: url('/galeria-seta-dir.svg') 13 15, pointer; }
 
 .block-galeria__prev:hover,
 .block-galeria__next:hover {
