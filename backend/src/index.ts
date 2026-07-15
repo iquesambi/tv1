@@ -6,6 +6,7 @@ import { casesTimelineRoute, invalidarCasesTimelineCache } from './cases-timelin
 import { menuDataRoute, invalidarMenuDataCache } from './menu-data-cache';
 import { clientesGridRoute, invalidarClientesGridCache } from './clientes-grid-cache';
 import { caseDetailRoute, invalidarCaseDetailCache } from './case-detail-cache';
+import { casePreviewRoute } from './case-preview';
 
 export default {
   register({ strapi }) {
@@ -58,6 +59,12 @@ export default {
         method: 'GET',
         path: '/api/case-detail',
         handler: (ctx) => caseDetailRoute(ctx),
+        config: { auth: false },
+      },
+      {
+        method: 'GET',
+        path: '/api/case-preview',
+        handler: (ctx) => casePreviewRoute(ctx),
         config: { auth: false },
       },
     ]);

@@ -464,14 +464,41 @@ function CasePageInner() {
     })
   }, [clienteSlug, caseSlug])
 
+  // Modo preview do Strapi: o link do admin traz documentId/status/token
+  // na URL — nesse caso busca direto o rascunho (ou publicado) sem cache,
+  // em vez do endpoint público por slug.
+  const previewParams = new URLSearchParams(location.search)
+  const previewDocumentId = previewParams.get('documentId')
+  const previewStatus = previewParams.get('status')
+  const previewToken = previewParams.get('token')
+  const emPreview = !!previewDocumentId
+
   useEffect(() => {
+    if (emPreview) {
+      axios
+        .get(`${STRAPI}/api/case-preview`, { params: { documentId: previewDocumentId, status: previewStatus, token: previewToken } })
+        .then(r => {
+          const resultado = r.data.data
+          setData(resultado?.data ?? null)
+          setIs40Anos(resultado?.is40Anos ?? false)
+        })
+        .catch(() => {})
+      return
+    }
     fetchCaseDetail(clienteSlug, caseSlug)
       .then(resultado => {
         setData(resultado?.data ?? null)
         setIs40Anos(resultado?.is40Anos ?? false)
       })
       .catch(() => {})
-  }, [clienteSlug, caseSlug])
+  }, [clienteSlug, caseSlug, emPreview, previewDocumentId, previewStatus, previewToken])
+
+  // Avisa o admin do Strapi (iframe pai) que a página carregou — sem isso,
+  // o painel de preview fica preso em "carregando".
+  useEffect(() => {
+    if (!emPreview || window.parent === window) return
+    window.parent.postMessage({ type: 'strapi:client:ready' }, '*')
+  }, [emPreview, data])
 
   // Quando data carrega: salva URLs (já redimensionadas) no localStorage
   // pra pré-aquecer visitas futuras, e aguarda só a capa do hero — o resto
@@ -535,6 +562,17 @@ function CasePageInner() {
 
   return (
     <div className="case-page">
+
+      {emPreview && (
+        <div style={{
+          position: 'sticky', top: 0, zIndex: 10000,
+          background: previewStatus === 'draft' ? '#e6a400' : '#2d7d46',
+          color: '#000', fontWeight: 700, fontSize: 13,
+          textAlign: 'center', padding: '6px 12px',
+        }}>
+          MODO PREVIEW — {previewStatus === 'draft' ? 'rascunho (não publicado)' : 'versão publicada'}
+        </div>
+      )}
 
       {/* Hero: título, descrição e imagem capa */}
       <section className="case-hero">
