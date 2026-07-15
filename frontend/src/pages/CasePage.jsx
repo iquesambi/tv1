@@ -493,11 +493,11 @@ function CasePageInner() {
       .catch(() => {})
   }, [clienteSlug, caseSlug, emPreview, previewDocumentId, previewStatus, previewToken])
 
-  // Avisa o admin do Strapi (iframe pai) que a página carregou — sem isso,
-  // o painel de preview fica preso em "carregando".
+  // Avisa o admin do Strapi (iframe pai) que a página carregou — o nome do
+  // evento é fixo no protocolo do Strapi (não pode ser outra string).
   useEffect(() => {
     if (!emPreview || window.parent === window) return
-    window.parent.postMessage({ type: 'strapi:client:ready' }, '*')
+    window.parent.postMessage({ type: 'previewReady' }, '*')
   }, [emPreview, data])
 
   // Quando data carrega: salva URLs (já redimensionadas) no localStorage
