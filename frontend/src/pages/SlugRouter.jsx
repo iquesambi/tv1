@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, useLocation } from 'react-router-dom'
 import axios from 'axios'
 import ClientePage from './ClientePage'
 import EspecialidadePage from './EspecialidadePage'
@@ -9,9 +9,15 @@ const STRAPI = 'https://tv1-53ev.onrender.com'
 
 export default function SlugRouter() {
   const { slug } = useParams()
-  const [tipo, setTipo] = useState(null)
+  const location = useLocation()
+  // Link de preview do Strapi: o conteúdo pode ser um rascunho ainda não
+  // publicado, então a detecção normal (que só busca publicados) nunca ia
+  // achar o case e caía no fallback ClientePage, travando o preview.
+  const emPreview = new URLSearchParams(location.search).has('documentId')
+  const [tipo, setTipo] = useState(emPreview ? 'case' : null)
 
   useEffect(() => {
+    if (emPreview) return
     // Verifica em paralelo: especialidade, cliente, case sem cliente e case 40 anos sem cliente
     Promise.all([
       axios.get(`${STRAPI}/api/especialidades?filters[slug][$eq]=${slug}&fields=slug`).catch(() => null),
