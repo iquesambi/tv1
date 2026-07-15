@@ -204,7 +204,7 @@ function CaseCard({ entrada, idx, carousel, proporcaoNatural = false, maxImageHe
   const goTo = useGoTo()
 
   const cardStyle = proporcaoNatural
-    ? { alignSelf: 'center', height: 'fit-content', background: 'transparent' }
+    ? { height: 'fit-content', background: 'transparent' }
     : carousel ? { height: alturaParaIdx(idx) } : undefined
 
   // aspectRatio reserva o espaço da imagem mesmo antes dela carregar (janela
