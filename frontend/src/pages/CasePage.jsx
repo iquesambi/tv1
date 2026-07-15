@@ -472,6 +472,7 @@ function CasePageInner() {
   const previewStatus = previewParams.get('status')
   const previewToken = previewParams.get('token')
   const emPreview = !!previewDocumentId
+  console.log('[preview-debug]', { href: window.location.href, search: location.search, previewDocumentId, emPreview })
 
   useEffect(() => {
     if (emPreview) {
