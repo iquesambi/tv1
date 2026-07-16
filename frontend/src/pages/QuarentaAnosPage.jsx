@@ -133,10 +133,10 @@ export default function QuarentaAnosPage() {
               <tspan x="260" y="510">ANOS DE</tspan>
             </text>
 
-            {/* experi ências */}
+            {/* evolu ção */}
             <text fontFamily="PP Hatton, serif" fontStyle="italic" fontWeight="500" fontSize="190" fill="white" className="qa-texto-sv-experiencias">
-              <tspan x="730" y="520">experi</tspan>
-              <tspan x="730" y="669">ências</tspan>
+              <tspan x="730" y="520">evolu</tspan>
+              <tspan x="1030" y="669">ção</tspan>
             </text>
 
           </svg>
@@ -146,8 +146,8 @@ export default function QuarentaAnosPage() {
       {/* TEXTO MOBILE — experiências primeiro (próximo ao 40), depois texto, depois BEM-VINDOS */}
       <section className="qa-texto-mobile">
         <div className="qa-texto-mobile__experiencias">
-          <span>experi</span>
-          <span>ências</span>
+          <span>evolu</span>
+          <span>ção</span>
         </div>
         <div className="qa-texto-mobile__paragrafos">
           <p>Nós não apenas vivemos 40 anos de história. O que importa é como usamos esses 40 anos para construir o depois.</p>
