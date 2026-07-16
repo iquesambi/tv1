@@ -34,7 +34,11 @@
 /* Página própria: ocupa a tela inteira, scroll hijackado */
 .cases-timeline--pagina {
   height: 100dvh;
-  overflow: visible;
+  /* padding-bottom (com box-sizing border-box global) reserva uma faixa do
+     próprio fundo preto abaixo da régua, antes da próxima seção — tudo
+     ainda dentro dos 100vh. */
+  padding-bottom: 40px;
+  overflow: hidden;
   background: #fff;
 }
 

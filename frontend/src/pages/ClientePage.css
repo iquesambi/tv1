@@ -186,6 +186,10 @@
 
 .cliente-viewport {
   flex: 1;
+  /* min-height: 0 deixa o item flex encolher de verdade — sem isso ele
+     não desce abaixo da altura das imagens, empurrando a régua/seta pra
+     fora dos 100vh e por cima da próxima seção. */
+  min-height: 0;
   overflow: visible;
   clip-path: inset(-200px 0);
   cursor: grab;
@@ -203,14 +207,6 @@
   gap: 16px;
   height: 100%;
   will-change: transform;
-}
-
-/* proporcaoNatural (ex: cases históricos): as imagens vêm com proporção
-   própria — alturas bem diferentes entre si. Centralizar cada uma deixava
-   tudo flutuando desalinhado; alinhar pela base lê como um filme de
-   verdade, com as fotos "pousando" numa linha comum. */
-.cliente-track--proporcao-natural {
-  align-items: flex-end;
 }
 
 .cliente-card--carousel {
