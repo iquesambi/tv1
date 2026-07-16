@@ -60,12 +60,15 @@
   border-left: 2px solid rgba(255, 255, 255, 1);
 }
 
-/* Labels: branco + PP Hatton itálico */
+/* Labels: branco + PP Hatton itálico. Letter-spacing maior que o padrão
+   porque aqui o label é o nome do tema (frase), não só um ano de 4
+   dígitos — apertado como estava, ficava difícil de ler. */
 .cases-timeline--escuro .timeline__label {
   color: #fff;
   font-family: 'PP Hatton', serif;
   font-style: italic;
   font-weight: 500;
+  letter-spacing: 0.04em;
 }
 
 /* Eras: branco, mantém Gilroy (diferente do label, que usa PP Hatton) */

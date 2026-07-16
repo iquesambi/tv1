@@ -271,7 +271,11 @@
   padding: 0 12px;
   box-sizing: border-box;
   position: relative;
-  overflow: hidden;
+  /* Só corta na horizontal (necessário pro carrossel infinito) — cortar
+     também na vertical cortava o topo de acentos (Í, Ç, Ã...) nos labels,
+     que em itálico desenham acima da métrica normal da fonte. */
+  overflow-x: hidden;
+  overflow-y: visible;
 }
 
 .timeline__ticks {
