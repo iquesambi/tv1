@@ -10,6 +10,36 @@ const QA_PATH = 'quarenta-anos?populate[imagem]=true&populate[video_capa]=true&p
 const api = (path) => axios.get(`${STRAPI}/api/${path}`).then(r => r.data.data).catch(() => null)
 const mediaUrl = (obj) => !obj?.url ? null : obj.url.startsWith("http") ? obj.url : `${STRAPI}${obj.url}`
 
+const PALAVRAS_CURTAS = [
+  'o','a','os','as','um','uma','uns','umas',
+  'e','é','ou','mas','nem',
+  'de','da','do','das','dos','d\'',
+  'em','na','no','nas','nos',
+  'ao','à','aos','às',
+  'por','pro','pra','pros','pras',
+  'que','se','já','só',
+  'com','sem','sob','até',
+]
+
+function semViuvas(html) {
+  if (!html) return html
+  const regex = new RegExp(
+    `\\b(${PALAVRAS_CURTAS.join('|')})\\s+`,
+    'gi'
+  )
+  return html.replace(regex, (_, palavra) => `${palavra}&nbsp;`)
+}
+
+// Texto do CMS vira parágrafos: linha em branco separa parágrafos, quebra
+// de linha simples vira <br> dentro do mesmo parágrafo.
+function textoParaHtml(texto) {
+  if (!texto) return ''
+  return texto
+    .split(/\n\n+/)
+    .map(p => `<p>${p.replace(/\n/g, '<br>')}</p>`)
+    .join('')
+}
+
 // Pré-busca usada pela transição da câmera para que os dados já estejam prontos
 // antes do overlay sair
 let qaPrefetch = null
@@ -94,12 +124,13 @@ export default function QuarentaAnosPage() {
               <image href={fotos[3]} x="734" y="-120" width="120" height="75" preserveAspectRatio="xMidYMid meet" />
             )}
 
-            {/* Texto descricao — largura de "experiências" */}
+            {/* Texto descricao (CMS) — largura de "experiências" */}
             <foreignObject x="744" y="0" width="510" height="400" className="qa-fo-lorem">
-              <div xmlns="http://www.w3.org/1999/xhtml" className="qa-lorem-fo">
-                <p style={{fontWeight: 700, margin: '0 0 1em'}}>Nós não apenas vivemos 40 anos de história.<br/>O que importa é como usamos esses 40 anos<br/>para construir o depois.</p>
-                <p style={{margin: '0 0 1em'}}>Quatro décadas atravessando mudanças de tecnologia,<br/>mídia, comportamento e cultura nos ensinaram algo<br/>essencial: futuro não é previsão, é construção diária.<br/>Cada experiência que criamos para ajudar a transformar<br/>pessoas, marcas e negócios nos abre novos caminhos<br/>de evolução.</p>
-              </div>
+              <div
+                xmlns="http://www.w3.org/1999/xhtml"
+                className="qa-lorem-fo"
+                dangerouslySetInnerHTML={{ __html: semViuvas(textoParaHtml(data?.descricao)) }}
+              />
             </foreignObject>
 
             {/* ── FOTOS empilhadas à esquerda ── */}
@@ -149,11 +180,10 @@ export default function QuarentaAnosPage() {
           <span>evolu</span>
           <span>ção</span>
         </div>
-        <div className="qa-texto-mobile__paragrafos">
-          <p>Nós não apenas vivemos 40 anos de história. O que importa é como usamos esses 40 anos para construir o depois.</p>
-          <p>Quatro décadas atravessando mudanças de tecnologia, mídia, comportamento e cultura nos ensinaram algo essencial: futuro não é previsão, é construção diária.</p>
-          <p>Cada experiência que criamos para ajudar a transformar pessoas, marcas e negócios nos abre novos caminhos de evolução.</p>
-        </div>
+        <div
+          className="qa-texto-mobile__paragrafos"
+          dangerouslySetInnerHTML={{ __html: semViuvas(textoParaHtml(data?.descricao)) }}
+        />
       </section>
 
       {/* CASES — escondida quando "mostrar_timeline" está desligado no CMS */}
