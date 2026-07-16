@@ -42,10 +42,15 @@ function montarEntradas(cases, tipoResolvido, slug = null) {
       const clienteSlug = c.cliente?.slug
       const caseSlug    = c.slug
       const imgTimeline = c.imagem_timeline || c.imagem_capa
+      // O label da timeline de 40 anos agora é o TEMA do case (não o ano) —
+      // os cases são agrupados/ordenados por tema (ver ordem no CMS).
+      const temaNome  = c.tema?.nome || ''
+      const ordemTema = c.tema?.ordem ?? 9999
       if (imgTimeline) {
         entradas.push({
           id:          `${c.id}-main`,
-          label:       c.Data ? new Date(c.Data).getFullYear() : null,
+          label:       temaNome,
+          ordemTema,
           data:        c.Data ? new Date(c.Data) : new Date(0),
           nome:        c.titulo_timeline || c.titulo || '',
           capa:        imgTimeline,
@@ -61,7 +66,8 @@ function montarEntradas(cases, tipoResolvido, slug = null) {
         if (bloco.__component === 'blocks.subcase' && bloco.ancora_id && blocoCapa && bloco.visivel !== false) {
           entradas.push({
             id:          `${c.id}-${bloco.ancora_id}`,
-            label:       blocoData ? new Date(blocoData).getFullYear() : null,
+            label:       temaNome,
+            ordemTema,
             data:        blocoData ? new Date(blocoData) : new Date(0),
             nome:        bloco.titulo_timeline || bloco.titulo || '',
             capa:        blocoCapa,
@@ -77,7 +83,8 @@ function montarEntradas(cases, tipoResolvido, slug = null) {
           if (!videoCapa) continue
           entradas.push({
             id:          `${c.id}-${bloco.ancora_id}`,
-            label:       c.Data ? new Date(c.Data).getFullYear() : null,
+            label:       temaNome,
+            ordemTema,
             data:        c.Data ? new Date(c.Data) : new Date(0),
             nome:        bloco.titulo || '',
             capa:        videoCapa,
@@ -90,7 +97,8 @@ function montarEntradas(cases, tipoResolvido, slug = null) {
         }
       }
     }
-    return entradas.sort((a, b) => a.data - b.data)
+    // Agrupa por tema (ordem asc); dentro de cada tema, mais recente primeiro.
+    return entradas.sort((a, b) => a.ordemTema - b.ordemTema || b.data - a.data)
   }
 
   // marca / especialidade
@@ -204,7 +212,7 @@ function CaseCard({ entrada, idx, carousel, proporcaoNatural = false, maxImageHe
   const goTo = useGoTo()
 
   const cardStyle = proporcaoNatural
-    ? { height: 'fit-content', background: 'transparent' }
+    ? { alignSelf: 'center', height: 'fit-content', background: 'transparent' }
     : carousel ? { height: alturaParaIdx(idx) } : undefined
 
   // aspectRatio reserva o espaço da imagem mesmo antes dela carregar (janela
@@ -372,7 +380,6 @@ export default function CasesTimeline({
   const labelsRef        = useRef([])
   const [labels, setLabels]   = useState([])
   const [vpHeight, setVpHeight] = useState(null)
-  const [erasRaw, setErasRaw] = useState([])
 
   // Janela de lazy loading: só os cards visíveis + 20% de buffer pra cada
   // lado têm a imagem carregada; os demais só carregam quando entram nessa
@@ -381,20 +388,10 @@ export default function CasesTimeline({
   const loadedIndicesRef = useRef(new Set())
   const [, setLoadedVersion] = useState(0) // só pra forçar re-render quando a janela muda
 
-  // Nomes de era (CMS) — só no modo quarentaAnos
-  useEffect(() => {
-    if (tipoResolvido !== 'quarentaAnos') return
-    apiGet('eras?sort=ano:asc&pagination[pageSize]=100').then(data => setErasRaw(Array.isArray(data) ? data : []))
-  }, [tipoResolvido])
-
-  // Posição de cada era = posição do label do ano correspondente (já
-  // calculada em calcLabels a partir do mesmo agrupamento por ano).
-  const eras = erasRaw
-    .map(e => {
-      const match = labels.find(l => l.label === String(e.ano))
-      return match ? { nome: e.nome, pos: match.pos } : null
-    })
-    .filter(Boolean)
+  // A faixa separada de "eras" saiu: no modo 40 anos o tema virou o próprio
+  // label da régua (ver montarEntradas). Mantido vazio para o TimelineBar não
+  // renderizar a régua de eras.
+  const eras = []
 
   // Logo para contexto 'pagina' (não quarentaAnos)
   useEffect(() => {
@@ -442,6 +439,7 @@ export default function CasesTimeline({
         '&populate[imagem_timeline]=true' +
         '&populate[cliente]=true' +
         '&populate[agencia]=true' +
+        '&populate[tema]=true' +
         '&populate[blocos][populate]=*' +
         '&sort=Data:desc' +
         '&pagination[limit]=100'
@@ -962,7 +960,7 @@ export default function CasesTimeline({
       {/* ── Cards ── */}
       {usaCarrossel ? (
         <div className="cliente-viewport" ref={viewportRef}>
-          <div className={`cliente-track${proporcaoNatural ? ' cliente-track--proporcao-natural' : ''}`} ref={trackRef}>
+          <div className="cliente-track" ref={trackRef}>
             {triplicadas.map(e => <CaseCard key={e._key} entrada={e} idx={e._idx} carousel proporcaoNatural={proporcaoNatural} maxImageHeight={vpHeight} navState={navState} carregarImagem={loadedIndicesRef.current.has(e._idx)} />)}
           </div>
         </div>

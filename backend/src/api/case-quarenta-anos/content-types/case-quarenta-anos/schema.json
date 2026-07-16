@@ -61,6 +61,12 @@
       "relation": "manyToOne",
       "target": "api::agencia.agencia"
     },
+    "tema": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::era.era",
+      "inversedBy": "cases_quarenta_anos"
+    },
     "especialidade": {
       "type": "relation",
       "relation": "manyToMany",

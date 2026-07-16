@@ -544,6 +544,7 @@ export interface ApiCaseQuarentaAnosCaseQuarentaAnos
       'manyToMany',
       'api::sub-especialidade.sub-especialidade'
     >;
+    tema: Schema.Attribute.Relation<'manyToOne', 'api::era.era'>;
     titulo: Schema.Attribute.String & Schema.Attribute.Required;
     titulo_timeline: Schema.Attribute.String;
     updatedAt: Schema.Attribute.DateTime;
@@ -705,7 +706,7 @@ export interface ApiConfiguracoesEmailConfiguracoesEmail
 export interface ApiEraEra extends Struct.CollectionTypeSchema {
   collectionName: 'eras';
   info: {
-    displayName: 'Era (40 anos)';
+    displayName: 'Temas (40 anos)';
     pluralName: 'eras';
     singularName: 'era';
   };
@@ -713,7 +714,10 @@ export interface ApiEraEra extends Struct.CollectionTypeSchema {
     draftAndPublish: true;
   };
   attributes: {
-    ano: Schema.Attribute.Integer & Schema.Attribute.Required;
+    cases_quarenta_anos: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::case-quarenta-anos.case-quarenta-anos'
+    >;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -721,6 +725,7 @@ export interface ApiEraEra extends Struct.CollectionTypeSchema {
     localizations: Schema.Attribute.Relation<'oneToMany', 'api::era.era'> &
       Schema.Attribute.Private;
     nome: Schema.Attribute.String & Schema.Attribute.Required;
+    ordem: Schema.Attribute.Integer;
     publishedAt: Schema.Attribute.DateTime;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &

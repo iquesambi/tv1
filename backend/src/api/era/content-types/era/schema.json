@@ -14,10 +14,15 @@
       "type": "string",
       "required": true
     },
-    "ano": {
+    "ordem": {
       "type": "integer",
-      "required": true,
-      "description": "Ano do case sobre o qual o nome da era vai centralizar na timeline."
+      "description": "Ordem em que o tema aparece na timeline de 40 anos (menor primeiro)."
+    },
+    "cases_quarenta_anos": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::case-quarenta-anos.case-quarenta-anos",
+      "mappedBy": "tema"
     }
   }
 }
