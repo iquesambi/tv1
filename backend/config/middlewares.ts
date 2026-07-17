@@ -7,7 +7,16 @@ const config: Core.Config.Middlewares = [
   {
     name: 'strapi::security',
     config: {
-      contentSecurityPolicy: false,
+      contentSecurityPolicy: {
+        useDefaults: true,
+        directives: {
+          // Mídia vem do Cloudinary — sem isso, o CSP padrão do Strapi só
+          // libera market-assets.strapi.io e as miniaturas no admin (media
+          // library, listagem de Cases etc.) ficam quebradas.
+          'img-src': ["'self'", 'data:', 'blob:', 'market-assets.strapi.io', 'res.cloudinary.com'],
+          'media-src': ["'self'", 'data:', 'blob:', 'res.cloudinary.com'],
+        },
+      },
     },
   },
 
