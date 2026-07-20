@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { motion, useScroll, useTransform } from 'framer-motion'
 import axios from 'axios'
+import { marked } from 'marked'
 import Menu from '../components/Menu.jsx'
 import CasesTimeline from '../components/CasesTimeline.jsx'
 import './QuarentaAnosPage.css'
@@ -30,14 +31,13 @@ function semViuvas(html) {
   return html.replace(regex, (_, palavra) => `${palavra}&nbsp;`)
 }
 
-// Texto do CMS vira parágrafos: linha em branco separa parágrafos, quebra
-// de linha simples vira <br> dentro do mesmo parágrafo.
+// Campo "descricao" agora é rich text (Markdown) no CMS — breaks:true faz
+// quebra de linha simples virar <br> dentro do parágrafo (igual o texto já
+// salvo, que usa \n solto pra isso), e linha em branco separa parágrafos.
+marked.setOptions({ breaks: true })
 function textoParaHtml(texto) {
   if (!texto) return ''
-  return texto
-    .split(/\n\n+/)
-    .map(p => `<p>${p.replace(/\n/g, '<br>')}</p>`)
-    .join('')
+  return marked.parse(texto)
 }
 
 // Pré-busca usada pela transição da câmera para que os dados já estejam prontos

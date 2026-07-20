@@ -35,7 +35,7 @@
       "required": true
     },
     "descricao": {
-      "type": "text",
+      "type": "richtext",
       "description": "Texto ao lado de \"40 anos de evolução\". Uma linha em branco separa parágrafos; o primeiro parágrafo aparece em negrito."
     },
     "video_url": {
