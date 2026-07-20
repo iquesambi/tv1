@@ -35,9 +35,22 @@ function semViuvas(html) {
 // quebra de linha simples virar <br> dentro do parágrafo (igual o texto já
 // salvo, que usa \n solto pra isso), e linha em branco separa parágrafos.
 marked.setOptions({ breaks: true })
+
+// O editor de rich text do Strapi, ao marcar negrito/itálico de uma seleção
+// que inclui um espaço na borda, gera markdown tipo "texto **" (espaço
+// colado no marcador de fechamento) — o Markdown exige o marcador colado
+// na palavra, sem espaço, senão não reconhece e mostra os asteriscos
+// literalmente. Corrige movendo o espaço pra fora do marcador antes de
+// converter.
+function corrigirEspacoEmphasis(texto) {
+  return texto
+    .replace(/(\*{1,2}|_{1,2})(\s+)/g, '$2$1') // "** texto" -> " **texto"
+    .replace(/(\s+)(\*{1,2}|_{1,2})/g, '$2$1') // "texto **" -> "texto** "
+}
+
 function textoParaHtml(texto) {
   if (!texto) return ''
-  return marked.parse(texto)
+  return marked.parse(corrigirEspacoEmphasis(texto))
 }
 
 // Pré-busca usada pela transição da câmera para que os dados já estejam prontos
