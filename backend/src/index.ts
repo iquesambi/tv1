@@ -105,9 +105,12 @@ export default {
       afterDelete() { invalidarMenuDataCache(); },
     });
 
-    // Mesma ideia pro cache da grade de logos de /clientes.
+    // Mesma ideia pro cache da grade de logos de /clientes. Inclui "case"
+    // porque a grade mostra o cliente como clicável só se ele tiver algum
+    // case publicado — publicar/despublicar/mudar o cliente de um case
+    // muda esse resultado sem tocar no registro do cliente em si.
     strapi.db.lifecycles.subscribe({
-      models: ['api::cliente.cliente'],
+      models: ['api::cliente.cliente', 'api::case.case'],
       afterCreate() { invalidarClientesGridCache(); },
       afterUpdate() { invalidarClientesGridCache(); },
       afterDelete() { invalidarClientesGridCache(); },
