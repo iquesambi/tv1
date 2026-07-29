@@ -131,7 +131,7 @@
 }
 
 .cliente-card__titulo {
-  font-size: clamp(11px, 1.1vw, 18px);
+  font-size: clamp(13px, 1.4vw, 22px);
   font-weight: 900;
   font-style: normal;
   text-transform: uppercase;

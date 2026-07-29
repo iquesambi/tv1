@@ -585,9 +585,9 @@ function CasePageInner() {
               <img src={mediaUrl(logo.logo)} alt="TV1" />
             </button>
           )}
-          {data.breadcrumb && (
+          {data.cliente?.nome && (
             <span className="case-hero__breadcrumb">
-              {data.cliente?.nome} / {data.breadcrumb}
+              {data.cliente.nome} /
             </span>
           )}
           <h1 className="case-hero__title">{data.titulo}</h1>
