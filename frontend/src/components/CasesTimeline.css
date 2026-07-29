@@ -109,7 +109,7 @@
 
 .cases-timeline__titulo-case {
   font-family: 'Gilroy', sans-serif;
-  font-size: clamp(56px, 8vw, 110px);
+  font-size: clamp(33.6px, 4.8vw, 66px);
   font-weight: 900;
   font-style: italic;
   text-transform: uppercase;
@@ -118,10 +118,11 @@
 }
 
 .cases-timeline__titulo-historicos {
-  font-family: 'PP Hatton', serif;
+  font-family: 'Gilroy', sans-serif;
   font-style: italic;
-  font-weight: 500;
-  font-size: clamp(56px, 8vw, 110px);
+  font-weight: 900;
+  font-size: clamp(33.6px, 4.8vw, 66px);
+  text-transform: uppercase;
   color: #fff;
   line-height: 1;
 }

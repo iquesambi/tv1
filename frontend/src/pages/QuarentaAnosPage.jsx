@@ -178,9 +178,9 @@ export default function QuarentaAnosPage() {
             </text>
 
             {/* evolu ção */}
-            <text fontFamily="PP Hatton, serif" fontStyle="italic" fontWeight="500" fontSize="190" fill="white" className="qa-texto-sv-experiencias">
+            <text fontFamily="PP Hatton, serif" fontStyle="italic" fontWeight="500" fontSize="180" fill="white" className="qa-texto-sv-experiencias">
               <tspan x="730" y="520">evolu</tspan>
-              <tspan x="1030" y="669">ção</tspan>
+              <tspan x="730" y="669">ção</tspan>
             </text>
 
           </svg>
