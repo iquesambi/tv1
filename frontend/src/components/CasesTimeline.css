@@ -60,12 +60,14 @@
   border-left: 2px solid rgba(255, 255, 255, 1);
 }
 
-/* Labels: branco + PP Hatton itálico */
+/* Labels: branco + PP Hatton itálico. Sem text-transform: respeita
+   exatamente a caixa (maiúscula/minúscula) digitada no CMS. */
 .cases-timeline--escuro .timeline__label {
   color: #fff;
   font-family: 'PP Hatton', serif;
   font-style: italic;
   font-weight: 500;
+  text-transform: none;
 }
 
 /* Eras: branco, mantém Gilroy (diferente do label, que usa PP Hatton) */
