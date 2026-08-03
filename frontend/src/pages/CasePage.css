@@ -25,19 +25,29 @@
   display: flex;
   flex-direction: column;
   gap: 24px;
-  justify-content: center;
   overflow: hidden;
   position: relative;
 }
 
 .case-hero__logo {
-  position: absolute;
-  top: 40px;
-  left: 80px;
   background: none;
   border: none;
   padding: 0;
   cursor: pointer;
+  flex-shrink: 0;
+}
+
+/* Grupo do texto: centraliza só no espaço que sobra abaixo do logo, e
+   corta com segurança (overflow: hidden) se o título for muito grande —
+   nunca invade o espaço do logo, que já está garantido acima no fluxo. */
+.case-hero__text {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  justify-content: center;
+  overflow: hidden;
 }
 
 .case-hero__logo img {
@@ -54,14 +64,16 @@
 }
 
 .case-hero__breadcrumb {
-  font-size: 32px;
+  /* --hero-scale (calculado em JS, medindo o conteúdo de verdade) encolhe
+     só quando o texto não cabe no espaço disponível abaixo do logo. */
+  font-size: calc(32px * var(--hero-scale, 1));
   font-weight: 500;
   text-transform: uppercase;
   line-height: normal;
 }
 
 .case-hero__title {
-  font-size: 67px;
+  font-size: calc(67px * var(--hero-scale, 1));
   font-weight: 900;
   text-transform: uppercase;
   line-height: 1;
@@ -74,7 +86,7 @@
 
 
 .case-hero__description {
-  font-size: 14px;
+  font-size: calc(14px * var(--hero-scale, 1));
   font-weight: 500;
   line-height: 1.4;
   margin: 0;
@@ -622,17 +634,19 @@
     padding: 20px 20px 36px;
     gap: 0;
     order: 1;
-    justify-content: flex-start;
     overflow: visible;
   }
 
-  /* Logo: sai do absolute, fica no fluxo normal */
   .case-hero__logo {
-    position: relative;
-    top: auto;
-    left: auto;
     margin-bottom: clamp(12px, 10vh, 20vh);
-    flex-shrink: 0;
+  }
+
+  /* Sem centralizar/cortar no mobile — flui naturalmente com a página. */
+  .case-hero__text {
+    flex: none;
+    min-height: 0;
+    display: block;
+    overflow: visible;
   }
 
   .case-hero__logo img {

@@ -420,6 +420,7 @@ function CasePageInner() {
   const [is40Anos, setIs40Anos] = useState(false)
   const [logo, setLogo] = useState(null)
   const footerRef = useRef(null)
+  const heroTextRef = useRef(null)
 
   const lsKey = `tv1-case-${caseSlug}`
   const [pronto, setPronto] = useState(() => {
@@ -530,6 +531,37 @@ function CasePageInner() {
     return () => clearTimeout(timeout)
   }, [data])
 
+  // Encolhe a fonte do bloco de texto do hero (breadcrumb+título+descrição)
+  // até caber no espaço abaixo do logo — nunca deixa cortar nem sumir texto.
+  // clamp() por vh sozinho não dava conta porque não sabe quanto texto tem
+  // cada case; aqui mede de verdade e ajusta.
+  useEffect(() => {
+    if (!pronto) return
+    const el = heroTextRef.current
+    if (!el) return
+
+    const ajustar = () => {
+      el.style.setProperty('--hero-scale', '1')
+      const disponivel = el.clientHeight
+      const necessario = el.scrollHeight
+      if (disponivel > 0 && necessario > disponivel) {
+        const escala = Math.max(0.5, (disponivel / necessario) * 0.97)
+        el.style.setProperty('--hero-scale', String(escala))
+      }
+    }
+
+    ajustar()
+    const ro = new ResizeObserver(ajustar)
+    ro.observe(el)
+    // Reforço: em alguns casos o ResizeObserver não dispara pra mudanças
+    // de viewport (só de elemento); resize da janela cobre esse caso.
+    window.addEventListener('resize', ajustar)
+    return () => {
+      ro.disconnect()
+      window.removeEventListener('resize', ajustar)
+    }
+  }, [pronto, data])
+
   // Rola até a âncora — precisa esperar "pronto" (não só "data"), porque o
   // conteúdo real (com os ids de âncora) só renderiza depois do spinner;
   // antes disso, document.getElementById nunca encontra nada e o retry
@@ -585,15 +617,20 @@ function CasePageInner() {
               <img src={mediaUrl(logo.logo)} alt="TV1" />
             </button>
           )}
-          {data.cliente?.nome && (
-            <span className="case-hero__breadcrumb">
-              {data.cliente.nome} /
-            </span>
-          )}
-          <h1 className="case-hero__title">{data.titulo}</h1>
-          {data.descricao && (
-            <div className="case-hero__description" dangerouslySetInnerHTML={{ __html: semViuvas(textoParaHtml(data.descricao)) }} />
-          )}
+          {/* Grupo à parte: centraliza só nesse espaço (abaixo do logo, que
+              fica sempre no fluxo normal) — título comprido nunca "vaza"
+              por cima do logo, mesmo com a janela estreita/baixa. */}
+          <div className="case-hero__text" ref={heroTextRef}>
+            {data.cliente?.nome && (
+              <span className="case-hero__breadcrumb">
+                {data.cliente.nome} /
+              </span>
+            )}
+            <h1 className="case-hero__title">{data.titulo}</h1>
+            {data.descricao && (
+              <div className="case-hero__description" dangerouslySetInnerHTML={{ __html: semViuvas(textoParaHtml(data.descricao)) }} />
+            )}
+          </div>
         </div>
         {data.imagem_capa && (
           <div className="case-hero__image">
