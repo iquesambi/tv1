@@ -34,13 +34,13 @@
     "escala_logo": {
       "type": "decimal",
       "default": 1,
-      "min": 0.3,
+      "min": 0.1,
       "max": 3
     },
     "escala_logo_mobile": {
       "type": "decimal",
       "default": 1,
-      "min": 0.3,
+      "min": 0.1,
       "max": 3
     },
     "posicao": {
