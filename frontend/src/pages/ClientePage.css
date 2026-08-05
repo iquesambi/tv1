@@ -329,9 +329,6 @@
   position: absolute;
   transform: translateX(-50%);
   top: 0;
-  /* empurra 0.1% pra baixo pra tirar o acento (til/agudo) da faixa que
-     estava sendo cortada no topo do container */
-  margin-top: 0.1%;
   font-family: 'Gilroy', sans-serif;
   font-size: 16px;
   font-weight: 500;

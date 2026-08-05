@@ -70,6 +70,13 @@
   text-transform: none;
 }
 
+/* Um pouco mais de espaço acima (margin no container, não na label) —
+   PP Hatton itálica desenha acentos (Ã, Í, Ç...) acima da métrica normal
+   da fonte; sem essa folga, o topo do acento cortava. */
+.cases-timeline--escuro .timeline__labels-viewport {
+  margin-top: 22px;
+}
+
 /* Eras: branco, mantém Gilroy (diferente do label, que usa PP Hatton) */
 .cases-timeline--escuro .timeline__era {
   color: #fff;
