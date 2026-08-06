@@ -24,6 +24,19 @@ const capaUrl = (obj) => {
 const ALTURAS = [460, 340, 400, 310, 380]
 const alturaParaIdx = (idx) => ALTURAS[idx % ALTURAS.length]
 
+// Quando o CMS não preenche ancora_id, deriva um a partir do título — sem
+// isso o bloco (subcase/vídeo) nunca ganhava uma entrada na timeline,
+// mesmo com capa e tudo mais preenchido. Mesma função existe em
+// CasePage.jsx pra gerar o id real do elemento — precisa bater com esta.
+function slugifyAncora(texto) {
+  if (!texto) return ''
+  return String(texto)
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+}
+
 /* ── monta entradas ── */
 // `slug` é a especialidade da página (só usado no modo 'especialidade').
 function montarEntradas(cases, tipoResolvido, slug = null) {
@@ -63,34 +76,38 @@ function montarEntradas(cases, tipoResolvido, slug = null) {
       for (const bloco of c.blocos ?? []) {
         const blocoCapa = bloco.imagem_timeline || bloco.imagem_capa
         const blocoData = bloco.Data || c.Data
-        if (bloco.__component === 'blocks.subcase' && bloco.ancora_id && blocoCapa && bloco.visivel !== false) {
+        if (bloco.__component === 'blocks.subcase' && blocoCapa && bloco.visivel !== false) {
+          const ancoraId = bloco.ancora_id || slugifyAncora(bloco.titulo_timeline || bloco.titulo)
+          if (!ancoraId) continue
           entradas.push({
-            id:          `${c.id}-${bloco.ancora_id}`,
+            id:          `${c.id}-${ancoraId}`,
             label:       temaNome,
             ordemTema,
             data:        blocoData ? new Date(blocoData) : new Date(0),
             nome:        bloco.titulo_timeline || bloco.titulo || '',
             capa:        blocoCapa,
             href:        clienteSlug && caseSlug
-              ? `/${clienteSlug}/${caseSlug}#${bloco.ancora_id}`
-              : `/${caseSlug ?? ''}#${bloco.ancora_id}`,
+              ? `/${clienteSlug}/${caseSlug}#${ancoraId}`
+              : `/${caseSlug ?? ''}#${ancoraId}`,
             agenciaLogo: c.agencia?.logo ?? null,
             agenciaNome: c.agencia?.nome ?? null,
           })
         }
-        if (bloco.__component === 'blocks.video' && bloco.ir_para_timeline && bloco.ancora_id && bloco.visivel !== false) {
+        if (bloco.__component === 'blocks.video' && bloco.ir_para_timeline && bloco.visivel !== false) {
           const videoCapa = bloco.imagem_timeline || bloco.capa
           if (!videoCapa) continue
+          const ancoraId = bloco.ancora_id || slugifyAncora(bloco.titulo)
+          if (!ancoraId) continue
           entradas.push({
-            id:          `${c.id}-${bloco.ancora_id}`,
+            id:          `${c.id}-${ancoraId}`,
             label:       temaNome,
             ordemTema,
             data:        c.Data ? new Date(c.Data) : new Date(0),
             nome:        bloco.titulo || '',
             capa:        videoCapa,
             href:        clienteSlug && caseSlug
-              ? `/${clienteSlug}/${caseSlug}#${bloco.ancora_id}`
-              : `/${caseSlug ?? ''}#${bloco.ancora_id}`,
+              ? `/${clienteSlug}/${caseSlug}#${ancoraId}`
+              : `/${caseSlug ?? ''}#${ancoraId}`,
             agenciaLogo: c.agencia?.logo ?? null,
             agenciaNome: c.agencia?.nome ?? null,
           })
@@ -128,6 +145,10 @@ function montarEntradas(cases, tipoResolvido, slug = null) {
       if (bloco.__component === 'blocks.subtitulo' && bloco.timeline && bloco.timeline_data && bloco.visivel !== false) {
         const subtituloCapa = bloco.timeline_capa || c.imagem_capa
         if (!subtituloCapa) continue
+        // A base do slug tem que ser o mesmo campo usado como id real do
+        // elemento em CasePage.jsx (block.texto) — timeline_nome é só o
+        // rótulo de exibição na timeline, não existe na página do case.
+        const ancoraId = bloco.ancora_id || slugifyAncora(bloco.texto)
         entradas.push({
           id:          `${c.id}-sub-${bloco.id}`,
           label:       tipoResolvido === 'marca'
@@ -137,16 +158,18 @@ function montarEntradas(cases, tipoResolvido, slug = null) {
           nome:        bloco.timeline_nome || bloco.texto,
           capa:        subtituloCapa,
           href:        clienteSlug && caseSlug
-            ? `/${clienteSlug}/${caseSlug}#${bloco.ancora_id ?? ''}`
-            : `/${caseSlug}#${bloco.ancora_id ?? ''}`,
+            ? `/${clienteSlug}/${caseSlug}#${ancoraId}`
+            : `/${caseSlug}#${ancoraId}`,
           agenciaLogo: c.agencia?.logo ?? null,
           agenciaNome: c.agencia?.nome ?? null,
           ordemSub,
         })
       }
-      if (bloco.__component === 'blocks.subcase' && bloco.ancora_id && bloco.visivel !== false) {
+      if (bloco.__component === 'blocks.subcase' && bloco.visivel !== false) {
         const blocoCapa = bloco.imagem_timeline || bloco.imagem_capa
         if (!blocoCapa) continue
+        const ancoraId = bloco.ancora_id || slugifyAncora(bloco.titulo_timeline || bloco.titulo)
+        if (!ancoraId) continue
         const blocoData = bloco.Data ? new Date(bloco.Data) : (c.Data ? new Date(c.Data) : new Date(0))
         entradas.push({
           id:          `${c.id}-sub-${bloco.id}`,
@@ -157,16 +180,18 @@ function montarEntradas(cases, tipoResolvido, slug = null) {
           nome:        bloco.titulo_timeline || bloco.titulo,
           capa:        blocoCapa,
           href:        clienteSlug && caseSlug
-            ? `/${clienteSlug}/${caseSlug}#${bloco.ancora_id}`
-            : `/${caseSlug}#${bloco.ancora_id}`,
+            ? `/${clienteSlug}/${caseSlug}#${ancoraId}`
+            : `/${caseSlug}#${ancoraId}`,
           agenciaLogo: c.agencia?.logo ?? null,
           agenciaNome: c.agencia?.nome ?? null,
           ordemSub,
         })
       }
-      if (bloco.__component === 'blocks.video' && bloco.ir_para_timeline && bloco.ancora_id && bloco.visivel !== false) {
+      if (bloco.__component === 'blocks.video' && bloco.ir_para_timeline && bloco.visivel !== false) {
         const videoCapa = bloco.imagem_timeline || bloco.capa
         if (!videoCapa) continue
+        const ancoraId = bloco.ancora_id || slugifyAncora(bloco.titulo)
+        if (!ancoraId) continue
         entradas.push({
           id:          `${c.id}-sub-${bloco.id}`,
           label:       tipoResolvido === 'marca'
@@ -176,8 +201,8 @@ function montarEntradas(cases, tipoResolvido, slug = null) {
           nome:        bloco.titulo,
           capa:        videoCapa,
           href:        clienteSlug && caseSlug
-            ? `/${clienteSlug}/${caseSlug}#${bloco.ancora_id}`
-            : `/${caseSlug}#${bloco.ancora_id}`,
+            ? `/${clienteSlug}/${caseSlug}#${ancoraId}`
+            : `/${caseSlug}#${ancoraId}`,
           agenciaLogo: c.agencia?.logo ?? null,
           agenciaNome: c.agencia?.nome ?? null,
           ordemSub,

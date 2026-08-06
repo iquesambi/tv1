@@ -35,6 +35,18 @@ function fetchCaseDetail(clienteSlug, caseSlug) {
   return promise
 }
 
+// Quando o CMS não preenche ancora_id, deriva um a partir do título — tem
+// que gerar exatamente igual à função de mesmo nome em CasesTimeline.jsx,
+// senão o link da timeline (#ancora) não acha esse elemento na página.
+function slugifyAncora(texto) {
+  if (!texto) return ''
+  return String(texto)
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+}
+
 const PALAVRAS_CURTAS = [
   'o','a','os','as','um','uma','uns','umas',
   'e','é','ou','mas','nem',
@@ -147,7 +159,7 @@ function Video({ block }) {
   }, [aberto, block.url])
 
   return (
-    <div className="block-video" id={block.ancora_id || undefined} onClick={() => !aberto && setAberto(true)}>
+    <div className="block-video" id={block.ancora_id || slugifyAncora(block.titulo) || undefined} onClick={() => !aberto && setAberto(true)}>
       <div
         ref={divRef}
         className="block-video__player"
@@ -175,7 +187,7 @@ function Subcase({ block }) {
   const temVideo = !!block.video_url
 
   return (
-    <section className="block-subcase" id={block.ancora_id || undefined}>
+    <section className="block-subcase" id={block.ancora_id || slugifyAncora(block.titulo) || undefined}>
       <div className="block-subcase__content">
         <h2 className="block-subcase__title">{block.titulo}</h2>
         {block.descricao && (
@@ -296,7 +308,7 @@ function Block({ block }) {
       return (
         <h2
           className="block-subtitulo"
-          id={block.ancora_id || undefined}
+          id={block.ancora_id || slugifyAncora(block.texto) || undefined}
         >
           {block.texto}
         </h2>
