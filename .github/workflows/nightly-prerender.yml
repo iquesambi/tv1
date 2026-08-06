@@ -15,6 +15,10 @@ concurrency:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    # Sem isso, um travamento silencioso (ex: runner preso, registry do npm
+    # instável) só encerraria no limite padrão de 6h — trava rápido e claro
+    # em vez disso.
+    timeout-minutes: 15
 
     steps:
       - uses: actions/checkout@v4
@@ -44,7 +48,10 @@ jobs:
           GOOGLE_APPLICATION_CREDENTIALS: ${{ runner.temp }}/firebase-sa.json
         run: |
           set +e
-          OUTPUT=$(npx firebase-tools@latest deploy --only hosting --project tv1-site 2>&1)
+          # Versão fixa (não @latest) — evita o npx ter que resolver a versão
+          # mais nova a cada run, o que já causou travamentos silenciosos se
+          # o registro do npm estiver lento/instável.
+          OUTPUT=$(npx firebase-tools@15.26.0 deploy --only hosting --project tv1-site 2>&1)
           CODE=$?
           echo "$OUTPUT"
           if [ $CODE -ne 0 ] && echo "$OUTPUT" | grep -q "is the current active version"; then
