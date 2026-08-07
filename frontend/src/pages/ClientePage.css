@@ -263,6 +263,15 @@
 .cases-timeline--escuro .timeline__next-arrow {
   background: linear-gradient(to right, rgba(0,0,1,0) 0%, #000001 65%, #000001 100%);
   color: #fff;
+  padding-left: 100px;
+  /* PP Hatton itálico (labels dessa página) tem ascendentes/descendentes
+     mais altos que a caixa padrão (baseada só no line-height do ">"),
+     então a máscara cobria só uma faixa fina no meio da letra, deixando o
+     topo/base do texto vazando por cima e por baixo dela. */
+  top: 44px;
+  height: 40px;
+  display: flex;
+  align-items: center;
 }
 
 /* Container interno com 98% da página (margens 1% de cada lado) */

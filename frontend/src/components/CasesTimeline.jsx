@@ -966,8 +966,7 @@ export default function CasesTimeline({
       {tipoResolvido === 'quarentaAnos' && (
         <div className="cases-timeline__header">
           <h2 className="cases-timeline__titulo">
-            <span className="cases-timeline__titulo-case">Do www ao</span>
-            <span className="cases-timeline__titulo-historicos">Prompt com a IA</span>
+            Do www ao <span className="cases-timeline__titulo-historicos">Prompt com a IA</span>
           </h2>
         </div>
       )}
