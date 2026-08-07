@@ -265,7 +265,14 @@ function CaseCard({ entrada, idx, carousel, proporcaoNatural = false, maxImageHe
       onClick={clickable ? () => goTo(entrada.href, null, navState) : undefined}
     >
       {entrada.capa && (
-        <img src={carregarImagem ? capaUrl(entrada.capa) : undefined} alt={entrada.nome} className="cliente-card__img" style={imgStyle} loading="lazy" />
+        // Sem loading="lazy": o card fica posicionado via transform (não no
+        // fluxo normal do documento), e o cálculo nativo do navegador pra
+        // decidir "está perto da tela?" usa a posição no FLUXO, não a
+        // posição visual real depois do transform — em telas estreitas
+        // (mobile, com muitos cards numa fileira bem larga), isso podia
+        // fazer a imagem nunca ser considerada "próxima" e nunca carregar.
+        // O app já controla sozinho quando pedir a imagem (carregarImagem).
+        <img src={carregarImagem ? capaUrl(entrada.capa) : undefined} alt={entrada.nome} className="cliente-card__img" style={imgStyle} />
       )}
       <div className="cliente-card__overlay">
         <h3 className="cliente-card__titulo">{entrada.nome}</h3>

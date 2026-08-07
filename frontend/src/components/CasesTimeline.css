@@ -62,6 +62,12 @@
 
 /* Labels: branco + PP Hatton itálico. Sem text-transform: respeita
    exatamente a caixa (maiúscula/minúscula) digitada no CMS. */
+/* Sobe um pouco o título "Do www ao Prompt com a IA" (só nessa página,
+   não afeta o header claro de /cases). */
+.cases-timeline--escuro .cases-timeline__header {
+  padding-top: 24px;
+}
+
 .cases-timeline--escuro .timeline__label {
   color: #fff;
   font-family: 'PP Hatton', serif;
@@ -118,7 +124,7 @@
 
 .cases-timeline__titulo-case {
   font-family: 'Gilroy', sans-serif;
-  font-size: clamp(33.6px, 4.8vw, 66px);
+  font-size: clamp(30.24px, 4.32vw, 59.4px);
   font-weight: 900;
   font-style: italic;
   text-transform: uppercase;
@@ -127,11 +133,11 @@
 }
 
 .cases-timeline__titulo-historicos {
-  font-family: 'Gilroy', sans-serif;
+  font-family: 'PP Hatton', serif;
   font-style: italic;
-  font-weight: 900;
-  font-size: clamp(33.6px, 4.8vw, 66px);
-  text-transform: uppercase;
+  font-weight: 500;
+  font-size: clamp(30.24px, 4.32vw, 59.4px);
+  text-transform: none;
   color: #fff;
   line-height: 1;
 }
