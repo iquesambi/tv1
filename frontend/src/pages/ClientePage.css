@@ -123,6 +123,10 @@
   padding: 24px 20px;
   opacity: 0;
   transition: opacity 0.3s ease;
+  /* Se o título (fallback sem titulo_timeline preenchido) for longo demais
+     pro card, rola em vez de deixar o .cliente-card (overflow: hidden)
+     cortar o texto. */
+  overflow-y: auto;
 }
 
 /* Overlay só no hover — todos os cards */

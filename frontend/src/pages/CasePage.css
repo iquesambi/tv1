@@ -37,9 +37,11 @@
   flex-shrink: 0;
 }
 
-/* Grupo do texto: centraliza só no espaço que sobra abaixo do logo, e
-   corta com segurança (overflow: hidden) se o título for muito grande —
-   nunca invade o espaço do logo, que já está garantido acima no fluxo. */
+/* Grupo do texto: centraliza só no espaço que sobra abaixo do logo. O JS
+   (ver --hero-scale) encolhe a fonte pra caber; se mesmo assim um
+   título/descrição no limite de caracteres não couber, rola em vez de
+   cortar — nunca invade o espaço do logo, que já está garantido acima no
+   fluxo, e nunca esconde texto. */
 .case-hero__text {
   flex: 1;
   min-height: 0;
@@ -47,7 +49,8 @@
   flex-direction: column;
   gap: 24px;
   justify-content: center;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .case-hero__logo img {
