@@ -554,12 +554,28 @@ function CasePageInner() {
 
     const ajustar = () => {
       el.style.setProperty('--hero-scale', '1')
-      const disponivel = el.clientHeight
-      const necessario = el.scrollHeight
-      if (disponivel > 0 && necessario > disponivel) {
-        const escala = Math.max(0.5, (disponivel / necessario) * 0.97)
-        el.style.setProperty('--hero-scale', String(escala))
+      let escala = 1
+
+      // Altura: se não couber mesmo encolhida, .case-hero__text rola (não
+      // corta) — por isso aqui tem um piso de 0.5, a fonte nunca fica
+      // ilegível só por causa da altura.
+      const alturaDisponivel = el.clientHeight
+      const alturaNecessaria = el.scrollHeight
+      if (alturaDisponivel > 0 && alturaNecessaria > alturaDisponivel) {
+        escala = Math.min(escala, Math.max(0.5, (alturaDisponivel / alturaNecessaria) * 0.97))
       }
+
+      // Largura: uma palavra sozinha (ex: "INAUGURAÇÃO") nunca quebra
+      // (hyphens/word-break desligados de propósito) e o container corta
+      // horizontalmente (overflow-x: hidden) — sem fallback de scroll aqui,
+      // então precisa encolher o quanto for necessário pra caber, sem piso.
+      const larguraDisponivel = el.clientWidth
+      const larguraNecessaria = el.scrollWidth
+      if (larguraDisponivel > 0 && larguraNecessaria > larguraDisponivel) {
+        escala = Math.min(escala, (larguraDisponivel / larguraNecessaria) * 0.97)
+      }
+
+      if (escala < 1) el.style.setProperty('--hero-scale', String(escala))
     }
 
     ajustar()
