@@ -621,6 +621,68 @@
 
 /* RESPONSIVO */
 
+/* Faixa intermediária (tablet/celular deitado, ex: iPad 1024px, iPhone
+   deitado ~844px): o grid 50/50 do desktop fica apertado demais aqui — o
+   título ou estoura em cima da imagem, ou (com --hero-scale encolhendo
+   forte) fica minúsculo e espremido. Empilha igual ao mobile, só que com
+   fonte um pouco maior já que sobra mais largura. */
+@media (min-width: 769px) and (max-width: 1024px) {
+
+  .case-hero {
+    grid-template-columns: 1fr;
+    height: auto;
+  }
+
+  .case-hero__content {
+    width: 100%;
+    height: auto;
+    padding: 40px 40px 48px;
+    gap: 0;
+    order: 1;
+    overflow: visible;
+  }
+
+  .case-hero__logo {
+    margin-bottom: clamp(12px, 10vh, 20vh);
+  }
+
+  .case-hero__text {
+    flex: none;
+    min-height: 0;
+    display: block;
+    overflow: visible;
+  }
+
+  .case-hero__image {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 2/3;
+    order: 2;
+  }
+
+  .case-hero__breadcrumb {
+    font-size: 26px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    margin-bottom: 36px;
+  }
+
+  .case-hero__title {
+    font-size: clamp(40px, 6vw, 72px);
+    font-style: normal;
+    line-height: 0.95;
+    word-break: normal;
+    overflow-wrap: normal;
+    hyphens: none;
+    margin-bottom: 48px;
+  }
+
+  .case-hero__description {
+    font-size: 16px;
+    line-height: 1.6;
+  }
+}
+
 @media (max-width: 768px) {
 
   /* ── Hero ── */
