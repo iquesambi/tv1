@@ -963,7 +963,7 @@ export default function CasesTimeline({
     <div className={rootClass}>
 
       {/* ── Header ── */}
-      {tipoResolvido === 'quarentaAnos' && (
+      {tipoResolvido === 'quarentaAnos' && contexto === 'pagina' && (
         <div className="cases-timeline__header">
           <h2 className="cases-timeline__titulo">
             Do www ao <span className="cases-timeline__titulo-historicos">Prompt com a IA</span>

@@ -681,7 +681,7 @@ function CasePageInner() {
           <CasesTimeline
             conteudo="quarentaAnos"
             contexto="case"
-            tema="claro"
+            tema="escuro"
           />
         </div>
       )}
