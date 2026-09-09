@@ -114,8 +114,9 @@ function montarEntradas(cases, tipoResolvido, slug = null) {
         }
       }
     }
-    // Agrupa por tema (ordem asc); dentro de cada tema, mais recente primeiro.
-    return entradas.sort((a, b) => a.ordemTema - b.ordemTema || b.data - a.data)
+    // Agrupa por tema (ordem asc); dentro de cada tema, mais antigo primeiro
+    // (esquerda) até o mais recente (direita).
+    return entradas.sort((a, b) => a.ordemTema - b.ordemTema || a.data - b.data)
   }
 
   // marca / especialidade
@@ -967,7 +968,7 @@ export default function CasesTimeline({
     <div className={rootClass}>
 
       {/* ── Header ── */}
-      {tipoResolvido === 'quarentaAnos' && contexto === 'pagina' && (
+      {tipoResolvido === 'quarentaAnos' && (
         <div className="cases-timeline__header">
           <h2 className="cases-timeline__titulo">
             Do www ao <span className="cases-timeline__titulo-historicos">Prompt com a IA</span>

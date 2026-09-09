@@ -649,7 +649,11 @@ function CasePageInner() {
               fica sempre no fluxo normal) — título comprido nunca "vaza"
               por cima do logo, mesmo com a janela estreita/baixa. */}
           <div className="case-hero__text" ref={heroTextRef}>
-            {data.cliente?.nome && (
+            {is40Anos && data.Data ? (
+              <span className="case-hero__breadcrumb">
+                {new Date(data.Data).getFullYear()} /
+              </span>
+            ) : data.cliente?.nome && (
               <span className="case-hero__breadcrumb">
                 {data.cliente.nome} /
               </span>
