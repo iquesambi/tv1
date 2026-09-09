@@ -251,7 +251,11 @@ function CaseCard({ entrada, idx, carousel, proporcaoNatural = false, maxImageHe
         width: '100%',
         height: 'auto',
         maxHeight: maxImageHeight ? `${maxImageHeight}px` : '70vh',
-        objectFit: 'fill',
+        // "fill" esticava/distorcia: quando max-height limita a altura, a
+        // largura (travada em 100%) não acompanha, e a caixa fica com uma
+        // proporção diferente da imagem real. "contain" nunca corta nem
+        // deforma — sempre respeita o crop/proporção original da imagem.
+        objectFit: 'contain',
         aspectRatio: capaW && capaH ? `${capaW} / ${capaH}` : undefined,
       }
     : undefined
