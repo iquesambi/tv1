@@ -651,7 +651,7 @@ function CasePageInner() {
           <div className="case-hero__text" ref={heroTextRef}>
             {is40Anos && data.Data ? (
               <span className="case-hero__breadcrumb">
-                {new Date(data.Data).getFullYear()} /
+                {new Date(data.Data).getFullYear()}
               </span>
             ) : data.cliente?.nome && (
               <span className="case-hero__breadcrumb">
