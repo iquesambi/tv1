@@ -21,9 +21,19 @@ type MenuData = {
 
 let cache: MenuData | null = null;
 let building: Promise<MenuData> | null = null;
+// Incrementada a cada invalidação — se uma reconstrução em andamento
+// (disparada ANTES da invalidação mais recente) terminar depois, ela não
+// pode mais escrever no cache: sem isso, editar de novo enquanto uma
+// reconstrução antiga ainda está em voo derrubava a invalidação e o cache
+// ficava travado numa versão intermediária (viu isso acontecer com a
+// ordem das agências: reordenar rápido deixava o cache preso no meio da
+// edição, sem nunca pegar o estado final).
+let generation = 0;
 
 export function invalidarMenuDataCache() {
   cache = null;
+  building = null;
+  generation++;
 }
 
 async function getJSON(path: string): Promise<any> {
@@ -47,9 +57,10 @@ async function montar(): Promise<MenuData> {
 export async function getMenuDataCache(): Promise<MenuData> {
   if (cache) return cache;
   if (building) return building;
+  const minhaGeneration = generation;
   building = montar()
     .then((result) => {
-      cache = result;
+      if (minhaGeneration === generation) cache = result;
       building = null;
       return result;
     })

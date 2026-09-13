@@ -9,9 +9,15 @@ const BASE = `http://127.0.0.1:${PORT}`;
 
 let cache: any[] | null = null;
 let building: Promise<any[]> | null = null;
+// Ver comentário equivalente em menu-data-cache.ts: sem isso, uma
+// reconstrução já em voo quando chega uma nova invalidação sobrescrevia o
+// cache com dados desatualizados ao terminar.
+let generation = 0;
 
 export function invalidarClientesGridCache() {
   cache = null;
+  building = null;
+  generation++;
 }
 
 async function montar(): Promise<any[]> {
@@ -26,9 +32,10 @@ async function montar(): Promise<any[]> {
 export async function getClientesGridCache(): Promise<any[]> {
   if (cache) return cache;
   if (building) return building;
+  const minhaGeneration = generation;
   building = montar()
     .then((result) => {
-      cache = result;
+      if (minhaGeneration === generation) cache = result;
       building = null;
       return result;
     })

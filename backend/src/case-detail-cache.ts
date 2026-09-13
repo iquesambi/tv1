@@ -14,10 +14,15 @@ type CaseDetail = { data: any; is40Anos: boolean } | null;
 
 let cache = new Map<string, CaseDetail>();
 let building = new Map<string, Promise<CaseDetail>>();
+// Ver comentário equivalente em menu-data-cache.ts: sem isso, uma
+// reconstrução já em voo quando chega uma nova invalidação sobrescrevia o
+// cache com dados desatualizados ao terminar.
+let generation = 0;
 
 export function invalidarCaseDetailCache() {
   cache = new Map();
   building = new Map();
+  generation++;
 }
 
 async function getJSON(path: string): Promise<any> {
@@ -49,9 +54,10 @@ export async function getCaseDetailCache(clienteSlug: string | null, caseSlug: s
   const key = `${clienteSlug ?? ''}/${caseSlug}`;
   if (cache.has(key)) return cache.get(key)!;
   if (building.has(key)) return building.get(key)!;
+  const minhaGeneration = generation;
   const promise = montar(clienteSlug, caseSlug)
     .then((result) => {
-      cache.set(key, result);
+      if (minhaGeneration === generation) cache.set(key, result);
       building.delete(key);
       return result;
     })
