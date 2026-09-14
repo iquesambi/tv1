@@ -25,10 +25,12 @@ const config = ({ env }: Core.Config.Shared.ConfigParams) => ({
     config: {
       allowedOrigins: env('CLIENT_URL'),
       async handler(uid: string, { documentId, status }: { documentId: string; locale?: string; status: string }) {
-        // Preview só existe pra Cases por enquanto.
-        if (uid !== 'api::case.case') return null;
+        // Preview existe pros dois tipos de case. A URL é montada igual nos
+        // dois: sem cliente, o case mora na raiz (/slug).
+        const TIPOS_COM_PREVIEW = ['api::case.case', 'api::case-quarenta-anos.case-quarenta-anos'];
+        if (!TIPOS_COM_PREVIEW.includes(uid)) return null;
 
-        const caso: any = await strapi.documents('api::case.case').findOne({
+        const caso: any = await strapi.documents(uid as any).findOne({
           documentId,
           status: status === 'draft' ? 'draft' : 'published',
           populate: { cliente: { fields: ['slug'] } },
