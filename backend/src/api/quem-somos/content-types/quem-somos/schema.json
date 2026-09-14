@@ -29,57 +29,6 @@
       "type": "component",
       "repeatable": false,
       "component": "quem-somos.content-driven"
-    },
-    "mostrar_intro": {
-      "type": "boolean",
-      "default": true,
-      "description": "Desligado: some a dobra de abertura (título + texto)."
-    },
-    "titulo_intro": {
-      "type": "richtext",
-      "description": "Título de abertura. O que estiver marcado (negrito ou itálico) sai na fonte serifada itálica; o resto, na Gilroy."
-    },
-    "titulo_acima": {
-      "type": "richtext",
-      "description": "Título grande acima do texto da abertura. Opcional. O que estiver marcado (negrito ou itálico) sai na fonte serifada itálica."
-    },
-    "texto_intro": {
-      "type": "richtext"
-    },
-    "titulo_abaixo": {
-      "type": "richtext",
-      "description": "Título grande abaixo do texto da abertura. Opcional. O que estiver marcado (negrito ou itálico) sai na fonte serifada itálica."
-    },
-    "mostrar_imagem": {
-      "type": "boolean",
-      "default": true,
-      "description": "Desligado: some a foto de largura total."
-    },
-    "imagem": {
-      "type": "media",
-      "multiple": false,
-      "required": false,
-      "allowedTypes": ["images"]
-    },
-    "mostrar_era": {
-      "type": "boolean",
-      "default": true,
-      "description": "Desligado: some o bloco \"da era\" (título + texto)."
-    },
-    "titulo_era": {
-      "type": "richtext",
-      "description": "Título do bloco. O que estiver marcado (negrito ou itálico) sai na fonte serifada itálica; o resto, na Gilroy."
-    },
-    "texto_era": {
-      "type": "richtext"
-    },
-    "mostrar_content_driven": {
-      "type": "boolean",
-      "default": true,
-      "description": "Desligado: some a faixa preta do rodapé (logo + frase)."
-    },
-    "tagline": {
-      "type": "text"
     }
   }
 }

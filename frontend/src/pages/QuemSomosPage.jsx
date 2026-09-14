@@ -10,8 +10,7 @@ const mediaUrl = (obj) => !obj?.url ? null : obj.url.startsWith("http") ? obj.ur
 
 const QS_BLOCOS =
   'quem-somos?populate[abertura]=true&populate[foto][populate][imagem]=true' +
-  '&populate[da_era]=true&populate[content_driven]=true&populate[imagem]=true'
-const QS_LEGADO = 'quem-somos?populate[imagem]=true'
+  '&populate[da_era]=true&populate[content_driven]=true'
 
 const cleanStr = (s) => (s || '').replace(/[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]/g, '').replace(/[­​‌‍﻿ ]/g, ' ').replace(/ +/g, ' ').trim()
 
@@ -95,13 +94,7 @@ export default function QuemSomosPage() {
   useEffect(() => {
     document.body.classList.remove('scroll-locked')
     api('logo-site?populate=logo').then(r => setLogo(r ?? null))
-    // Enquanto o backend com os blocos não subiu, pedir os componentes no
-    // populate devolve 400 ("Invalid key abertura") e a página ficaria
-    // vazia — então cai na consulta antiga, só com os campos soltos. Some
-    // na etapa 2 (ver backend/src/quem-somos-migracao.ts).
-    api(QS_BLOCOS)
-      .then(r => r ?? api(QS_LEGADO))
-      .then(r => setData(r ?? null))
+    api(QS_BLOCOS).then(r => setData(r ?? null))
   }, [])
 
   const pronto = data !== undefined && logo !== undefined
@@ -112,29 +105,26 @@ export default function QuemSomosPage() {
     </div>
   )
 
-  // O conteúdo vem dos componentes de bloco. Enquanto a migração não
-  // rodou e a página não foi republicada, cai nos campos soltos antigos —
-  // essa queda sai na etapa 2, junto com os campos (ver
-  // backend/src/quem-somos-migracao.ts).
-  const abertura      = data?.abertura      ?? {}
-  const foto          = data?.foto          ?? {}
-  const daEra         = data?.da_era        ?? {}
+  // Um componente por bloco da página (ver o schema do quem-somos).
+  const abertura      = data?.abertura       ?? {}
+  const foto          = data?.foto           ?? {}
+  const daEra         = data?.da_era         ?? {}
   const contentDriven = data?.content_driven ?? {}
 
-  const tituloIntro  = abertura.titulo       ?? data?.titulo_intro
-  const tituloAcima  = abertura.titulo_acima ?? data?.titulo_acima
-  const textoIntro   = abertura.texto        ?? data?.texto_intro
-  const tituloAbaixo = abertura.titulo_abaixo ?? data?.titulo_abaixo
-  const imagem       = foto.imagem           ?? data?.imagem
-  const tituloEra    = daEra.titulo          ?? data?.titulo_era
-  const textoEra     = daEra.texto           ?? data?.texto_era
-  const tagline      = contentDriven.tagline ?? data?.tagline
+  const tituloIntro  = abertura.titulo
+  const tituloAcima  = abertura.titulo_acima
+  const textoIntro   = abertura.texto
+  const tituloAbaixo = abertura.titulo_abaixo
+  const imagem       = foto.imagem
+  const tituloEra    = daEra.titulo
+  const textoEra     = daEra.texto
+  const tagline      = contentDriven.tagline
 
   // Liga/desliga de cada bloco. Vazio conta como ligado.
-  const mostrarIntro         = (abertura.mostrar      ?? data?.mostrar_intro)          !== false
-  const mostrarImagem        = (foto.mostrar          ?? data?.mostrar_imagem)         !== false && !!imagem
-  const mostrarEra           = (daEra.mostrar         ?? data?.mostrar_era)            !== false
-  const mostrarContentDriven = (contentDriven.mostrar ?? data?.mostrar_content_driven) !== false
+  const mostrarIntro         = abertura.mostrar      !== false
+  const mostrarImagem        = foto.mostrar          !== false && !!imagem
+  const mostrarEra           = daEra.mostrar         !== false
+  const mostrarContentDriven = contentDriven.mostrar !== false
 
   return (
     <div className="qs-page">

@@ -450,7 +450,7 @@ export interface ApiAgenciaAgencia extends Struct.CollectionTypeSchema {
       Schema.Attribute.SetMinMax<
         {
           max: 3;
-          min: 0.3;
+          min: 0.1;
         },
         number
       > &
@@ -459,7 +459,7 @@ export interface ApiAgenciaAgencia extends Struct.CollectionTypeSchema {
       Schema.Attribute.SetMinMax<
         {
           max: 3;
-          min: 0.3;
+          min: 0.1;
         },
         number
       > &
@@ -525,7 +525,10 @@ export interface ApiCaseQuarentaAnosCaseQuarentaAnos
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
     Data: Schema.Attribute.Date;
-    descricao: Schema.Attribute.Text;
+    descricao: Schema.Attribute.Text &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 1000;
+      }>;
     especialidade: Schema.Attribute.Relation<
       'manyToMany',
       'api::especialidade.especialidade'
@@ -545,7 +548,11 @@ export interface ApiCaseQuarentaAnosCaseQuarentaAnos
       'api::sub-especialidade.sub-especialidade'
     >;
     tema: Schema.Attribute.Relation<'manyToOne', 'api::era.era'>;
-    titulo: Schema.Attribute.String & Schema.Attribute.Required;
+    titulo: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 255;
+      }>;
     titulo_timeline: Schema.Attribute.String;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
@@ -588,7 +595,10 @@ export interface ApiCaseCase extends Struct.CollectionTypeSchema {
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
     Data: Schema.Attribute.Date;
-    descricao: Schema.Attribute.Text;
+    descricao: Schema.Attribute.Text &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 1000;
+      }>;
     especialidade: Schema.Attribute.Relation<
       'manyToMany',
       'api::especialidade.especialidade'
@@ -604,7 +614,11 @@ export interface ApiCaseCase extends Struct.CollectionTypeSchema {
       'manyToMany',
       'api::sub-especialidade.sub-especialidade'
     >;
-    titulo: Schema.Attribute.String & Schema.Attribute.Required;
+    titulo: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 255;
+      }>;
     titulo_timeline: Schema.Attribute.String;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
@@ -631,7 +645,7 @@ export interface ApiClienteCliente extends Struct.CollectionTypeSchema {
       Schema.Attribute.SetMinMax<
         {
           max: 3;
-          min: 0.3;
+          min: 0.1;
         },
         number
       > &
@@ -640,7 +654,7 @@ export interface ApiClienteCliente extends Struct.CollectionTypeSchema {
       Schema.Attribute.SetMinMax<
         {
           max: 3;
-          min: 0.3;
+          min: 0.1;
         },
         number
       > &
@@ -885,7 +899,7 @@ export interface ApiQuarentaAnosQuarentaAnos extends Struct.SingleTypeSchema {
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-    descricao: Schema.Attribute.Text;
+    descricao: Schema.Attribute.RichText;
     fotos: Schema.Attribute.Media<'images', true>;
     imagem: Schema.Attribute.Media<'images'> & Schema.Attribute.Required;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
@@ -918,10 +932,16 @@ export interface ApiQuemSomosQuemSomos extends Struct.SingleTypeSchema {
     draftAndPublish: true;
   };
   attributes: {
+    abertura: Schema.Attribute.Component<'quem-somos.abertura', false>;
+    content_driven: Schema.Attribute.Component<
+      'quem-somos.content-driven',
+      false
+    >;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-    imagem: Schema.Attribute.Media<'images'>;
+    da_era: Schema.Attribute.Component<'quem-somos.da-era', false>;
+    foto: Schema.Attribute.Component<'quem-somos.foto', false>;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
@@ -929,12 +949,6 @@ export interface ApiQuemSomosQuemSomos extends Struct.SingleTypeSchema {
     > &
       Schema.Attribute.Private;
     publishedAt: Schema.Attribute.DateTime;
-    tagline: Schema.Attribute.Text;
-    texto_era: Schema.Attribute.RichText;
-    texto_intro: Schema.Attribute.RichText;
-    titulo_era: Schema.Attribute.String;
-    titulo_era_italico: Schema.Attribute.String;
-    titulo_intro: Schema.Attribute.String;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;

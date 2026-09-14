@@ -205,6 +205,58 @@ export interface NavigationSublink extends Struct.ComponentSchema {
   };
 }
 
+export interface QuemSomosAbertura extends Struct.ComponentSchema {
+  collectionName: 'components_quem_somos_aberturas';
+  info: {
+    displayName: 'Abertura';
+    icon: 'file';
+  };
+  attributes: {
+    mostrar: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
+    texto: Schema.Attribute.RichText;
+    titulo: Schema.Attribute.RichText;
+    titulo_abaixo: Schema.Attribute.RichText;
+    titulo_acima: Schema.Attribute.RichText;
+  };
+}
+
+export interface QuemSomosContentDriven extends Struct.ComponentSchema {
+  collectionName: 'components_quem_somos_content_drivens';
+  info: {
+    displayName: 'Content Driven';
+    icon: 'apps';
+  };
+  attributes: {
+    mostrar: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
+    tagline: Schema.Attribute.Text;
+  };
+}
+
+export interface QuemSomosDaEra extends Struct.ComponentSchema {
+  collectionName: 'components_quem_somos_da_eras';
+  info: {
+    displayName: 'Da Era';
+    icon: 'file';
+  };
+  attributes: {
+    mostrar: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
+    texto: Schema.Attribute.RichText;
+    titulo: Schema.Attribute.RichText;
+  };
+}
+
+export interface QuemSomosFoto extends Struct.ComponentSchema {
+  collectionName: 'components_quem_somos_fotos';
+  info: {
+    displayName: 'Foto';
+    icon: 'picture';
+  };
+  attributes: {
+    imagem: Schema.Attribute.Media<'images'>;
+    mostrar: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
+  };
+}
+
 export interface SocialRede extends Struct.ComponentSchema {
   collectionName: 'components_social_redes';
   info: {
@@ -247,6 +299,10 @@ declare module '@strapi/strapi' {
       'blocks.video': BlocksVideo;
       'navigation.link': NavigationLink;
       'navigation.sublink': NavigationSublink;
+      'quem-somos.abertura': QuemSomosAbertura;
+      'quem-somos.content-driven': QuemSomosContentDriven;
+      'quem-somos.da-era': QuemSomosDaEra;
+      'quem-somos.foto': QuemSomosFoto;
       'social.rede': SocialRede;
       'trabalhe-conosco.vaga': TrabalheConoscoVaga;
     }

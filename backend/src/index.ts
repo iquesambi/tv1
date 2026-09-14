@@ -7,7 +7,6 @@ import { menuDataRoute, invalidarMenuDataCache } from './menu-data-cache';
 import { clientesGridRoute, invalidarClientesGridCache } from './clientes-grid-cache';
 import { caseDetailRoute, invalidarCaseDetailCache } from './case-detail-cache';
 import { casePreviewRoute } from './case-preview';
-import { migrarQuemSomosParaBlocos } from './quem-somos-migracao';
 
 export default {
   register({ strapi }) {
@@ -72,10 +71,6 @@ export default {
   },
 
   bootstrap({ strapi }) {
-
-    // Migração única do Quem Somos para blocos — some junto com os campos
-    // antigos na etapa 2 (ver quem-somos-migracao.ts).
-    migrarQuemSomosParaBlocos(strapi);
 
     // Invalida o cache da timeline de /cases sempre que algo que ela usa
     // muda — case, especialidade, sub-especialidade ou a navegação (que
