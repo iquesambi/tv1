@@ -47,9 +47,10 @@ function renderRichText(value) {
       .map(para => {
         const html = para
           .replace(/\n/g, '<br>')
-          .replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>')
-          .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-          .replace(/\*(.+?)\*/g, '<em>$1</em>')
+          // O editor do Strapi usa _ pra itálico, não só *
+          .replace(/(\*{3}|_{3})(.+?)\1/g, '<strong><em>$2</em></strong>')
+          .replace(/(\*{2}|_{2})(.+?)\1/g, '<strong>$2</strong>')
+          .replace(/(\*|_)(.+?)\1/g, '<em>$2</em>')
         return `<p>${html}</p>`
       })
       .join('')
@@ -73,7 +74,10 @@ function renderTitulo(valor, classeItalico) {
     return miolo ? `${antes}<em class="${classeItalico}">${miolo}</em>${depois}` : trecho
   }
   return cleanStr(String(valor))
-    .replace(/\*{1,3}([\s\S]+?)\*{1,3}/g, (_, trecho) => italico(trecho))
+    // O editor do Strapi usa _ pra itálico e ** pra negrito. A
+    // retrorreferência garante que o marcador de fechamento é igual ao de
+    // abertura, em vez de casar "*texto**".
+    .replace(/(\*{1,3}|_{1,3})([\s\S]+?)\1/g, (_, __, trecho) => italico(trecho))
     // Se vier HTML pronto em vez de markdown
     .replace(/<(strong|em|b|i)>([\s\S]*?)<\/\1>/gi, (_, __, trecho) => italico(trecho))
 }
@@ -123,10 +127,28 @@ export default function QuemSomosPage() {
                 __html: renderTitulo(data?.titulo_intro, 'qs-intro__titulo-italico'),
               }}
             />
-            <div
-              className="qs-intro__texto"
-              dangerouslySetInnerHTML={{ __html: renderRichText(data?.texto_intro) }}
-            />
+            <div className="qs-intro__coluna">
+              {data?.titulo_acima && (
+                <div
+                  className="qs-intro__destaque"
+                  dangerouslySetInnerHTML={{
+                    __html: renderTitulo(data.titulo_acima, 'qs-intro__destaque-italico'),
+                  }}
+                />
+              )}
+              <div
+                className="qs-intro__texto"
+                dangerouslySetInnerHTML={{ __html: renderRichText(data?.texto_intro) }}
+              />
+              {data?.titulo_abaixo && (
+                <div
+                  className="qs-intro__destaque"
+                  dangerouslySetInnerHTML={{
+                    __html: renderTitulo(data.titulo_abaixo, 'qs-intro__destaque-italico'),
+                  }}
+                />
+              )}
+            </div>
           </section>
         )}
       </div>

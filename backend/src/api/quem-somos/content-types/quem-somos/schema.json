@@ -19,8 +19,16 @@
       "type": "richtext",
       "description": "Título de abertura. O que estiver marcado (negrito ou itálico) sai na fonte serifada itálica; o resto, na Gilroy."
     },
+    "titulo_acima": {
+      "type": "richtext",
+      "description": "Título grande acima do texto da abertura. Opcional. O que estiver marcado (negrito ou itálico) sai na fonte serifada itálica."
+    },
     "texto_intro": {
       "type": "richtext"
+    },
+    "titulo_abaixo": {
+      "type": "richtext",
+      "description": "Título grande abaixo do texto da abertura. Opcional. O que estiver marcado (negrito ou itálico) sai na fonte serifada itálica."
     },
     "mostrar_imagem": {
       "type": "boolean",

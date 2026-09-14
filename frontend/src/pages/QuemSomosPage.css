@@ -66,12 +66,38 @@
   text-transform: none;
 }
 
+/* Coluna da direita: título opcional, texto, título opcional. */
+.qs-intro__coluna {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  max-width: 460px;
+}
+
+/* Mesmo tratamento do título do bloco "da era": Gilroy black em caixa
+   alta, e o trecho marcado no CMS em serifada itálica, maior. */
+.qs-intro__destaque {
+  font-size: clamp(32px, 3.5vw, 52px);
+  font-weight: 900;
+  text-transform: uppercase;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.qs-intro__destaque-italico {
+  font-family: 'PP Hatton', 'Georgia', serif;
+  font-size: clamp(40px, 4.5vw, 68px);
+  font-weight: 500;
+  font-style: italic;
+  letter-spacing: -0.02em;
+  text-transform: none;
+}
+
 .qs-intro__texto {
   font-size: 15px;
   font-weight: 400;
   line-height: 1.7;
   color: #000001;
-  max-width: 460px;
 }
 
 .qs-intro__texto p {
@@ -143,6 +169,9 @@
   font-style: italic;
   line-height: 1.1;
   letter-spacing: -0.02em;
+  /* O uppercase vale só pra parte em Gilroy — a serifada respeita a caixa
+     digitada no CMS. */
+  text-transform: none;
 }
 
 .qs-era__texto {
