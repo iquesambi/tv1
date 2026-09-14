@@ -41,6 +41,11 @@
 
 .qs-intro {
   flex: 1;
+  /* Sem isso o item flex cresce além da sobra da dobra (min-height: auto
+     não deixa encolher abaixo do conteúdo) e vaza por baixo — e a medida
+     de "espaço disponível" usada pra calcular a escala vinha errada, já
+     refletindo a altura estourada. */
+  min-height: 0;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 48px;
@@ -66,18 +71,20 @@
   text-transform: none;
 }
 
-/* Coluna da direita: título opcional, texto, título opcional. */
+/* Coluna da direita: título opcional, texto, título opcional. O limite
+   existe só pra linha não ficar comprida demais em tela larga — abaixo
+   disso a coluna usa o espaço todo da grade. */
 .qs-intro__coluna {
   display: flex;
   flex-direction: column;
-  gap: 32px;
-  max-width: 460px;
+  gap: calc(32px * var(--qs-escala, 1));
+  max-width: 620px;
 }
 
 /* Mesmo tratamento do título do bloco "da era": Gilroy black em caixa
    alta, e o trecho marcado no CMS em serifada itálica, maior. */
 .qs-intro__destaque {
-  font-size: clamp(32px, 3.5vw, 52px);
+  font-size: calc(clamp(32px, 3.5vw, 52px) * var(--qs-escala, 1));
   font-weight: 900;
   text-transform: uppercase;
   line-height: 1.1;
@@ -86,7 +93,7 @@
 
 .qs-intro__destaque-italico {
   font-family: 'PP Hatton', 'Georgia', serif;
-  font-size: clamp(40px, 4.5vw, 68px);
+  font-size: calc(clamp(40px, 4.5vw, 68px) * var(--qs-escala, 1));
   font-weight: 500;
   font-style: italic;
   letter-spacing: -0.02em;
@@ -94,7 +101,7 @@
 }
 
 .qs-intro__texto {
-  font-size: 15px;
+  font-size: calc(16px * var(--qs-escala, 1));
   font-weight: 400;
   line-height: 1.7;
   color: #000001;

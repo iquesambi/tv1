@@ -90,6 +90,8 @@ export default function QuemSomosPage() {
   const [data, setData]   = useState(undefined)
   const [logo, setLogo]   = useState(undefined)
   const footerRef         = useRef(null)
+  const introRef          = useRef(null)
+  const colunaRef         = useRef(null)
 
   useEffect(() => {
     document.body.classList.remove('scroll-locked')
@@ -98,6 +100,49 @@ export default function QuemSomosPage() {
   }, [])
 
   const pronto = data !== undefined && logo !== undefined
+
+  // A dobra tem altura fixa (100vh) e a coluna da direita cresce conforme o
+  // conteúdo do CMS: com os dois títulos preenchidos ela passa da dobra e
+  // vaza por baixo, em telas mais baixas. Aqui mede de verdade e encolhe as
+  // fontes só o necessário — um valor fixo não daria conta, já que depende
+  // do tamanho do texto e da altura da janela.
+  useEffect(() => {
+    if (!pronto) return
+    const secao = introRef.current
+    const coluna = colunaRef.current
+    if (!secao || !coluna) return
+
+    const ajustar = () => {
+      coluna.style.setProperty('--qs-escala', '1')
+      const disponivel = secao.clientHeight
+      if (disponivel <= 0 || coluna.scrollHeight <= disponivel) return
+
+      // Busca binária pela maior escala que ainda cabe. Uma conta direta
+      // (disponível / necessário) erra pra baixo: encolher a fonte reflui o
+      // texto em menos linhas, então a altura cai mais que proporcional e o
+      // bloco acaba bem menor do que o espaço permitia.
+      let cabe = 0.4
+      let naoCabe = 1
+      for (let i = 0; i < 7; i++) {
+        const meio = (cabe + naoCabe) / 2
+        coluna.style.setProperty('--qs-escala', String(meio))
+        if (coluna.scrollHeight <= disponivel) cabe = meio
+        else naoCabe = meio
+      }
+      coluna.style.setProperty('--qs-escala', String(cabe))
+    }
+
+    ajustar()
+    // Observa a seção (altura fixa da dobra), não a coluna: encolher a
+    // coluna muda a altura dela, e observá-la entraria em laço.
+    const ro = new ResizeObserver(ajustar)
+    ro.observe(secao)
+    window.addEventListener('resize', ajustar)
+    return () => {
+      ro.disconnect()
+      window.removeEventListener('resize', ajustar)
+    }
+  }, [pronto, data])
 
   if (!pronto) return (
     <div className="qs-page" style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -138,14 +183,14 @@ export default function QuemSomosPage() {
         />
 
         {mostrarIntro && (
-          <section className="qs-intro">
+          <section className="qs-intro" ref={introRef}>
             <h1
               className="qs-intro__titulo"
               dangerouslySetInnerHTML={{
                 __html: renderTitulo(tituloIntro, 'qs-intro__titulo-italico'),
               }}
             />
-            <div className="qs-intro__coluna">
+            <div className="qs-intro__coluna" ref={colunaRef}>
               {tituloAcima && (
                 <div
                   className="qs-intro__destaque"
