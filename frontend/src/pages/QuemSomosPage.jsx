@@ -58,6 +58,26 @@ function renderRichText(value) {
   return ''
 }
 
+// Títulos de fonte mista: em vez de um campo por fonte, o CMS tem um rich
+// text só e quem escreve marca o trecho que deve sair na serifada itálica.
+// Negrito e itálico caem no mesmo tratamento de propósito — o título só
+// tem duas fontes, então qualquer marcação leva à mesma, e não tem como
+// errar o botão no editor.
+function renderTitulo(valor, classeItalico) {
+  if (!valor) return ''
+  // Os espaços das bordas ficam FORA do <em>: o editor do Strapi costuma
+  // incluí-los na seleção, e dentro eles sairiam no corpo da serifada
+  // (que é maior), deixando o vão entre as duas partes errado.
+  const italico = (trecho) => {
+    const [, antes, miolo, depois] = trecho.match(/^(\s*)([\s\S]*?)(\s*)$/)
+    return miolo ? `${antes}<em class="${classeItalico}">${miolo}</em>${depois}` : trecho
+  }
+  return cleanStr(String(valor))
+    .replace(/\*{1,3}([\s\S]+?)\*{1,3}/g, (_, trecho) => italico(trecho))
+    // Se vier HTML pronto em vez de markdown
+    .replace(/<(strong|em|b|i)>([\s\S]*?)<\/\1>/gi, (_, __, trecho) => italico(trecho))
+}
+
 export default function QuemSomosPage() {
   const [data, setData]   = useState(undefined)
   const [logo, setLogo]   = useState(undefined)
@@ -97,17 +117,12 @@ export default function QuemSomosPage() {
 
         {mostrarIntro && (
           <section className="qs-intro">
-            <h1 className="qs-intro__titulo">
-              {data?.titulo_intro}
-              {data?.titulo_intro_italico && (
-                <>
-                  {' '}
-                  <em className="qs-intro__titulo-italico">
-                    {data.titulo_intro_italico}
-                  </em>
-                </>
-              )}
-            </h1>
+            <h1
+              className="qs-intro__titulo"
+              dangerouslySetInnerHTML={{
+                __html: renderTitulo(data?.titulo_intro, 'qs-intro__titulo-italico'),
+              }}
+            />
             <div
               className="qs-intro__texto"
               dangerouslySetInnerHTML={{ __html: renderRichText(data?.texto_intro) }}
@@ -130,14 +145,12 @@ export default function QuemSomosPage() {
 
           {mostrarEra && (
             <section className="qs-era">
-              <div className="qs-era__titulo">
-                <span className="qs-era__titulo-normal">
-                  {data?.titulo_era}
-                </span>{' '}
-                <em className="qs-era__titulo-italico">
-                  {data?.titulo_era_italico}
-                </em>
-              </div>
+              <div
+                className="qs-era__titulo"
+                dangerouslySetInnerHTML={{
+                  __html: renderTitulo(data?.titulo_era, 'qs-era__titulo-italico'),
+                }}
+              />
               <div
                 className="qs-era__texto"
                 dangerouslySetInnerHTML={{ __html: renderRichText(data?.texto_era) }}

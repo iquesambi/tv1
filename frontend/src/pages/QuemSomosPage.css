@@ -128,10 +128,6 @@
 
 .qs-era__titulo {
   display: block;
-}
-
-.qs-era__titulo-normal {
-  display: inline;
   font-size: clamp(32px, 3.5vw, 52px);
   font-weight: 900;
   text-transform: uppercase;
@@ -227,7 +223,7 @@
     padding: 60px 24px;
   }
 
-  .qs-era__titulo-normal {
+  .qs-era__titulo {
     font-size: 26px;
   }
 

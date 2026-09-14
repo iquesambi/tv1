@@ -16,11 +16,8 @@
       "description": "Desligado: some a dobra de abertura (título + texto)."
     },
     "titulo_intro": {
-      "type": "string"
-    },
-    "titulo_intro_italico": {
-      "type": "string",
-      "description": "Segunda parte do título de abertura, em itálico serifado. Deixe vazio para um título de fonte única."
+      "type": "richtext",
+      "description": "Título de abertura. O que estiver marcado (negrito ou itálico) sai na fonte serifada itálica; o resto, na Gilroy."
     },
     "texto_intro": {
       "type": "richtext"
@@ -42,10 +39,8 @@
       "description": "Desligado: some o bloco \"da era\" (título + texto)."
     },
     "titulo_era": {
-      "type": "string"
-    },
-    "titulo_era_italico": {
-      "type": "string"
+      "type": "richtext",
+      "description": "Título do bloco. O que estiver marcado (negrito ou itálico) sai na fonte serifada itálica; o resto, na Gilroy."
     },
     "texto_era": {
       "type": "richtext"
