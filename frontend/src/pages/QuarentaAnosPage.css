@@ -353,24 +353,16 @@
 /* ── MOBILE ───────────────────────────── */
 
 @media (max-width: 768px) {
-  /* Esconde o header fixo do Menu nesta página */
-  .qa-page .footer-branco__top {
-    display: none;
-  }
-
   .qa-hero {
     height: 100dvh;
   }
 
+  /* A composição de desktop (SVG inteiro, com o "40" bem maior e a
+     descrição/fotos em posições fixas pensadas pra tela larga) dá lugar
+     ao bloco .qa-texto-mobile abaixo, que tem sua própria versão do "40"
+     — evita ter as duas ao mesmo tempo (texto duplicado, máquina de
+     escrever solta fora de contexto). */
   .qa-composicao {
-    padding: 0 24px;
-
-  }
-
-  /* Esconde elementos de texto do SVG — aparecem como HTML abaixo */
-  .qa-fo-lorem,
-  .qa-texto-sv-experiencias,
-  .qa-texto-sv-bv {
     display: none;
   }
 
@@ -381,6 +373,31 @@
     gap: 32px;
     padding: 40px 20px;
     background: #000001;
+  }
+
+  /* Estoura o padding lateral da seção: na arte, o "40" vai de ponta a
+     ponta da tela, não fica dentro da mesma margem do texto. */
+  .qa-mobile-40 {
+    margin: 0 -20px -16px;
+  }
+
+  .qa-mobile-40__svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .qa-texto-mobile__fotos {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .qa-texto-mobile__fotos img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 4 / 3.4;
+    object-fit: cover;
   }
 
   .qa-texto-mobile__paragrafos {
@@ -406,6 +423,19 @@
     color: #fff;
     display: flex;
     flex-direction: column;
+    /* Largura do bloco = a da linha mais larga, então o conjunto todo
+       (as duas linhas com o deslocamento entre elas) fica centralizado
+       sem mudar o alinhamento de uma linha em relação à outra. */
+    width: fit-content;
+    margin: 0 auto;
+  }
+
+  /* Desloca "ção" pra que o "ç" caia embaixo do "u" de "evolu". O "evol"
+     invisível dá o deslocamento exato na mesma fonte/tamanho, então
+     continua certo quando o clamp() do font-size muda de tela pra tela. */
+  .qa-texto-mobile__experiencias span:last-child::before {
+    content: 'evol';
+    visibility: hidden;
   }
 
   .qa-texto-mobile__bv {

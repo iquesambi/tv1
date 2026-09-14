@@ -53,6 +53,19 @@ function textoParaHtml(texto) {
   return marked.parse(corrigirEspacoEmphasis(texto))
 }
 
+// As quebras de linha soltas do CMS foram feitas pra largura do desktop —
+// no mobile elas deixam as linhas curtas, sem acompanhar a margem das fotos.
+// Aqui elas viram espaço (o texto quebra sozinho na largura do bloco), mas
+// linha em branco continua separando parágrafos.
+function semQuebrasManuais(texto) {
+  if (!texto) return texto
+  return texto
+    .replace(/\r\n/g, '\n')
+    .split(/\n{2,}/)
+    .map(paragrafo => paragrafo.replace(/\s*\n\s*/g, ' ').trim())
+    .join('\n\n')
+}
+
 // Pré-busca usada pela transição da câmera para que os dados já estejam prontos
 // antes do overlay sair
 let qaPrefetch = null
@@ -187,16 +200,82 @@ export default function QuarentaAnosPage() {
         </div>
       </section>
 
-      {/* TEXTO MOBILE — experiências primeiro (próximo ao 40), depois texto, depois BEM-VINDOS */}
+      {/* TEXTO MOBILE — ordem: "40" (com a máquina de escrever dentro do
+          "0"), texto, "experiências", fotos empilhadas. Reaproveita os
+          mesmos paths do "4"/"0" do SVG de desktop (mesmas coordenadas —
+          só corta o viewBox pra mostrar só essa parte), pra não duplicar
+          a arte em dois desenhos diferentes. */}
       <section className="qa-texto-mobile">
+        <div className="qa-mobile-40">
+          <svg viewBox="-43 -20 1453 1654" xmlns="http://www.w3.org/2000/svg" className="qa-mobile-40__svg">
+            {/* "4" */}
+            <path
+              d="M570.973 752.706V874.707C570.973 886.506 561.418 896.068 549.628 896.068H385.116C373.326 896.068 363.771 886.506 363.771 874.707V774.068C363.771 762.268 354.217 752.706 342.427 752.706H-21.6556C-33.4454 752.706 -43 743.144 -43 731.345V593.709C-43 573.657 -38.2748 553.896 -29.2182 536.011L236.307 11.7063C239.944 4.52027 247.309 0 255.347 0H427.48C443.404 0 453.723 16.8177 446.52 31.0276L192.692 532.221C185.488 546.431 195.807 563.249 211.731 563.249H549.605C561.395 563.249 570.95 572.811 570.95 584.61V752.695L570.973 752.706Z"
+              fill="white"
+            />
+            {/* Foto do prédio dentro do miolo do "0" — recortada no círculo
+                do furo (raio um pouco maior que o furo pra não sobrar fresta
+                na borda). Fica atrás do anel e da máquina de escrever. */}
+            {fotos[0] && (
+              <>
+                <clipPath id="qa-mobile-40-miolo">
+                  <circle cx="948.5" cy="1152.5" r="262" />
+                </clipPath>
+                <image
+                  href={fotos[0]}
+                  x="686.5"
+                  y="890.5"
+                  width="524"
+                  height="524"
+                  preserveAspectRatio="xMidYMid slice"
+                  clipPath="url(#qa-mobile-40-miolo)"
+                />
+              </>
+            )}
+            {/* "0" donut */}
+            <g transform="translate(487, 691)">
+              <path
+                fillRule="evenodd"
+                d="M788.635 789.897C699.032 878.655 589.988 923.034 461.517 923.034C333.045 923.034 223.979 878.655 134.399 789.897C44.7957 701.14 0 591.689 0 461.511C0 331.333 44.7957 221.882 134.399 133.125C223.979 44.3671 333.022 0 461.517 0C590.012 0 699.032 44.3787 788.635 133.125C878.215 221.882 923.034 331.356 923.034 461.511C923.034 591.666 878.226 701.151 788.635 789.897ZM277.045 651.704C326.492 700.734 387.99 725.243 461.528 725.243C535.067 725.243 596.554 700.734 646.001 651.704C695.448 602.697 720.177 539.296 720.177 461.523C720.177 383.75 695.459 320.371 646.001 271.341C596.554 222.334 535.055 197.802 461.528 197.802C388.002 197.802 326.492 222.334 277.045 271.341C227.598 320.371 202.868 383.773 202.868 461.523C202.868 539.272 227.586 602.697 277.045 651.704Z"
+                fill="white"
+              />
+            </g>
+            {/* Máquina de escrever POR CIMA do "40" (desenhada depois = fica
+                na frente), estourando pra fora do miolo do "0". A caixa usa
+                a proporção nativa do PNG (524x376) com "meet": o recorte do
+                arquivo aparece inteiro, sem virar um retângulo cortado. */}
+            {fotos[3] && (
+              <image
+                href={fotos[3]}
+                x="668.5"
+                y="1198"
+                width="560"
+                height="402"
+                preserveAspectRatio="xMidYMid meet"
+              />
+            )}
+            {/* ANOS DE — duas linhas, à direita da diagonal do "4" */}
+            <text fontFamily="Gilroy, sans-serif" fontWeight="900" fontStyle="normal" fontSize="108" fill="white">
+              <tspan x="400" y="340">ANOS</tspan>
+              <tspan x="400" y="450">DE</tspan>
+            </text>
+          </svg>
+        </div>
         <div className="qa-texto-mobile__experiencias">
           <span>evolu</span>
           <span>ção</span>
         </div>
         <div
           className="qa-texto-mobile__paragrafos"
-          dangerouslySetInnerHTML={{ __html: semViuvas(textoParaHtml(data?.descricao)) }}
+          dangerouslySetInnerHTML={{ __html: semViuvas(textoParaHtml(semQuebrasManuais(data?.descricao))) }}
         />
+        {/* Pilha de fotos — sem a fotos[0], que já aparece dentro do "0" */}
+        {(fotos[1] || fotos[2]) && (
+          <div className="qa-texto-mobile__fotos">
+            {fotos[1] && <img src={fotos[1]} alt="" />}
+            {fotos[2] && <img src={fotos[2]} alt="" />}
+          </div>
+        )}
       </section>
 
       {/* CASES — escondida quando "mostrar_timeline" está desligado no CMS */}
