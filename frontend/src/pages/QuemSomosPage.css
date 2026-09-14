@@ -31,6 +31,12 @@
   flex-direction: column;
 }
 
+/* Bloco da intro desligado no CMS: a dobra encolhe pro header, sem deixar
+   uma tela inteira em branco antes do próximo bloco. */
+.qs-dobra--so-header {
+  height: auto;
+}
+
 /* ── INTRO ───────────────────────────── */
 
 .qs-intro {
@@ -49,6 +55,15 @@
   line-height: 0.95;
   margin: 0;
   letter-spacing: -0.03em;
+}
+
+/* Segunda parte do título, em itálico serifado — mesmo tratamento de
+   fonte mista do título do bloco "da era". */
+.qs-intro__titulo-italico {
+  font-family: 'PP Hatton', 'Georgia', serif;
+  font-weight: 500;
+  font-style: italic;
+  text-transform: none;
 }
 
 .qs-intro__texto {
@@ -92,6 +107,12 @@
   height: 100vh;
   display: flex;
   flex-direction: column;
+}
+
+/* Com um dos dois blocos desligado no CMS, o que sobrou ocupa a dobra
+   inteira em vez de deixar o vão dos 70%/30% fixos. */
+.qs-terceira-dobra > :only-child {
+  flex: 1;
 }
 
 /* ── ERA ─────────────────────────────── */

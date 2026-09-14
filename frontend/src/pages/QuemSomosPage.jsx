@@ -77,67 +77,91 @@ export default function QuemSomosPage() {
     </div>
   )
 
+  // Cada bloco tem seu liga/desliga no CMS. Campo vazio (conteúdo antigo,
+  // antes dos toggles existirem) conta como ligado.
+  const mostrarIntro         = data?.mostrar_intro !== false
+  const mostrarImagem        = data?.mostrar_imagem !== false && !!data?.imagem
+  const mostrarEra           = data?.mostrar_era !== false
+  const mostrarContentDriven = data?.mostrar_content_driven !== false
+
   return (
     <div className="qs-page">
 
-      {/* ── Primeira dobra: header + intro ── */}
-      <div className="qs-dobra">
+      {/* ── Bloco 1: intro (o header fica sempre, é a navegação) ── */}
+      <div className={`qs-dobra${mostrarIntro ? '' : ' qs-dobra--so-header'}`}>
         <PageHeader
           logoUrl={mediaUrl(logo?.logo)}
           onLogoClick={() => footerRef.current?.scrollIntoView({ behavior: 'smooth' })}
           mobileMenuLogo={logo?.logo}
         />
 
-        <section className="qs-intro">
-          <h1 className="qs-intro__titulo">
-            {data?.titulo_intro}
-          </h1>
-          <div
-            className="qs-intro__texto"
-            dangerouslySetInnerHTML={{ __html: renderRichText(data?.texto_intro) }}
-          />
-        </section>
+        {mostrarIntro && (
+          <section className="qs-intro">
+            <h1 className="qs-intro__titulo">
+              {data?.titulo_intro}
+              {data?.titulo_intro_italico && (
+                <>
+                  {' '}
+                  <em className="qs-intro__titulo-italico">
+                    {data.titulo_intro_italico}
+                  </em>
+                </>
+              )}
+            </h1>
+            <div
+              className="qs-intro__texto"
+              dangerouslySetInnerHTML={{ __html: renderRichText(data?.texto_intro) }}
+            />
+          </section>
+        )}
       </div>
 
-      {/* ── Imagem full-width ── */}
-      {data?.imagem && (
+      {/* ── Bloco 2: foto de largura total ── */}
+      {mostrarImagem && (
         <div className="qs-imagem">
           <img src={mediaUrl(data.imagem)} alt="" />
         </div>
       )}
 
-      {/* ── Terceira dobra: era (70%) + footer dark (30%) ── */}
-      <div className="qs-terceira-dobra">
+      {/* ── Blocos 3 e 4: "da era" (70%) + faixa preta (30%). Sozinho,
+             qualquer um dos dois ocupa a dobra inteira (ver CSS). ── */}
+      {(mostrarEra || mostrarContentDriven) && (
+        <div className="qs-terceira-dobra">
 
-        <section className="qs-era">
-          <div className="qs-era__titulo">
-            <span className="qs-era__titulo-normal">
-              {data?.titulo_era}
-            </span>{' '}
-            <em className="qs-era__titulo-italico">
-              {data?.titulo_era_italico}
-            </em>
-          </div>
-          <div
-            className="qs-era__texto"
-            dangerouslySetInnerHTML={{ __html: renderRichText(data?.texto_era) }}
-          />
-        </section>
-
-        <section className="qs-footer-dark">
-          {logo?.logo && (
-            <img
-              src={mediaUrl(logo.logo)}
-              alt="TV1"
-              className="qs-footer-dark__logo"
-            />
+          {mostrarEra && (
+            <section className="qs-era">
+              <div className="qs-era__titulo">
+                <span className="qs-era__titulo-normal">
+                  {data?.titulo_era}
+                </span>{' '}
+                <em className="qs-era__titulo-italico">
+                  {data?.titulo_era_italico}
+                </em>
+              </div>
+              <div
+                className="qs-era__texto"
+                dangerouslySetInnerHTML={{ __html: renderRichText(data?.texto_era) }}
+              />
+            </section>
           )}
-          <p className="qs-footer-dark__tagline">
-            {data?.tagline}
-          </p>
-        </section>
 
-      </div>
+          {mostrarContentDriven && (
+            <section className="qs-footer-dark">
+              {logo?.logo && (
+                <img
+                  src={mediaUrl(logo.logo)}
+                  alt="TV1"
+                  className="qs-footer-dark__logo"
+                />
+              )}
+              <p className="qs-footer-dark__tagline">
+                {data?.tagline}
+              </p>
+            </section>
+          )}
+
+        </div>
+      )}
 
       <div ref={footerRef}><Menu /></div>
 

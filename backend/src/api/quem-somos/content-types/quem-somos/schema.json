@@ -10,17 +10,36 @@
     "draftAndPublish": true
   },
   "attributes": {
+    "mostrar_intro": {
+      "type": "boolean",
+      "default": true,
+      "description": "Desligado: some a dobra de abertura (título + texto)."
+    },
     "titulo_intro": {
       "type": "string"
     },
+    "titulo_intro_italico": {
+      "type": "string",
+      "description": "Segunda parte do título de abertura, em itálico serifado. Deixe vazio para um título de fonte única."
+    },
     "texto_intro": {
       "type": "richtext"
+    },
+    "mostrar_imagem": {
+      "type": "boolean",
+      "default": true,
+      "description": "Desligado: some a foto de largura total."
     },
     "imagem": {
       "type": "media",
       "multiple": false,
       "required": false,
       "allowedTypes": ["images"]
+    },
+    "mostrar_era": {
+      "type": "boolean",
+      "default": true,
+      "description": "Desligado: some o bloco \"da era\" (título + texto)."
     },
     "titulo_era": {
       "type": "string"
@@ -30,6 +49,11 @@
     },
     "texto_era": {
       "type": "richtext"
+    },
+    "mostrar_content_driven": {
+      "type": "boolean",
+      "default": true,
+      "description": "Desligado: some a faixa preta do rodapé (logo + frase)."
     },
     "tagline": {
       "type": "text"
