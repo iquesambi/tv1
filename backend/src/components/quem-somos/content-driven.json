@@ -1,0 +1,8 @@
+{
+  "collectionName": "components_quem_somos_content_drivens",
+  "info": { "displayName": "Content Driven", "icon": "apps" },
+  "attributes": {
+    "mostrar": { "type": "boolean", "default": true },
+    "tagline": { "type": "text" }
+  }
+}

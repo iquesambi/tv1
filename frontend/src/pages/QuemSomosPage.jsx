@@ -8,6 +8,11 @@ const STRAPI = 'https://tv1-53ev.onrender.com'
 const api = (path) => axios.get(`${STRAPI}/api/${path}`).then(r => r.data.data).catch(() => null)
 const mediaUrl = (obj) => !obj?.url ? null : obj.url.startsWith("http") ? obj.url : `${STRAPI}${obj.url}`
 
+const QS_BLOCOS =
+  'quem-somos?populate[abertura]=true&populate[foto][populate][imagem]=true' +
+  '&populate[da_era]=true&populate[content_driven]=true&populate[imagem]=true'
+const QS_LEGADO = 'quem-somos?populate[imagem]=true'
+
 const cleanStr = (s) => (s || '').replace(/[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]/g, '').replace(/[­​‌‍﻿ ]/g, ' ').replace(/ +/g, ' ').trim()
 
 // Suporta Markdown (Strapi richtext), HTML string, e blocks JSON (Strapi v5)
@@ -90,7 +95,13 @@ export default function QuemSomosPage() {
   useEffect(() => {
     document.body.classList.remove('scroll-locked')
     api('logo-site?populate=logo').then(r => setLogo(r ?? null))
-    api('quem-somos?populate[imagem]=true').then(r => setData(r ?? null))
+    // Enquanto o backend com os blocos não subiu, pedir os componentes no
+    // populate devolve 400 ("Invalid key abertura") e a página ficaria
+    // vazia — então cai na consulta antiga, só com os campos soltos. Some
+    // na etapa 2 (ver backend/src/quem-somos-migracao.ts).
+    api(QS_BLOCOS)
+      .then(r => r ?? api(QS_LEGADO))
+      .then(r => setData(r ?? null))
   }, [])
 
   const pronto = data !== undefined && logo !== undefined
@@ -101,12 +112,29 @@ export default function QuemSomosPage() {
     </div>
   )
 
-  // Cada bloco tem seu liga/desliga no CMS. Campo vazio (conteúdo antigo,
-  // antes dos toggles existirem) conta como ligado.
-  const mostrarIntro         = data?.mostrar_intro !== false
-  const mostrarImagem        = data?.mostrar_imagem !== false && !!data?.imagem
-  const mostrarEra           = data?.mostrar_era !== false
-  const mostrarContentDriven = data?.mostrar_content_driven !== false
+  // O conteúdo vem dos componentes de bloco. Enquanto a migração não
+  // rodou e a página não foi republicada, cai nos campos soltos antigos —
+  // essa queda sai na etapa 2, junto com os campos (ver
+  // backend/src/quem-somos-migracao.ts).
+  const abertura      = data?.abertura      ?? {}
+  const foto          = data?.foto          ?? {}
+  const daEra         = data?.da_era        ?? {}
+  const contentDriven = data?.content_driven ?? {}
+
+  const tituloIntro  = abertura.titulo       ?? data?.titulo_intro
+  const tituloAcima  = abertura.titulo_acima ?? data?.titulo_acima
+  const textoIntro   = abertura.texto        ?? data?.texto_intro
+  const tituloAbaixo = abertura.titulo_abaixo ?? data?.titulo_abaixo
+  const imagem       = foto.imagem           ?? data?.imagem
+  const tituloEra    = daEra.titulo          ?? data?.titulo_era
+  const textoEra     = daEra.texto           ?? data?.texto_era
+  const tagline      = contentDriven.tagline ?? data?.tagline
+
+  // Liga/desliga de cada bloco. Vazio conta como ligado.
+  const mostrarIntro         = (abertura.mostrar      ?? data?.mostrar_intro)          !== false
+  const mostrarImagem        = (foto.mostrar          ?? data?.mostrar_imagem)         !== false && !!imagem
+  const mostrarEra           = (daEra.mostrar         ?? data?.mostrar_era)            !== false
+  const mostrarContentDriven = (contentDriven.mostrar ?? data?.mostrar_content_driven) !== false
 
   return (
     <div className="qs-page">
@@ -124,27 +152,27 @@ export default function QuemSomosPage() {
             <h1
               className="qs-intro__titulo"
               dangerouslySetInnerHTML={{
-                __html: renderTitulo(data?.titulo_intro, 'qs-intro__titulo-italico'),
+                __html: renderTitulo(tituloIntro, 'qs-intro__titulo-italico'),
               }}
             />
             <div className="qs-intro__coluna">
-              {data?.titulo_acima && (
+              {tituloAcima && (
                 <div
                   className="qs-intro__destaque"
                   dangerouslySetInnerHTML={{
-                    __html: renderTitulo(data.titulo_acima, 'qs-intro__destaque-italico'),
+                    __html: renderTitulo(tituloAcima, 'qs-intro__destaque-italico'),
                   }}
                 />
               )}
               <div
                 className="qs-intro__texto"
-                dangerouslySetInnerHTML={{ __html: renderRichText(data?.texto_intro) }}
+                dangerouslySetInnerHTML={{ __html: renderRichText(textoIntro) }}
               />
-              {data?.titulo_abaixo && (
+              {tituloAbaixo && (
                 <div
                   className="qs-intro__destaque"
                   dangerouslySetInnerHTML={{
-                    __html: renderTitulo(data.titulo_abaixo, 'qs-intro__destaque-italico'),
+                    __html: renderTitulo(tituloAbaixo, 'qs-intro__destaque-italico'),
                   }}
                 />
               )}
@@ -156,7 +184,7 @@ export default function QuemSomosPage() {
       {/* ── Bloco 2: foto de largura total ── */}
       {mostrarImagem && (
         <div className="qs-imagem">
-          <img src={mediaUrl(data.imagem)} alt="" />
+          <img src={mediaUrl(imagem)} alt="" />
         </div>
       )}
 
@@ -170,12 +198,12 @@ export default function QuemSomosPage() {
               <div
                 className="qs-era__titulo"
                 dangerouslySetInnerHTML={{
-                  __html: renderTitulo(data?.titulo_era, 'qs-era__titulo-italico'),
+                  __html: renderTitulo(tituloEra, 'qs-era__titulo-italico'),
                 }}
               />
               <div
                 className="qs-era__texto"
-                dangerouslySetInnerHTML={{ __html: renderRichText(data?.texto_era) }}
+                dangerouslySetInnerHTML={{ __html: renderRichText(textoEra) }}
               />
             </section>
           )}
@@ -190,7 +218,7 @@ export default function QuemSomosPage() {
                 />
               )}
               <p className="qs-footer-dark__tagline">
-                {data?.tagline}
+                {tagline}
               </p>
             </section>
           )}

@@ -10,6 +10,26 @@
     "draftAndPublish": true
   },
   "attributes": {
+    "abertura": {
+      "type": "component",
+      "repeatable": false,
+      "component": "quem-somos.abertura"
+    },
+    "foto": {
+      "type": "component",
+      "repeatable": false,
+      "component": "quem-somos.foto"
+    },
+    "da_era": {
+      "type": "component",
+      "repeatable": false,
+      "component": "quem-somos.da-era"
+    },
+    "content_driven": {
+      "type": "component",
+      "repeatable": false,
+      "component": "quem-somos.content-driven"
+    },
     "mostrar_intro": {
       "type": "boolean",
       "default": true,

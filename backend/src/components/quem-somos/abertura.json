@@ -1,0 +1,20 @@
+{
+  "collectionName": "components_quem_somos_aberturas",
+  "info": { "displayName": "Abertura", "icon": "file" },
+  "attributes": {
+    "mostrar": { "type": "boolean", "default": true },
+    "titulo": {
+      "type": "richtext",
+      "description": "Título grande da coluna da esquerda. O trecho marcado (negrito ou itálico) sai na fonte serifada itálica."
+    },
+    "titulo_acima": {
+      "type": "richtext",
+      "description": "Título grande acima do texto. Opcional."
+    },
+    "texto": { "type": "richtext" },
+    "titulo_abaixo": {
+      "type": "richtext",
+      "description": "Título grande abaixo do texto. Opcional."
+    }
+  }
+}

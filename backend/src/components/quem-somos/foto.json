@@ -1,0 +1,8 @@
+{
+  "collectionName": "components_quem_somos_fotos",
+  "info": { "displayName": "Foto", "icon": "picture" },
+  "attributes": {
+    "mostrar": { "type": "boolean", "default": true },
+    "imagem": { "type": "media", "multiple": false, "allowedTypes": ["images"] }
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "collectionName": "components_quem_somos_da_eras",
+  "info": { "displayName": "Da Era", "icon": "file" },
+  "attributes": {
+    "mostrar": { "type": "boolean", "default": true },
+    "titulo": {
+      "type": "richtext",
+      "description": "O trecho marcado (negrito ou itálico) sai na fonte serifada itálica."
+    },
+    "texto": { "type": "richtext" }
+  }
+}
