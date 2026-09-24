@@ -66,6 +66,17 @@ function semQuebrasManuais(texto) {
     .join('\n\n')
 }
 
+// O campo video_url do CMS recebe tanto link do YouTube quanto arquivo de
+// vídeo direto. O <video> do HTML só toca arquivo, então um link do YouTube
+// precisa virar embed — sem isso o hero fica vazio ao dar play.
+function idDoYoutube(url) {
+  if (!url) return null
+  const m = String(url).match(
+    /(?:youtu\.be\/|youtube\.com\/(?:watch\?(?:.*&)?v=|embed\/|shorts\/|live\/))([\w-]{11})/
+  )
+  return m ? m[1] : null
+}
+
 // Pré-busca usada pela transição da câmera para que os dados já estejam prontos
 // antes do overlay sair
 let qaPrefetch = null
@@ -94,17 +105,23 @@ export default function QuarentaAnosPage() {
     document.body.classList.remove('scroll-locked')
   }, [])
 
+  const youtubeId = idDoYoutube(data?.video_url)
+  // Sem capa no CMS o hero ficava totalmente vazio antes do play. Para link
+  // do YouTube dá pra usar a miniatura do próprio vídeo como capa.
+  const capaHero = data?.video_capa
+    ? mediaUrl(data.video_capa)
+    : youtubeId ? `https://img.youtube.com/vi/${youtubeId}/maxresdefault.jpg` : null
+
   // Sinaliza pronto quando dados chegam E a imagem do hero termina de carregar
   useEffect(() => {
     if (!data) return
-    const capaUrl = data?.video_capa ? mediaUrl(data.video_capa) : null
     const fire = () => window.dispatchEvent(new Event('qa-page-ready'))
-    if (!capaUrl) { fire(); return }
+    if (!capaHero) { fire(); return }
     const img = new Image()
     img.onload = fire
     img.onerror = fire
-    img.src = capaUrl
-  }, [data])
+    img.src = capaHero
+  }, [data, capaHero])
 
   const fotos = (data?.fotos ?? []).map(f => mediaUrl(f)).filter(Boolean)
 
@@ -113,12 +130,20 @@ export default function QuarentaAnosPage() {
 
       {/* HERO — escondida quando "mostrar_video" está desligado no CMS */}
       {data?.mostrar_video !== false && (
-        <section ref={heroRef} className="qa-hero" onClick={() => data?.video_url && !playing && setPlaying(true)}>
+        <section ref={heroRef} className="qa-hero" onClick={() => data?.video_url && setPlaying(p => !p)}>
           <motion.div className="qa-hero__bg-wrap" style={{ y: heroBgY }}>
-            {playing && data?.video_url
+            {playing && youtubeId
+              ? <iframe
+                  className="qa-hero__bg qa-hero__bg--embed"
+                  src={`https://www.youtube.com/embed/${youtubeId}?autoplay=1&playsinline=1&rel=0`}
+                  title="Vídeo"
+                  allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
+                  allowFullScreen
+                />
+              : playing && data?.video_url
               ? <video ref={videoRef} className="qa-hero__bg" src={data.video_url} autoPlay playsInline />
-              : data?.video_capa
-              ? <img className="qa-hero__bg" src={mediaUrl(data.video_capa)} alt="" />
+              : capaHero
+              ? <img className="qa-hero__bg" src={capaHero} alt="" />
               : null
             }
           </motion.div>

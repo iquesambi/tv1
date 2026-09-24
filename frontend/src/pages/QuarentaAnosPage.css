@@ -32,6 +32,25 @@
   transform: translateX(10%);
 }
 
+/* Embed do YouTube. O wrap é propositalmente maior que a tela (inset
+   negativo, pro parallax) e a capa preenchia isso com object-fit: cover —
+   um iframe não consegue, e o player ficaria pequeno no meio de uma caixa
+   gigante. O inset positivo aqui cancela exatamente essa sobra, deixando o
+   player do tamanho do hero. */
+.qa-hero__bg--embed {
+  position: absolute;
+  /* Medida explícita: iframe é elemento substituído, então width/height
+     auto cai no tamanho intrínseco (300x150) em vez de esticar pelos
+     insets. O deslocamento compensa o inset negativo do wrap. */
+  top: 15vh;
+  left: 15vw;
+  width: 100vw;
+  height: 100vh;
+  border: 0;
+  object-fit: unset;
+  transform: none;
+}
+
 .qa-hero__overlay {
   position: absolute;
   inset: 0;
