@@ -32,6 +32,10 @@ const config: Core.Config.Middlewares = [
         'https://tv1.com.br',
         'https://www.tv1.com.br',
         'https://slacking-stylized-scheme.ngrok-free.dev',
+        // Canal de preview do Firebase usado para revisão com o cliente.
+        // A URL não muda a cada publicação: o sufixo é fixo por canal, então
+        // republicar o canal "cliente" continua caindo nesta mesma origem.
+        'https://tv1-site--cliente-ehalv6l4.web.app',
       ],
       methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
       headers: '*',

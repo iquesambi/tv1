@@ -10,10 +10,18 @@
 
 /* ── HERO ───────────────────────────── */
 
+/* O vídeo do CMS tem tarja preta gravada no próprio arquivo: a imagem
+   ocupa só a faixa central, 123 das 720 linhas do quadro, começando na
+   linha 299 (medido em quatro quadros ao longo do vídeo, sempre igual).
+   Em vez de uma dobra de 100vh quase toda preta, o hero passa a ter a
+   altura dessa faixa — 100vw / 10,41 — e o embed é posicionado pra que
+   ela preencha exatamente, com a tarja caindo fora do overflow.
+   Se o vídeo for reexportado sem tarja, basta voltar esta altura para
+   100vh e a do embed para 100vh. */
 .qa-hero {
   position: relative;
   width: 100vw;
-  height: 100vh;
+  height: 9.61vw;
   overflow: clip;
   cursor: pointer;
 }
@@ -41,11 +49,16 @@
   position: absolute;
   /* Medida explícita: iframe é elemento substituído, então width/height
      auto cai no tamanho intrínseco (300x150) em vez de esticar pelos
-     insets. O deslocamento compensa o inset negativo do wrap. */
-  top: 15vh;
+     insets.
+     56.25vw = 16:9 exato para 100vw de largura, então o vídeo preenche o
+     iframe sem o player acrescentar sobra própria. O topo sobe 23.36vw
+     (onde a faixa com imagem começa) e o 15vh compensa o inset negativo
+     do wrap — assim a faixa fica alinhada com o hero e só a tarja sai
+     pelo overflow. */
+  top: calc(15vh - 23.36vw);
   left: 15vw;
   width: 100vw;
-  height: 100vh;
+  height: 56.25vw;
   border: 0;
   object-fit: unset;
   transform: none;
@@ -90,8 +103,9 @@
 }
 
 .qa-hero__play svg {
-  width: 80px;
-  height: 80px;
+  /* A faixa do vídeo é baixa: 80px fixos ocupariam ela inteira. */
+  width: min(80px, 6vw);
+  height: min(80px, 6vw);
   transition: transform 0.2s ease, opacity 0.2s ease;
 }
 
@@ -372,9 +386,9 @@
 /* ── MOBILE ───────────────────────────── */
 
 @media (max-width: 768px) {
-  .qa-hero {
-    height: 100dvh;
-  }
+  /* A altura do hero agora vem da proporção da faixa do vídeo (ver
+     .qa-hero), e vale em qualquer largura — forçar 100dvh aqui traria a
+     tarja preta de volta. */
 
   /* A composição de desktop (SVG inteiro, com o "40" bem maior e a
      descrição/fotos em posições fixas pensadas pra tela larga) dá lugar

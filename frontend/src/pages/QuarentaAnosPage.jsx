@@ -88,7 +88,8 @@ export function prefetchQuarentaAnos() {
 export default function QuarentaAnosPage() {
 
   const [data, setData]       = useState(null)
-  const [playing, setPlaying] = useState(false)
+  // Começa tocando; o clique no hero pausa e volta pra capa.
+  const [playing, setPlaying] = useState(true)
 
   const videoRef      = useRef(null)
   const heroRef       = useRef(null)
@@ -135,7 +136,13 @@ export default function QuarentaAnosPage() {
             {playing && youtubeId
               ? <iframe
                   className="qa-hero__bg qa-hero__bg--embed"
-                  src={`https://www.youtube.com/embed/${youtubeId}?autoplay=1&playsinline=1&rel=0`}
+                  // mute=1 é o que permite o autoplay: navegador bloqueia
+                  // vídeo que começa sozinho com som, e sem isso o player
+                  // carregaria parado.
+                  // controls=0: o overlay do hero fica por cima e captura os
+                  // cliques, então os controles do player seriam inalcançáveis
+                  // de qualquer jeito — melhor não mostrar.
+                  src={`https://www.youtube.com/embed/${youtubeId}?autoplay=1&mute=1&playsinline=1&rel=0&controls=0&modestbranding=1`}
                   title="Vídeo"
                   allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
                   allowFullScreen
