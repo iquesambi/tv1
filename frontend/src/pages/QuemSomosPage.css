@@ -91,6 +91,21 @@
   letter-spacing: -0.02em;
 }
 
+/* O título de baixo fecha a coluna em corpo pequeno, como uma assinatura
+   ("Content driven. Tech inspired."), não como um segundo título grande.
+   Sem uppercase: respeita a caixa digitada no CMS. */
+.qs-intro__destaque--rodape {
+  font-size: calc(20px * var(--qs-escala, 1));
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+/* Se houver trecho marcado, ele acompanha o corpo pequeno em vez do
+   tamanho grande da serifada. */
+.qs-intro__destaque--rodape .qs-intro__destaque-italico {
+  font-size: inherit;
+}
+
 .qs-intro__destaque-italico {
   font-family: 'PP Hatton', 'Georgia', serif;
   font-size: calc(clamp(40px, 4.5vw, 68px) * var(--qs-escala, 1));

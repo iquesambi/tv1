@@ -77,6 +77,23 @@ function idDoYoutube(url) {
   return m ? m[1] : null
 }
 
+// Carrega a API do YouTube uma única vez por página. É ela que permite
+// ligar o som depois, sem recarregar o vídeo (trocar a URL do iframe
+// reiniciaria a reprodução do zero).
+function carregarApiYoutube() {
+  if (window.YT?.Player) return Promise.resolve()
+  if (!window.__promiseApiYoutube) {
+    window.__promiseApiYoutube = new Promise(resolve => {
+      const anterior = window.onYouTubeIframeAPIReady
+      window.onYouTubeIframeAPIReady = () => { anterior?.(); resolve() }
+      const script = document.createElement('script')
+      script.src = 'https://www.youtube.com/iframe_api'
+      document.head.appendChild(script)
+    })
+  }
+  return window.__promiseApiYoutube
+}
+
 // Pré-busca usada pela transição da câmera para que os dados já estejam prontos
 // antes do overlay sair
 let qaPrefetch = null
@@ -94,6 +111,7 @@ export default function QuarentaAnosPage() {
   const videoRef      = useRef(null)
   const heroRef       = useRef(null)
   const composicaoRef = useRef(null)
+  const containerPlayerRef = useRef(null)
 
   const { scrollYProgress: heroProgress } = useScroll({
     target: heroRef,
@@ -124,6 +142,57 @@ export default function QuarentaAnosPage() {
     img.src = capaHero
   }, [data, capaHero])
 
+  // O autoplay só é permitido mudo — navegador bloqueia vídeo que começa
+  // sozinho com som. Então ele entra mudo e o som sobe na primeira ação do
+  // visitante, qualquer que seja: clique, rolagem, tecla, toque ou mouse.
+  useEffect(() => {
+    if (!playing || !youtubeId || !containerPlayerRef.current) return
+
+    let player = null
+    let vivo = true
+    const acoes = ['pointerdown', 'keydown', 'wheel', 'touchstart', 'mousemove', 'scroll']
+
+    const ligarSom = () => {
+      pararDeOuvir()
+      try { player?.unMute?.(); player?.setVolume?.(100) } catch { /* player ainda não pronto */ }
+    }
+    const pararDeOuvir = () => acoes.forEach(a => window.removeEventListener(a, ligarSom))
+
+    carregarApiYoutube().then(() => {
+      if (!vivo || !containerPlayerRef.current) return
+      player = new window.YT.Player(containerPlayerRef.current, {
+        videoId: youtubeId,
+        playerVars: {
+          autoplay: 1,
+          mute: 1,
+          playsinline: 1,
+          rel: 0,
+          // O overlay do hero fica por cima e captura os cliques, então os
+          // controles do player seriam inalcançáveis de qualquer forma.
+          controls: 0,
+          modestbranding: 1,
+        },
+        events: {
+          onReady: (e) => {
+            if (!vivo) return
+            // O autoplay do playerVars nem sempre pega quando o player é
+            // criado pela API; mandar tocar explicitamente (e garantir o
+            // mudo, que é a condição pro navegador permitir) é o caminho
+            // confiável.
+            try { e.target.mute(); e.target.playVideo() } catch { /* ignora */ }
+            acoes.forEach(a => window.addEventListener(a, ligarSom, { passive: true }))
+          },
+        },
+      })
+    })
+
+    return () => {
+      vivo = false
+      pararDeOuvir()
+      try { player?.destroy?.() } catch { /* já removido com o nó pai */ }
+    }
+  }, [playing, youtubeId])
+
   const fotos = (data?.fotos ?? []).map(f => mediaUrl(f)).filter(Boolean)
 
   return (
@@ -134,19 +203,12 @@ export default function QuarentaAnosPage() {
         <section ref={heroRef} className="qa-hero" onClick={() => data?.video_url && setPlaying(p => !p)}>
           <motion.div className="qa-hero__bg-wrap" style={{ y: heroBgY }}>
             {playing && youtubeId
-              ? <iframe
-                  className="qa-hero__bg qa-hero__bg--embed"
-                  // mute=1 é o que permite o autoplay: navegador bloqueia
-                  // vídeo que começa sozinho com som, e sem isso o player
-                  // carregaria parado.
-                  // controls=0: o overlay do hero fica por cima e captura os
-                  // cliques, então os controles do player seriam inalcançáveis
-                  // de qualquer jeito — melhor não mostrar.
-                  src={`https://www.youtube.com/embed/${youtubeId}?autoplay=1&mute=1&playsinline=1&rel=0&controls=0&modestbranding=1`}
-                  title="Vídeo"
-                  allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
-                  allowFullScreen
-                />
+              // A API do YouTube substitui a div de dentro por um iframe; a de
+              // fora fica com o React, que assim continua dono do nó que ele
+              // mesmo remove ao despausar.
+              ? <div className="qa-hero__bg qa-hero__bg--embed">
+                  <div ref={containerPlayerRef} />
+                </div>
               : playing && data?.video_url
               ? <video ref={videoRef} className="qa-hero__bg" src={data.video_url} autoPlay playsInline />
               : capaHero

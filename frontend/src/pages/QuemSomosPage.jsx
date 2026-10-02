@@ -156,7 +156,6 @@ export default function QuemSomosPage() {
   const daEra         = data?.da_era         ?? {}
   const contentDriven = data?.content_driven ?? {}
 
-  const tituloIntro  = abertura.titulo
   const tituloAcima  = abertura.titulo_acima
   const textoIntro   = abertura.texto
   const tituloAbaixo = abertura.titulo_abaixo
@@ -184,28 +183,25 @@ export default function QuemSomosPage() {
 
         {mostrarIntro && (
           <section className="qs-intro" ref={introRef}>
+            {/* O título grande da coluna da esquerda vem do campo
+                "titulo_acima": ele já guarda o texto que ocupa essa posição
+                na arte ("Da era da comunicação à era da experiência."), e
+                assim não foi preciso remontar o conteúdo no CMS. O campo
+                "titulo" deixou de ser usado nesta página. */}
             <h1
               className="qs-intro__titulo"
               dangerouslySetInnerHTML={{
-                __html: renderTitulo(tituloIntro, 'qs-intro__titulo-italico'),
+                __html: renderTitulo(tituloAcima, 'qs-intro__titulo-italico'),
               }}
             />
             <div className="qs-intro__coluna" ref={colunaRef}>
-              {tituloAcima && (
-                <div
-                  className="qs-intro__destaque"
-                  dangerouslySetInnerHTML={{
-                    __html: renderTitulo(tituloAcima, 'qs-intro__destaque-italico'),
-                  }}
-                />
-              )}
               <div
                 className="qs-intro__texto"
                 dangerouslySetInnerHTML={{ __html: renderRichText(textoIntro) }}
               />
               {tituloAbaixo && (
                 <div
-                  className="qs-intro__destaque"
+                  className="qs-intro__destaque qs-intro__destaque--rodape"
                   dangerouslySetInnerHTML={{
                     __html: renderTitulo(tituloAbaixo, 'qs-intro__destaque-italico'),
                   }}
