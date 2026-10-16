@@ -7,6 +7,12 @@ const STRAPI = 'https://tv1-53ev.onrender.com'
 const api = (path) => axios.get(`${STRAPI}/api/${path}`).then(r => r.data.data).catch(() => null)
 const mediaUrl = (obj) => !obj?.url ? null : obj.url.startsWith('http') ? obj.url : `${STRAPI}${obj.url}`
 
+// O PDF vai em base64 dentro do JSON (fica ~33% maior) e o Strapi recusa
+// requisições acima de 10 MB. 5 MB deixa folga e também evita e-mails que
+// o servidor de quem recebe rejeitaria.
+const MAX_CURRICULO_MB = 5
+const formatMB = (bytes) => (bytes / 1024 / 1024).toFixed(1).replace('.', ',')
+
 export default function TrabalheFormularioPage() {
   const [logo, setLogo] = useState(null)
   const [form, setForm] = useState({
@@ -25,6 +31,7 @@ export default function TrabalheFormularioPage() {
   const [enviado, setEnviado] = useState(false)
   const [enviando, setEnviando] = useState(false)
   const [drag, setDrag] = useState(false)
+  const [erroArquivo, setErroArquivo] = useState('')
   const fileInputRef = useRef(null)
   const footerRef = useRef(null)
 
@@ -39,6 +46,12 @@ export default function TrabalheFormularioPage() {
 
   const handleFile = (file) => {
     if (!file) return
+    if (file.size > MAX_CURRICULO_MB * 1024 * 1024) {
+      setErroArquivo(`O arquivo tem ${formatMB(file.size)} MB e o limite é ${MAX_CURRICULO_MB} MB. Envie um PDF menor ou coloque seu portfólio no campo de link abaixo.`)
+      setForm(prev => ({ ...prev, curriculo: null }))
+      return
+    }
+    setErroArquivo('')
     setForm(prev => ({ ...prev, curriculo: file }))
   }
 
@@ -82,8 +95,12 @@ export default function TrabalheFormularioPage() {
         curriculo_nome,
       })
       setEnviado(true)
-    } catch {
-      alert('Erro ao enviar. Tente novamente.')
+    } catch (err) {
+      if (err.response?.status === 413) {
+        alert(`O arquivo é grande demais para envio. Envie um PDF de até ${MAX_CURRICULO_MB} MB ou use o campo de link do portfólio.`)
+      } else {
+        alert('Erro ao enviar. Tente novamente.')
+      }
     } finally {
       setEnviando(false)
     }
@@ -158,7 +175,7 @@ export default function TrabalheFormularioPage() {
 
               <div className="tform-field">
                 <label className="tform-field__label">Anexe seu currículo ou portifólio <span className="tform-required">*</span></label>
-                <span className="tform-field__hint">Adicione o currículo em formato de PDF</span>
+                <span className="tform-field__hint">Adicione o currículo em formato de PDF (até {MAX_CURRICULO_MB} MB)</span>
                 <div
                   className={`tform-upload${drag ? ' tform-upload--drag' : ''}${form.curriculo ? ' tform-upload--filled' : ''}`}
                   onDragOver={(e) => { e.preventDefault(); setDrag(true) }}
@@ -171,7 +188,7 @@ export default function TrabalheFormularioPage() {
                     type="file"
                     accept=".pdf"
                     style={{ display: 'none' }}
-                    onChange={(e) => handleFile(e.target.files[0])}
+                    onChange={(e) => { handleFile(e.target.files[0]); e.target.value = '' }}
                     required={!form.curriculo}
                   />
                   {form.curriculo ? (
@@ -187,6 +204,7 @@ export default function TrabalheFormularioPage() {
                     </>
                   )}
                 </div>
+                {erroArquivo && <span className="tform-field__erro" role="alert">{erroArquivo}</span>}
               </div>
 
               <div className="tform-field">

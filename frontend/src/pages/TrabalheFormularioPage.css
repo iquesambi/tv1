@@ -167,6 +167,13 @@
   font-weight: 700;
 }
 
+.tform-field__erro {
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.4;
+  color: #c62828;
+}
+
 /* ── BOTÃO ──────────────────────────── */
 
 .tform-form__footer {
