@@ -1,6 +1,6 @@
 import { StrictMode, Suspense, lazy } from 'react'
 import { createRoot } from 'react-dom/client'
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import './index.css'
 import App from './App.jsx'
 // CasesPage fica de fora do lazy-loading: Menu.jsx (montado em toda
@@ -15,7 +15,6 @@ const EspecialidadePage      = lazy(() => import('./pages/EspecialidadePage.jsx'
 const SlugRouter             = lazy(() => import('./pages/SlugRouter.jsx'))
 const PessoasPage            = lazy(() => import('./pages/PessoasPage.jsx'))
 const QuarentaAnosPage       = lazy(() => import('./pages/QuarentaAnosPage.jsx'))
-const TrabalheComenoscoPage  = lazy(() => import('./pages/TrabalheComenoscoPage.jsx'))
 const TrabalheFormularioPage = lazy(() => import('./pages/TrabalheFormularioPage.jsx'))
 const OutrosAssuntosPage     = lazy(() => import('./pages/OutrosAssuntosPage.jsx'))
 const QuemSomosPage          = lazy(() => import('./pages/QuemSomosPage.jsx'))
@@ -31,7 +30,8 @@ createRoot(document.getElementById('root')).render(
             <Route path="/" element={<App />} />
             <Route path="/contato" element={<App />} />
             <Route path="/contato/seja-cliente" element={<SejaClientePage />} />
-            <Route path="/contato/trabalhe-conosco" element={<TrabalheComenoscoPage />} />
+            {/* A antiga página de vagas foi removida; links antigos caem no formulário. */}
+            <Route path="/contato/trabalhe-conosco" element={<Navigate to="/contato/trabalhe-conosco/formulario" replace />} />
             <Route path="/contato/trabalhe-conosco/formulario" element={<TrabalheFormularioPage />} />
             <Route path="/contato/outros-assuntos" element={<OutrosAssuntosPage />} />
             <Route path="/clientes" element={<ClientesGridPage />} />

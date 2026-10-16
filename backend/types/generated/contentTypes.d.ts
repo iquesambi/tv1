@@ -1101,38 +1101,6 @@ export interface ApiTextosFormulariosTextosFormularios
   };
 }
 
-export interface ApiTrabalheConoscoTrabalheConosco
-  extends Struct.SingleTypeSchema {
-  collectionName: 'trabalhe_conoscos';
-  info: {
-    displayName: 'Trabalhe Conosco';
-    pluralName: 'trabalhe-conoscos';
-    singularName: 'trabalhe-conosco';
-  };
-  options: {
-    draftAndPublish: true;
-  };
-  attributes: {
-    createdAt: Schema.Attribute.DateTime;
-    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
-      Schema.Attribute.Private;
-    descricao: Schema.Attribute.RichText;
-    locale: Schema.Attribute.String & Schema.Attribute.Private;
-    localizations: Schema.Attribute.Relation<
-      'oneToMany',
-      'api::trabalhe-conosco.trabalhe-conosco'
-    > &
-      Schema.Attribute.Private;
-    publishedAt: Schema.Attribute.DateTime;
-    titulo: Schema.Attribute.String &
-      Schema.Attribute.DefaultTo<'Porqu\u00EA trabalhar aqui?'>;
-    updatedAt: Schema.Attribute.DateTime;
-    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
-      Schema.Attribute.Private;
-    vagas: Schema.Attribute.Component<'trabalhe-conosco.vaga', true>;
-  };
-}
-
 export interface PluginContentReleasesRelease
   extends Struct.CollectionTypeSchema {
   collectionName: 'strapi_releases';
@@ -1660,7 +1628,6 @@ declare module '@strapi/strapi' {
       'api::redes-sociais.redes-sociais': ApiRedesSociaisRedesSociais;
       'api::sub-especialidade.sub-especialidade': ApiSubEspecialidadeSubEspecialidade;
       'api::textos-formularios.textos-formularios': ApiTextosFormulariosTextosFormularios;
-      'api::trabalhe-conosco.trabalhe-conosco': ApiTrabalheConoscoTrabalheConosco;
       'plugin::content-releases.release': PluginContentReleasesRelease;
       'plugin::content-releases.release-action': PluginContentReleasesReleaseAction;
       'plugin::i18n.locale': PluginI18NLocale;

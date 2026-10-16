@@ -311,20 +311,6 @@ export interface SocialRede extends Struct.ComponentSchema {
   };
 }
 
-export interface TrabalheConoscoVaga extends Struct.ComponentSchema {
-  collectionName: 'components_trabalhe_conosco_vagas';
-  info: {
-    displayName: 'Vaga';
-    icon: 'briefcase';
-  };
-  attributes: {
-    data_expiracao: Schema.Attribute.Date;
-    descricao: Schema.Attribute.Text & Schema.Attribute.Required;
-    link_aplicacao: Schema.Attribute.String;
-    titulo: Schema.Attribute.String & Schema.Attribute.Required;
-  };
-}
-
 declare module '@strapi/strapi' {
   export module Public {
     export interface ComponentSchemas {
@@ -349,7 +335,6 @@ declare module '@strapi/strapi' {
       'quem-somos.da-era': QuemSomosDaEra;
       'quem-somos.foto': QuemSomosFoto;
       'social.rede': SocialRede;
-      'trabalhe-conosco.vaga': TrabalheConoscoVaga;
     }
   }
 }
