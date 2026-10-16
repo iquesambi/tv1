@@ -2,6 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useRef, useState } f
 import { useNavigate } from 'react-router-dom'
 import { CAMERA_START_TIME } from './cameraConfig.js'
 import { prefetchQuarentaAnos } from './pages/QuarentaAnosPage.jsx'
+import { CAMERA_WEBM, CAMERA_MOV } from './videos.js'
 
 const Ctx = createContext(null)
 
@@ -107,8 +108,8 @@ export function TransitionProvider({ children }) {
             }
           }}
         >
-          <source src="/camera-rotation-alpha.webm" type="video/webm" />
-          <source src="/camera-rotation-alpha.mov" type="video/mp4; codecs=hvc1" />
+          <source src={CAMERA_WEBM} type="video/webm" />
+          <source src={CAMERA_MOV} type="video/mp4; codecs=hvc1" />
         </video>
       )}
     </Ctx.Provider>

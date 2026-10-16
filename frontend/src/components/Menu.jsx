@@ -4,6 +4,7 @@ import axios from 'axios'
 import { useGoTo, useStartCamera, useCameraAtiva } from '../transition.jsx'
 import { CAMERA_START_TIME } from '../cameraConfig.js'
 import { prefetchCases, casesAnchorDisponivel } from '../pages/CasesPage.jsx'
+import { CAMERA_WEBM, CAMERA_MOV } from '../videos.js'
 import '../App.css'
 import './Menu.css'
 
@@ -129,8 +130,8 @@ function CameraVideo() {
     <video ref={videoRef} muted playsInline preload="auto">
       {/* .mov primeiro: Safari usa HEVC alpha (formato correto). Chrome/Firefox não
           suportam hvc1 e pulam para o .webm automaticamente. */}
-      <source src="/camera-rotation-alpha.mov" type="video/mp4; codecs=hvc1" />
-      <source src="/camera-rotation-alpha.webm" type="video/webm" />
+      <source src={CAMERA_MOV} type="video/mp4; codecs=hvc1" />
+      <source src={CAMERA_WEBM} type="video/webm" />
     </video>
   )
 }
