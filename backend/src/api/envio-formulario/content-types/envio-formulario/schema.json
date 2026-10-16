@@ -10,15 +10,31 @@
   "options": {
     "draftAndPublish": false
   },
+  "pluginOptions": {
+    "content-manager": {
+      "visible": false
+    },
+    "content-type-builder": {
+      "visible": false
+    }
+  },
   "attributes": {
     "tipo": {
       "type": "enumeration",
-      "enum": ["seja-cliente", "trabalhe-conosco", "outros-assuntos"],
+      "enum": [
+        "seja-cliente",
+        "trabalhe-conosco",
+        "outros-assuntos"
+      ],
       "required": true
     },
     "status": {
       "type": "enumeration",
-      "enum": ["pendente", "enviado", "erro"],
+      "enum": [
+        "pendente",
+        "enviado",
+        "erro"
+      ],
       "default": "pendente",
       "required": true
     },
