@@ -1,0 +1,18 @@
+{
+  "collectionName": "components_formularios_outros_assuntos",
+  "info": {
+    "displayName": "Outros Assuntos",
+    "icon": "message"
+  },
+  "options": {},
+  "attributes": {
+    "titulo": {
+      "type": "string",
+      "default": "Outros assuntos"
+    },
+    "mensagem_sucesso": {
+      "type": "text",
+      "default": "Mensagem enviada! Em breve entraremos em contato."
+    }
+  }
+}

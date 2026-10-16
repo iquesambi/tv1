@@ -7,6 +7,7 @@ import { menuDataRoute, invalidarMenuDataCache } from './menu-data-cache';
 import { clientesGridRoute, invalidarClientesGridCache } from './clientes-grid-cache';
 import { caseDetailRoute, invalidarCaseDetailCache } from './case-detail-cache';
 import { casePreviewRoute } from './case-preview';
+import { processarFila } from './fila-emails';
 
 export default {
   register({ strapi }) {
@@ -71,6 +72,10 @@ export default {
   },
 
   bootstrap({ strapi }) {
+
+    // No plano gratuito do Render o servidor dorme quando ninguém acessa, e
+    // o cron não roda dormindo. Ao acordar, já esvazia o que ficou pendente.
+    setTimeout(() => processarFila(), 15_000);
 
     // Invalida o cache da timeline de /cases sempre que algo que ela usa
     // muda — case, especialidade, sub-especialidade ou a navegação (que

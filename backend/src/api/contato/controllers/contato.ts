@@ -1,119 +1,116 @@
-function linha(label: string, valor: string | undefined) {
-  if (!valor) return '';
-  return `<tr><td style="padding:6px 16px 6px 0;font-weight:600;white-space:nowrap;vertical-align:top">${label}</td><td style="padding:6px 0">${valor.replace(/\n/g, '<br>')}</td></tr>`;
+import { processarFila } from '../../../fila-emails';
+
+// Campos aceitos por formulário. O que não estiver aqui é descartado, e os
+// marcados como obrigatórios precisam vir preenchidos.
+const CAMPOS: Record<string, { campos: string[]; obrigatorios: string[] }> = {
+  'seja-cliente': {
+    campos: ['nome', 'empresa', 'contato', 'mensagem'],
+    obrigatorios: ['nome', 'contato', 'mensagem'],
+  },
+  'outros-assuntos': {
+    campos: ['nome', 'email', 'assunto', 'mensagem'],
+    obrigatorios: ['nome', 'email', 'mensagem'],
+  },
+  'trabalhe-conosco': {
+    campos: ['nome', 'cargo', 'area', 'email', 'telefone', 'cidade', 'empresa', 'pretensao', 'linkedin', 'portfolio_link'],
+    obrigatorios: ['nome', 'email'],
+  },
+};
+
+const MAX_MENSAGEM = 5000;
+const MAX_CAMPO = 500;
+// 5 MB de PDF viram ~6,7 MB em base64; o front já barra acima de 5 MB.
+const MAX_CURRICULO_BASE64 = 7 * 1024 * 1024;
+
+// Limite por IP, em memória (some quando o servidor reinicia — suficiente
+// pra segurar robô disparando em sequência).
+const LIMITE_POR_IP = 5;
+const JANELA_IP_MS = 60 * 60 * 1000;
+const enviosPorIp = new Map<string, number[]>();
+
+function ipDoCliente(ctx: any): string {
+  const h = ctx.request.headers;
+  if (h['true-client-ip']) return String(h['true-client-ip']);
+  if (h['cf-connecting-ip']) return String(h['cf-connecting-ip']);
+  // O proxy do Render acrescenta o IP real no fim; o começo pode ter sido
+  // forjado pelo próprio cliente.
+  const xff = String(h['x-forwarded-for'] || '').split(',').map((s) => s.trim()).filter(Boolean);
+  return xff[xff.length - 1] || ctx.ip;
 }
 
-function template(titulo: string, linhas: string) {
-  return `
-    <div style="font-family:sans-serif;max-width:600px;margin:0 auto;color:#111">
-      <div style="background:#000;padding:24px 32px">
-        <span style="color:#fff;font-size:20px;font-weight:700;letter-spacing:0.05em">TV1</span>
-      </div>
-      <div style="padding:32px">
-        <h2 style="margin:0 0 24px;font-size:18px">${titulo}</h2>
-        <table style="border-collapse:collapse;width:100%">${linhas}</table>
-      </div>
-    </div>
-  `;
+function excedeuLimite(ip: string) {
+  const agora = Date.now();
+  const recentes = (enviosPorIp.get(ip) || []).filter((t) => agora - t < JANELA_IP_MS);
+  if (recentes.length >= LIMITE_POR_IP) {
+    enviosPorIp.set(ip, recentes);
+    return true;
+  }
+  recentes.push(agora);
+  enviosPorIp.set(ip, recentes);
+  // Limpeza simples pra o Map não crescer pra sempre.
+  if (enviosPorIp.size > 5000) {
+    for (const [chave, tempos] of enviosPorIp) {
+      if (!tempos.some((t) => agora - t < JANELA_IP_MS)) enviosPorIp.delete(chave);
+    }
+  }
+  return false;
 }
 
 export default {
   async enviar(ctx: any) {
-    const body = ctx.request.body as Record<string, string>;
-    const { tipo, curriculo_base64, curriculo_nome, ...campos } = body;
+    const body = (ctx.request.body || {}) as Record<string, unknown>;
+    const { tipo, website, curriculo_base64, curriculo_nome } = body as Record<string, string | undefined>;
 
-    if (!tipo) return ctx.badRequest('Campo "tipo" obrigatório');
+    // Honeypot: o campo "website" fica invisível no formulário. Pessoa não
+    // preenche; robô preenche. Responde sucesso pra o robô não insistir.
+    if (website) return ctx.send({ ok: true });
 
-    // Busca configurações de email no CMS
-    const config = await strapi.db
-      .query('api::configuracoes-email.configuracoes-email')
-      .findOne({}) as Record<string, string> | null;
+    const regras = tipo ? CAMPOS[tipo] : undefined;
+    if (!regras) return ctx.badRequest('Tipo inválido');
 
-    const destinatarioMap: Record<string, string | undefined> = {
-      'seja-cliente':      config?.email_seja_cliente,
-      'trabalhe-conosco':  config?.email_trabalhe_conosco,
-      'outros-assuntos':   config?.email_outros_assuntos,
-    };
-
-    const paraRaw = destinatarioMap[tipo];
-    if (!paraRaw) {
-      return ctx.badRequest('Tipo inválido ou destinatário não configurado no CMS');
+    const dados: Record<string, string> = {};
+    for (const campo of regras.campos) {
+      const valor = body[campo];
+      if (valor == null || valor === '') continue;
+      if (typeof valor !== 'string') return ctx.badRequest(`Campo "${campo}" inválido`);
+      const max = campo === 'mensagem' ? MAX_MENSAGEM : MAX_CAMPO;
+      if (valor.length > max) return ctx.badRequest(`Campo "${campo}" muito longo`);
+      dados[campo] = valor.trim();
     }
-    const para = paraRaw.split(',').map((e: string) => e.trim()).filter(Boolean);
+    const faltando = regras.obrigatorios.filter((c) => !dados[c]);
+    if (faltando.length) return ctx.badRequest(`Campos obrigatórios: ${faltando.join(', ')}`);
 
-    const remetente = config?.email_remetente || 'formularios@tv1.com.br';
-
-    // Monta HTML e assunto por tipo
-    let assunto: string;
-    let html: string;
-
-    if (tipo === 'seja-cliente') {
-      assunto = `[TV1] Novo contato — Seja Cliente`;
-      html = template('Novo contato: Seja Cliente', [
-        linha('Nome',     campos.nome),
-        linha('Empresa',  campos.empresa),
-        linha('Contato',  campos.contato),
-        linha('Mensagem', campos.mensagem),
-      ].join(''));
-    } else if (tipo === 'outros-assuntos') {
-      assunto = `[TV1] Novo contato — Outros Assuntos`;
-      html = template('Novo contato: Outros Assuntos', [
-        linha('Nome',     campos.nome),
-        linha('E-mail',   campos.email),
-        linha('Assunto',  campos.assunto),
-        linha('Mensagem', campos.mensagem),
-      ].join(''));
-    } else if (tipo === 'trabalhe-conosco') {
-      assunto = `[TV1] Candidatura — ${campos.cargo || 'Trabalhe Conosco'}`;
-      html = template('Candidatura: Trabalhe Conosco', [
-        linha('Nome',           campos.nome),
-        linha('Cargo desejado', campos.cargo),
-        linha('Área de atuação',campos.area),
-        linha('E-mail',         campos.email),
-        linha('Telefone',       campos.telefone),
-        linha('Cidade',         campos.cidade),
-        linha('Última empresa', campos.empresa),
-        linha('Pretensão',      campos.pretensao ? `R$ ${campos.pretensao}` : undefined),
-        linha('LinkedIn',       campos.linkedin),
-        linha('Portfólio',      campos.portfolio_link),
-      ].join(''));
-    } else {
-      return ctx.badRequest('Tipo inválido');
+    if (curriculo_base64) {
+      if (tipo !== 'trabalhe-conosco' || typeof curriculo_base64 !== 'string' || typeof curriculo_nome !== 'string') {
+        return ctx.badRequest('Anexo inválido');
+      }
+      if (!/\.pdf$/i.test(curriculo_nome)) return ctx.badRequest('O currículo precisa ser PDF');
+      if (curriculo_base64.length > MAX_CURRICULO_BASE64) return ctx.badRequest('Currículo acima de 5 MB');
     }
 
-    // Monta payload do Resend
-    const payload: Record<string, unknown> = {
-      from: remetente,
-      to:   para,
-      subject: assunto,
-      html,
-    };
-
-    // Anexa currículo se enviado (base64)
-    if (curriculo_base64 && curriculo_nome) {
-      payload.attachments = [{ filename: curriculo_nome, content: curriculo_base64 }];
+    if (excedeuLimite(ipDoCliente(ctx))) {
+      ctx.status = 429;
+      ctx.body = { error: { status: 429, message: 'Muitos envios em pouco tempo. Tente novamente mais tarde.' } };
+      return;
     }
 
-    const apiKey = process.env.RESEND_API_KEY;
-    if (!apiKey) {
-      strapi.log.error('RESEND_API_KEY não configurada');
-      return ctx.internalServerError('Configuração de email ausente');
-    }
-
-    const res = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(payload),
+    // Salva antes de tentar o e-mail: se o Resend estiver sem cota ou fora
+    // do ar, o envio fica pendente e a fila manda depois.
+    await strapi.documents('api::envio-formulario.envio-formulario').create({
+      data: {
+        tipo,
+        status: 'pendente',
+        nome: dados.nome,
+        dados,
+        curriculo_nome: curriculo_base64 ? curriculo_nome.slice(0, 200) : null,
+        curriculo_base64: curriculo_base64 || null,
+        tentativas: 0,
+      } as any,
     });
 
-    if (!res.ok) {
-      const err = await res.text();
-      strapi.log.error(`Resend error: ${err}`);
-      return ctx.internalServerError('Erro ao enviar email');
-    }
+    // Não espera o envio: a pessoa recebe a confirmação na hora e a fila
+    // segue em segundo plano.
+    processarFila();
 
     return ctx.send({ ok: true });
   },

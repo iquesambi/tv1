@@ -717,6 +717,49 @@ export interface ApiConfiguracoesEmailConfiguracoesEmail
   };
 }
 
+export interface ApiEnvioFormularioEnvioFormulario
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'envios_formulario';
+  info: {
+    description: 'Tudo que chega pelos formul\u00E1rios do site. Os que passam da cota di\u00E1ria do Resend ficam como pendentes e s\u00E3o enviados quando a cota volta.';
+    displayName: 'Envios de Formul\u00E1rio';
+    pluralName: 'envios-formulario';
+    singularName: 'envio-formulario';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    curriculo_base64: Schema.Attribute.Text & Schema.Attribute.Private;
+    curriculo_nome: Schema.Attribute.String;
+    dados: Schema.Attribute.JSON;
+    enviado_em: Schema.Attribute.DateTime;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::envio-formulario.envio-formulario'
+    > &
+      Schema.Attribute.Private;
+    nome: Schema.Attribute.String;
+    publishedAt: Schema.Attribute.DateTime;
+    status: Schema.Attribute.Enumeration<['pendente', 'enviado', 'erro']> &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'pendente'>;
+    tentativas: Schema.Attribute.Integer & Schema.Attribute.DefaultTo<0>;
+    tipo: Schema.Attribute.Enumeration<
+      ['seja-cliente', 'trabalhe-conosco', 'outros-assuntos']
+    > &
+      Schema.Attribute.Required;
+    ultimo_erro: Schema.Attribute.Text;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiEraEra extends Struct.CollectionTypeSchema {
   collectionName: 'eras';
   info: {
@@ -1014,6 +1057,44 @@ export interface ApiSubEspecialidadeSubEspecialidade
     ordem: Schema.Attribute.Integer;
     publishedAt: Schema.Attribute.DateTime;
     slug: Schema.Attribute.UID<'nome'> & Schema.Attribute.Required;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiTextosFormulariosTextosFormularios
+  extends Struct.SingleTypeSchema {
+  collectionName: 'textos_formularios';
+  info: {
+    description: 'T\u00EDtulos e mensagens de sucesso das p\u00E1ginas Seja Cliente, Outros Assuntos e Trabalhe Conosco. Campo vazio usa o texto padr\u00E3o do site.';
+    displayName: 'Textos dos Formul\u00E1rios';
+    pluralName: 'textos-dos-formularios';
+    singularName: 'textos-formularios';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::textos-formularios.textos-formularios'
+    > &
+      Schema.Attribute.Private;
+    outros_assuntos: Schema.Attribute.Component<
+      'formularios.outros-assuntos',
+      false
+    >;
+    publishedAt: Schema.Attribute.DateTime;
+    seja_cliente: Schema.Attribute.Component<'formularios.seja-cliente', false>;
+    trabalhe_conosco: Schema.Attribute.Component<
+      'formularios.trabalhe-conosco',
+      false
+    >;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -1568,6 +1649,7 @@ declare module '@strapi/strapi' {
       'api::case.case': ApiCaseCase;
       'api::cliente.cliente': ApiClienteCliente;
       'api::configuracoes-email.configuracoes-email': ApiConfiguracoesEmailConfiguracoesEmail;
+      'api::envio-formulario.envio-formulario': ApiEnvioFormularioEnvioFormulario;
       'api::era.era': ApiEraEra;
       'api::especialidade.especialidade': ApiEspecialidadeEspecialidade;
       'api::logo-site.logo-site': ApiLogoSiteLogoSite;
@@ -1577,6 +1659,7 @@ declare module '@strapi/strapi' {
       'api::quem-somos.quem-somos': ApiQuemSomosQuemSomos;
       'api::redes-sociais.redes-sociais': ApiRedesSociaisRedesSociais;
       'api::sub-especialidade.sub-especialidade': ApiSubEspecialidadeSubEspecialidade;
+      'api::textos-formularios.textos-formularios': ApiTextosFormulariosTextosFormularios;
       'api::trabalhe-conosco.trabalhe-conosco': ApiTrabalheConoscoTrabalheConosco;
       'plugin::content-releases.release': PluginContentReleasesRelease;
       'plugin::content-releases.release-action': PluginContentReleasesReleaseAction;

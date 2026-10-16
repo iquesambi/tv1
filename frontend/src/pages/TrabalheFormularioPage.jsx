@@ -1,6 +1,9 @@
 import { useState, useEffect, useRef } from 'react'
 import axios from 'axios'
 import Menu from '../components/Menu.jsx'
+import Honeypot from '../components/Honeypot.jsx'
+import { valorHoneypot, mensagemErroEnvio } from '../formularios.js'
+import { useTextosFormulario } from '../textosFormularios.js'
 import './TrabalheFormularioPage.css'
 
 const STRAPI = 'https://tv1-53ev.onrender.com'
@@ -15,6 +18,7 @@ const formatMB = (bytes) => (bytes / 1024 / 1024).toFixed(1).replace('.', ',')
 
 export default function TrabalheFormularioPage() {
   const [logo, setLogo] = useState(null)
+  const textos = useTextosFormulario('trabalhe_conosco')
   const [form, setForm] = useState({
     nome: '',
     cargo: '',
@@ -93,20 +97,21 @@ export default function TrabalheFormularioPage() {
         linkedin: form.linkedin,
         curriculo_base64,
         curriculo_nome,
+        website: valorHoneypot(e),
       })
       setEnviado(true)
     } catch (err) {
       if (err.response?.status === 413) {
         alert(`O arquivo é grande demais para envio. Envie um PDF de até ${MAX_CURRICULO_MB} MB ou use o campo de link do portfólio.`)
       } else {
-        alert('Erro ao enviar. Tente novamente.')
+        alert(mensagemErroEnvio(err))
       }
     } finally {
       setEnviando(false)
     }
   }
 
-  if (!logo) return (
+  if (!logo || !textos) return (
     <div className="tform-page" style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       <div className="tform-spinner" />
     </div>
@@ -122,15 +127,16 @@ export default function TrabalheFormularioPage() {
       </header>
 
       <main className="tform-main">
-        <h1 className="tform-title">Quero ser um TVÚnico!</h1>
+        <h1 className="tform-title">{textos.titulo}</h1>
 
         <div className="tform-content">
           {enviado ? (
             <div className="tform-sucesso">
-              <p>Candidatura enviada! Em breve entraremos em contato.</p>
+              <p style={{ whiteSpace: 'pre-line' }}>{textos.mensagem_sucesso}</p>
             </div>
           ) : (
             <form className="tform-form" onSubmit={handleSubmit}>
+              <Honeypot />
 
               <div className="tform-field">
                 <label className="tform-field__label">Nome <span className="tform-required">*</span></label>

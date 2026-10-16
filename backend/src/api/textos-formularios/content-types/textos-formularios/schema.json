@@ -1,0 +1,30 @@
+{
+  "kind": "singleType",
+  "collectionName": "textos_formularios",
+  "info": {
+    "singularName": "textos-formularios",
+    "pluralName": "textos-dos-formularios",
+    "displayName": "Textos dos Formulários",
+    "description": "Títulos e mensagens de sucesso das páginas Seja Cliente, Outros Assuntos e Trabalhe Conosco. Campo vazio usa o texto padrão do site."
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "attributes": {
+    "seja_cliente": {
+      "type": "component",
+      "repeatable": false,
+      "component": "formularios.seja-cliente"
+    },
+    "outros_assuntos": {
+      "type": "component",
+      "repeatable": false,
+      "component": "formularios.outros-assuntos"
+    },
+    "trabalhe_conosco": {
+      "type": "component",
+      "repeatable": false,
+      "component": "formularios.trabalhe-conosco"
+    }
+  }
+}

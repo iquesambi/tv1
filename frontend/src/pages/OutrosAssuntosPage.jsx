@@ -2,6 +2,9 @@ import { useState, useEffect, useRef } from 'react'
 import axios from 'axios'
 import { useGoTo } from '../transition.jsx'
 import Menu from '../components/Menu.jsx'
+import Honeypot from '../components/Honeypot.jsx'
+import { valorHoneypot, mensagemErroEnvio } from '../formularios.js'
+import { useTextosFormulario } from '../textosFormularios.js'
 import './OutrosAssuntosPage.css'
 
 const STRAPI = 'https://tv1-53ev.onrender.com'
@@ -10,13 +13,14 @@ const mediaUrl = (obj) => !obj?.url ? null : obj.url.startsWith("http") ? obj.ur
 
 export default function OutrosAssuntosPage() {
   const [logo, setLogo] = useState(null)
+  const textos = useTextosFormulario('outros_assuntos')
   const [form, setForm] = useState({ nome: '', email: '', assunto: '', mensagem: '' })
   const [enviado, setEnviado] = useState(false)
   const [enviando, setEnviando] = useState(false)
   const footerRef = useRef(null)
   const goTo = useGoTo()
 
-  const pronto = logo !== null
+  const pronto = logo !== null && textos !== null
 
   useEffect(() => {
     api('logo-site?populate=logo').then(setLogo)
@@ -31,10 +35,10 @@ export default function OutrosAssuntosPage() {
     e.preventDefault()
     setEnviando(true)
     try {
-      await axios.post(`${STRAPI}/api/contato`, { tipo: 'outros-assuntos', ...form })
+      await axios.post(`${STRAPI}/api/contato`, { tipo: 'outros-assuntos', ...form, website: valorHoneypot(e) })
       setEnviado(true)
-    } catch {
-      alert('Erro ao enviar. Tente novamente.')
+    } catch (err) {
+      alert(mensagemErroEnvio(err))
     } finally {
       setEnviando(false)
     }
@@ -59,15 +63,16 @@ export default function OutrosAssuntosPage() {
       {/* Main */}
       <main className="outros-main">
 
-        <h1 className="outros-title">Outros assuntos</h1>
+        <h1 className="outros-title">{textos.titulo}</h1>
 
         <div className="outros-content">
           {enviado ? (
             <div className="outros-sucesso">
-              <p>Mensagem enviada! Em breve entraremos em contato.</p>
+              <p style={{ whiteSpace: 'pre-line' }}>{textos.mensagem_sucesso}</p>
             </div>
           ) : (
             <form className="outros-form" onSubmit={handleSubmit}>
+              <Honeypot />
 
               <div className="outros-field">
                 <label className="outros-field__label">Nome</label>

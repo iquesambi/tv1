@@ -1,0 +1,18 @@
+{
+  "collectionName": "components_formularios_seja_cliente",
+  "info": {
+    "displayName": "Seja Cliente",
+    "icon": "handshake"
+  },
+  "options": {},
+  "attributes": {
+    "titulo": {
+      "type": "string",
+      "default": "Seja cliente"
+    },
+    "mensagem_sucesso": {
+      "type": "text",
+      "default": "Mensagem enviada! Em breve entraremos em contato."
+    }
+  }
+}

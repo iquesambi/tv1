@@ -1,0 +1,18 @@
+{
+  "collectionName": "components_formularios_trabalhe_conosco",
+  "info": {
+    "displayName": "Trabalhe Conosco",
+    "icon": "briefcase"
+  },
+  "options": {},
+  "attributes": {
+    "titulo": {
+      "type": "string",
+      "default": "Quero ser um TVÚnico!"
+    },
+    "mensagem_sucesso": {
+      "type": "text",
+      "default": "Candidatura enviada! Em breve entraremos em contato."
+    }
+  }
+}

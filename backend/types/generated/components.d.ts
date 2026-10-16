@@ -176,6 +176,48 @@ export interface BlocksVideo extends Struct.ComponentSchema {
   };
 }
 
+export interface FormulariosOutrosAssuntos extends Struct.ComponentSchema {
+  collectionName: 'components_formularios_outros_assuntos';
+  info: {
+    displayName: 'Outros Assuntos';
+    icon: 'message';
+  };
+  attributes: {
+    mensagem_sucesso: Schema.Attribute.Text &
+      Schema.Attribute.DefaultTo<'Mensagem enviada! Em breve entraremos em contato.'>;
+    titulo: Schema.Attribute.String &
+      Schema.Attribute.DefaultTo<'Outros assuntos'>;
+  };
+}
+
+export interface FormulariosSejaCliente extends Struct.ComponentSchema {
+  collectionName: 'components_formularios_seja_cliente';
+  info: {
+    displayName: 'Seja Cliente';
+    icon: 'handshake';
+  };
+  attributes: {
+    mensagem_sucesso: Schema.Attribute.Text &
+      Schema.Attribute.DefaultTo<'Mensagem enviada! Em breve entraremos em contato.'>;
+    titulo: Schema.Attribute.String &
+      Schema.Attribute.DefaultTo<'Seja cliente'>;
+  };
+}
+
+export interface FormulariosTrabalheConosco extends Struct.ComponentSchema {
+  collectionName: 'components_formularios_trabalhe_conosco';
+  info: {
+    displayName: 'Trabalhe Conosco';
+    icon: 'briefcase';
+  };
+  attributes: {
+    mensagem_sucesso: Schema.Attribute.Text &
+      Schema.Attribute.DefaultTo<'Candidatura enviada! Em breve entraremos em contato.'>;
+    titulo: Schema.Attribute.String &
+      Schema.Attribute.DefaultTo<'Quero ser um TV\u00DAnico!'>;
+  };
+}
+
 export interface NavigationLink extends Struct.ComponentSchema {
   collectionName: 'components_navigation_links';
   info: {
@@ -297,6 +339,9 @@ declare module '@strapi/strapi' {
       'blocks.subtitulo': BlocksSubtitulo;
       'blocks.texto': BlocksTexto;
       'blocks.video': BlocksVideo;
+      'formularios.outros-assuntos': FormulariosOutrosAssuntos;
+      'formularios.seja-cliente': FormulariosSejaCliente;
+      'formularios.trabalhe-conosco': FormulariosTrabalheConosco;
       'navigation.link': NavigationLink;
       'navigation.sublink': NavigationSublink;
       'quem-somos.abertura': QuemSomosAbertura;
